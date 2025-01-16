@@ -1,5 +1,4 @@
 import { Dayjs } from "dayjs";
-import { ICountry } from "../common";
 
 export interface IStaff {
   id: string;
@@ -9,11 +8,15 @@ export interface IStaff {
   gender: "MALE" | "FEMALE" | "OTHER";
   password?: string;
   // country: ICountry;
-  active: boolean;
+  isActivated: boolean;
   dob: string | Dayjs;
   role: IRole;
   createdAt: string;
   updatedAt?: string;
+}
+
+export interface StaffFilterCriteria {
+  isActivated?: string;
 }
 
 export interface IPermission {

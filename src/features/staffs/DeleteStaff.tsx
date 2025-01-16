@@ -10,24 +10,21 @@ interface DeleteStaffProps {
 
 const DeleteStaff: React.FC<DeleteStaffProps> = ({ userId }) => {
   const queryClient = useQueryClient();
+
   const { mutate: deleteUser, isPending: isDeleting } = useMutation({
     mutationFn: staffService.delete,
-    onSuccess: () => {
+
+    onSuccess: (data) => {
       queryClient.invalidateQueries({
-        predicate: (query) => query.queryKey.includes("users"),
+        predicate: (query) => query.queryKey.includes("staffs"),
       });
+
+      toast.success(data.message || "Operation successful");
     },
   });
 
   function handleConfirmDelete(): void {
-    deleteUser(userId, {
-      onSuccess: () => {
-        toast.success("Xóa nhân viên thành công");
-      },
-      onError: () => {
-        toast.error("Xóa nhân viên thất bại");
-      },
-    });
+    deleteUser(userId);
   }
 
   return (

@@ -5,6 +5,7 @@ import {
   Page,
   PaginationParams,
   SortParams,
+  StaffFilterCriteria,
 } from "../../interfaces";
 import { createApiClient } from "../api-client";
 
@@ -13,6 +14,7 @@ interface IStaffService {
   getStaffs(
     pagination: PaginationParams,
     query: string,
+    filter?: StaffFilterCriteria,
     sort?: SortParams,
   ): Promise<ApiResponse<Page<IStaff>>>;
   create(newStaff: Omit<IStaff, "staffId">): Promise<ApiResponse<IStaff>>;
@@ -29,12 +31,14 @@ class StaffService implements IStaffService {
   async getStaffs(
     pagination: PaginationParams,
     query: string,
+    filter?: StaffFilterCriteria,
     sort?: SortParams,
   ): Promise<ApiResponse<Page<IStaff>>> {
     return (
       await apiClient.get("", {
         params: {
           ...pagination,
+          ...filter,
           query,
           sortBy: sort?.sortBy !== "" ? sort?.sortBy : undefined,
           direction: sort?.direction !== "" ? sort?.direction : undefined,

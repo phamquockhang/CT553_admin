@@ -26,15 +26,15 @@ export function colorMethod(method: "GET" | "POST" | "PUT" | "DELETE") {
 }
 
 export function colorFilterIcon(filtered: boolean) {
-  return filtered ? "#3b82f6" : "#fff";
+  return filtered ? "#60C158" : "#fff";
 }
 
 export function colorSortUpIcon(sortOrder: SortOrder | undefined) {
-  return sortOrder === "ascend" ? "#3b82f6" : "#fff";
+  return sortOrder === "ascend" ? "#60C158" : "#fff";
 }
 
 export function colorSortDownIcon(sortOrder: SortOrder | undefined) {
-  return sortOrder === "descend" ? "#3b82f6" : "#fff";
+  return sortOrder === "descend" ? "#60C158" : "#fff";
 }
 
 export function colorFlightStatus(status: string) {

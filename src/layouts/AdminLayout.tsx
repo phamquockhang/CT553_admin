@@ -201,7 +201,7 @@ const AdminLayout: React.FC = () => {
         theme="light"
       >
         <div className="demo-logo-vertical flex flex-col items-center pb-6">
-          <img src="https://placehold.co/512" alt="Logo" className="w-36 p-3" />
+          <img src="logo_512.png" alt="Logo" className="w-36 p-3" />
           {!collapsed && <h1 className="font-bold">{user?.firstName}</h1>}
         </div>
         <Menu

@@ -30,8 +30,8 @@ export interface Page<T> {
 }
 
 export interface SortParams {
-  sortBy: string;
-  direction: string;
+  sortBy?: string;
+  direction?: string;
 }
 
 // export interface ElasticSortParams {

@@ -1,22 +1,32 @@
-import { useQuery } from "@tanstack/react-query";
+import {
+  CaretDownFilled,
+  CaretUpFilled,
+  FilterFilled,
+} from "@ant-design/icons";
 import { Space, Table, TablePaginationConfig, TableProps, Tag } from "antd";
+import { SorterResult } from "antd/es/table/interface";
+import { GetProp } from "antd/lib";
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-// import { PERMISSIONS } from "../../../interfaces/common/constants";
-// import { Module } from "../../../interfaces/common/enums";
-// import { IUser } from "../../../interfaces";
-// import { userService } from "../../../services";
-// import { formatTimestamp } from "../../../utils";
-// import Access from "../Access";
+import { IStaff, Module, Page, PERMISSIONS } from "../../interfaces";
+import {
+  colorFilterIcon,
+  colorSortDownIcon,
+  colorSortUpIcon,
+  formatTimestamp,
+  getDefaultFilterValue,
+  getDefaultSortOrder,
+  getSortDirection,
+} from "../../utils";
+import Access from "../auth/Access";
+import DeleteStaff from "./DeleteStaff";
 import UpdateStaff from "./UpdateStaff";
 import ViewStaff from "./ViewStaff";
-import { staffService } from "../../services";
-import { IStaff, Module, Page, PERMISSIONS } from "../../interfaces";
-import { formatTimestamp } from "../../utils";
-import Access from "../auth/Access";
 
 interface TableParams {
   pagination: TablePaginationConfig;
+  filters?: Parameters<GetProp<TableProps, "onChange">>[1];
+  sorter?: SorterResult<IStaff> | SorterResult<IStaff>[];
 }
 
 interface StaffTableProps {
@@ -48,18 +58,6 @@ const StaffsTable: React.FC<StaffTableProps> = ({ staffPage, isLoading }) => {
     }
   }, [staffPage]);
 
-  // const pagination = {
-  //   page: Number(searchParams.get("page")) || 1,
-  //   pageSize: Number(searchParams.get("pageSize")) || 10,
-  // };
-
-  // const { data, isLoading } = useQuery({
-  //   queryKey: ["staffs", pagination],
-  //   queryFn: () => staffService.getStaffs(pagination),
-  // });
-
-  // console.log(data);
-
   const handleTableChange: TableProps<IStaff>["onChange"] = (
     pagination,
     filters,
@@ -68,15 +66,59 @@ const StaffsTable: React.FC<StaffTableProps> = ({ staffPage, isLoading }) => {
     setTableParams((prev) => ({
       ...prev,
       pagination,
-      sorter,
       filters,
+      sorter,
     }));
     searchParams.set("page", String(pagination.current));
     searchParams.set("pageSize", String(pagination.pageSize));
+
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          searchParams.set(key, value.join(","));
+        } else {
+          if (value) {
+            searchParams.set(key, `${value}`);
+          } else {
+            searchParams.delete(key);
+          }
+        }
+      });
+    }
+
+    let sortBy;
+    let direction;
+    if (sorter) {
+      if (Array.isArray(sorter)) {
+        sortBy = sorter[0].field as string;
+        direction = getSortDirection(sorter[0].order as string);
+      } else {
+        sortBy = sorter.field as string;
+        direction = getSortDirection(sorter.order as string);
+      }
+    }
+    if (sortBy && direction) {
+      searchParams.set("sortBy", sortBy);
+      searchParams.set("direction", direction);
+    } else {
+      searchParams.delete("direction");
+      searchParams.delete("sortBy");
+    }
+
     setSearchParams(searchParams);
   };
 
   const columns: TableProps<IStaff>["columns"] = [
+    {
+      title: "STT",
+      width: "2%",
+      align: "center",
+      render: (_, __, index) =>
+        ((tableParams.pagination.current || 1) - 1) *
+          (tableParams.pagination.pageSize || 10) +
+        index +
+        1,
+    },
     {
       title: "Họ",
       key: "lastName",
@@ -84,10 +126,10 @@ const StaffsTable: React.FC<StaffTableProps> = ({ staffPage, isLoading }) => {
       width: "10%",
     },
     {
-      title: "Tên đệm và tên",
+      title: "Tên",
       key: "firstName",
       dataIndex: "firstName",
-      width: "15%",
+      width: "10%",
     },
     {
       key: "email",
@@ -96,42 +138,64 @@ const StaffsTable: React.FC<StaffTableProps> = ({ staffPage, isLoading }) => {
       width: "15%",
     },
     {
-      key: "role",
-      title: "Vai trò",
-      dataIndex: "role",
-      width: "10%",
-      render: (role) => role.description,
-    },
-    {
-      key: "active",
+      key: "isActivated",
       title: "Trạng thái",
       dataIndex: "isActivated",
       width: "8%",
-      render: (active: boolean) => (
-        <Tag color={active ? "green" : "red"}>
-          {active ? "ACTIVE" : "INACTIVE"}
+      align: "center",
+      render: (isActivated: boolean) => (
+        <Tag color={isActivated ? "green" : "red"}>
+          {isActivated ? "ACTIVE" : "INACTIVE"}
         </Tag>
+      ),
+      filters: [
+        { text: "ACTIVE", value: true },
+        { text: "INACTIVE", value: false },
+      ],
+      defaultFilteredValue: getDefaultFilterValue(searchParams, "isActivated"),
+      filterIcon: (filtered) => (
+        <FilterFilled style={{ color: colorFilterIcon(filtered) }} />
       ),
     },
     {
       key: "createdAt",
       title: "Ngày tạo",
       dataIndex: "createdAt",
-      width: "15%",
+      width: "12%",
+      align: "center",
       render: (createdAt: string) =>
         createdAt ? formatTimestamp(createdAt) : "",
+      sorter: true,
+      defaultSortOrder: getDefaultSortOrder(searchParams, "createdAt"),
+      sortIcon: ({ sortOrder }) => (
+        <div className="flex flex-col text-[10px]">
+          <CaretUpFilled style={{ color: colorSortUpIcon(sortOrder) }} />
+          <CaretDownFilled style={{ color: colorSortDownIcon(sortOrder) }} />
+        </div>
+      ),
     },
     {
       key: "updatedAt",
       title: "Ngày cập nhật",
       dataIndex: "updatedAt",
-      width: "15%",
+      width: "12%",
+      align: "center",
       render: (updatedAt: string) =>
         updatedAt ? formatTimestamp(updatedAt) : "",
+      sorter: true,
+      defaultSortOrder: getDefaultSortOrder(searchParams, "updatedAt"),
+      sortIcon: ({ sortOrder }) => (
+        <div className="flex flex-col text-[10px]">
+          <CaretUpFilled style={{ color: colorSortUpIcon(sortOrder) }} />
+          <CaretDownFilled style={{ color: colorSortDownIcon(sortOrder) }} />
+        </div>
+      ),
     },
     {
       title: "Hành động",
       key: "action",
+      width: "10%",
+      align: "center",
 
       render: (record: IStaff) => (
         <Space>
@@ -139,9 +203,9 @@ const StaffsTable: React.FC<StaffTableProps> = ({ staffPage, isLoading }) => {
           <Access permission={PERMISSIONS[Module.STAFF].UPDATE} hideChildren>
             <UpdateStaff user={record} />
           </Access>
-          {/* <Access permission={ALL_PERMISSIONS.USERS.DELETE} hideChildren>
-            <DeleteUser userId={record.userId} />
-          </Access> */}
+          <Access permission={PERMISSIONS[Module.STAFF].DELETE} hideChildren>
+            <DeleteStaff userId={record.id} />
+          </Access>
         </Space>
       ),
     },

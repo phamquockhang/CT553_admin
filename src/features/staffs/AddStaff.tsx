@@ -17,7 +17,7 @@ const AddStaff: React.FC = () => {
   return (
     <>
       <Button type="primary" icon={<PlusOutlined />} onClick={handleOpenModal}>
-        Thêm mới
+        Thêm
       </Button>
       <Modal
         open={isOpenModal}

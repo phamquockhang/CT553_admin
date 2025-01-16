@@ -54,4 +54,4 @@ export const PERMISSIONS = {
 
 export const VIETNAM_TIMEZONE = "Asia/Ho_Chi_Minh";
 
-export const PRIMARY_COLOR = "#3AAD";
+export const PRIMARY_COLOR = "#003F8F";

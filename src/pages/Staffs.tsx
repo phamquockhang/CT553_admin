@@ -1,30 +1,39 @@
+import { useQuery } from "@tanstack/react-query";
 import { Input } from "antd";
-import { Module, PERMISSIONS, SortParams } from "../interfaces";
+import { SearchProps } from "antd/es/input";
+import { useSearchParams } from "react-router-dom";
 import Access from "../features/auth/Access";
 import AddStaff from "../features/staffs/AddStaff";
 import StaffsTable from "../features/staffs/StaffsTable";
-import { useSearchParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import {
+  Module,
+  PERMISSIONS,
+  SortParams,
+  StaffFilterCriteria,
+} from "../interfaces";
 import { staffService } from "../services";
-import { SearchProps } from "antd/es/input";
 import { useDynamicTitle } from "../utils";
 
 const Staffs: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const query = searchParams.get("query") || "";
 
   const pagination = {
     page: Number(searchParams.get("page")) || 1,
     pageSize: Number(searchParams.get("pageSize")) || 10,
   };
 
+  const query = searchParams.get("query") || undefined;
+
   const sort: SortParams = {
-    sortBy: searchParams.get("sortBy") || "",
-    direction: searchParams.get("direction") || "",
+    sortBy: searchParams.get("sortBy") || undefined,
+    direction: searchParams.get("direction") || undefined,
+  };
+  const filter: StaffFilterCriteria = {
+    isActivated: searchParams.get("isActivated") || undefined,
   };
 
   const { data, isLoading } = useQuery({
-    queryKey: ["staffs", pagination, query, sort].filter((key) => {
+    queryKey: ["staffs", pagination, query, sort, filter].filter((key) => {
       if (typeof key === "string") {
         return key !== "";
       } else if (key instanceof Object) {
@@ -33,7 +42,7 @@ const Staffs: React.FC = () => {
         );
       }
     }),
-    queryFn: () => staffService.getStaffs(pagination, query, sort),
+    queryFn: () => staffService.getStaffs(pagination, query, filter, sort),
   });
 
   const handleSearch: SearchProps["onSearch"] = (value) => {
@@ -51,7 +60,7 @@ const Staffs: React.FC = () => {
     <Access permission={PERMISSIONS[Module.STAFF].GET_PAGINATION}>
       <div className="card">
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Nhân viên</h2>
+          <h2 className="text-xl font-semibold">Quản lý nhân viên</h2>
 
           <div className="w-[60%]">
             <div className="flex gap-3">

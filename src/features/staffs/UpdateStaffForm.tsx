@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Button,
   DatePicker,
@@ -6,7 +6,6 @@ import {
   Form,
   Input,
   Radio,
-  Select,
   Space,
   Switch,
 } from "antd";
@@ -15,9 +14,6 @@ import { useEffect } from "react";
 import toast from "react-hot-toast";
 import { IStaff } from "../../interfaces";
 import { staffService } from "../../services";
-// import Loading from "../../../common/components/Loading";
-// import { IUser } from "../../../interfaces";
-// import { countryService, roleService, userService } from "../../../services";
 
 interface UpdateStaffFormProps {
   userToUpdate?: IStaff;
@@ -52,24 +48,27 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
     }
   }, [userToUpdate, form]);
 
-  // const { data: countriesData, isLoading: isCountriesLoading } = useQuery({
-  //   queryKey: ["countries"],
-  //   queryFn: countryService.getAll,
-  // });
-
-  // const { data: rolesData, isLoading: isRolesLoading } = useQuery({
-  //   queryKey: ["roles"],
-  //   queryFn: roleService.getAllRoles,
-  // });
-
   const { mutate: createUser, isPending: isCreating } = useMutation({
     mutationFn: staffService.create,
-    onSuccess: () => {
+
+    onSuccess: (data) => {
       queryClient.invalidateQueries({
         predicate: (query) => {
-          return query.queryKey.includes("users");
+          return query.queryKey.includes("staffs");
         },
       });
+      toast.success(data.message || "Operation successful");
+
+      onCancel();
+      form.resetFields();
+    },
+
+    onError: (error: { response?: { data?: { message?: string } } }) => {
+      if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("An error occurred");
+      }
     },
   });
 
@@ -77,23 +76,27 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
     mutationFn: ({ userId, updatedUser }: UpdateUserArgs) => {
       return staffService.update(userId, updatedUser);
     },
-    onSuccess: () => {
+
+    onSuccess: (data) => {
       queryClient.invalidateQueries({
         predicate: (query) => {
-          return query.queryKey.includes("users");
+          return query.queryKey.includes("staffs");
         },
       });
+      toast.success(data.message || "Operation successful");
+
+      onCancel();
+      form.resetFields();
+    },
+
+    onError: (error: { response?: { data?: { message?: string } } }) => {
+      if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("An error occurred");
+      }
     },
   });
-
-  // const countryOptions = countriesData?.payload?.map((country) => ({
-  //   value: country.countryId,
-  //   label: country.countryName,
-  // }));
-  // const roleOptions = rolesData?.payload?.map((role) => ({
-  //   value: role.roleId,
-  //   label: role.roleName,
-  // }));
 
   const disabledDate: DatePickerProps["disabledDate"] = (current) => {
     return current && dayjs(current).isAfter(dayjs().endOf("day"));
@@ -107,39 +110,18 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
         firstName: values.firstName.toUpperCase(),
         lastName: values.lastName.toUpperCase(),
       };
-      updateUser(
-        { userId: userToUpdate.userId, updatedUser },
-        {
-          onSuccess: () => {
-            toast.success("Cập nhật nhân viên thành công");
-            onCancel();
-            form.resetFields();
-          },
-          onError: () => {
-            toast.error("Cập nhật nhân viên thất bại");
-          },
-        },
-      );
+      updateUser({ userId: userToUpdate.id, updatedUser });
     } else {
       const newUser = {
         ...values,
         firstName: values.firstName.toUpperCase(),
         lastName: values.lastName.toUpperCase(),
       };
-      createUser(newUser, {
-        onSuccess: () => {
-          toast.success("Thêm mới nhân viên thành công");
-          onCancel();
-          form.resetFields();
-        },
-        onError: () => {
-          toast.error("Thêm mới nhân viên thất bại");
-        },
-      });
+      createUser(newUser);
     }
   }
 
-  // if (isCountriesLoading || isRolesLoading) {
+  // if (isRolesLoading) {
   //   return <Loading />;
   // }
 
@@ -161,14 +143,16 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
               message: "Vui lòng nhập họ",
             },
             {
-              pattern: /^[a-zA-Z\s]+$/,
+              // vietnamese name has anccent characters
+              pattern:
+                /^[a-zA-ZăâđêôơưàảãáạăằẳẵắặâầẩẫấậèẻẽéẹêềểễếệìỉĩíịòỏõóọôồổỗốộơờởỡớợùủũúụưừửữứựỳỷỹýỵĂÂĐÊÔƠƯÀẢÃÁẠĂẰẲẴẮẶÂẦẨẪẤẬÈẺẼÉẸÊỀỂỄẾỆÌỈĨÍỊÒỎÕÓỌÔỒỔỖỐỘƠỜỞỠỚOỢÙỦŨÚỤƯỪỬỮỨỰỲỶỸÝỴ\s]+$/,
               message: "Họ không chứa ký tự đặc biệt",
             },
           ]}
         >
           <Input
             readOnly={viewOnly}
-            placeholder="Họ, ví dụ PHAM"
+            placeholder="Họ, ví dụ PHẠM"
             style={{ textTransform: "uppercase" }}
           />
         </Form.Item>
@@ -183,7 +167,8 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
               message: "Vui lòng nhập tên đệm & tên",
             },
             {
-              pattern: /^[a-zA-Z\s]+$/,
+              pattern:
+                /^[a-zA-ZăâđêôơưàảãáạăằẳẵắặâầẩẫấậèẻẽéẹêềểễếệìỉĩíịòỏõóọôồổỗốộơờởỡớợùủũúụưừửữứựỳỷỹýỵĂÂĐÊÔƠƯÀẢÃÁẠĂẰẲẴẮẶÂẦẨẪẤẬÈẺẼÉẸÊỀỂỄẾỆÌỈĨÍỊÒỎÕÓỌÔỒỔỖỐỘƠỜỞỠỚOỢÙỦŨÚỤƯỪỬỮỨỰỲỶỸÝỴ\s]+$/,
               message: "Tên đệm & tên không chứa ký tự đặc biệt",
             },
           ]}
@@ -195,11 +180,12 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
           />
         </Form.Item>
       </div>
+
       <div className="flex gap-8">
         <Form.Item
           className="flex-1"
           label="Ngày sinh"
-          name="dateOfBirth"
+          name="dob"
           rules={[
             {
               required: true,
@@ -238,102 +224,24 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
           />
         </Form.Item>
       </div>
-      <div className="flex gap-8">
-        <Form.Item
-          className="flex-1"
-          label="Số điện thoại"
-          name="phoneNumber"
-          rules={[
-            {
-              required: true,
-              message: "Vui lòng nhập số điện thoại",
-            },
-            {
-              pattern: /(84|0[3|5|7|8|9])+([0-9]{8})\b/,
-              message: "Số điện thoại không hợp lệ",
-            },
-          ]}
-        >
-          <Input readOnly={viewOnly} placeholder="Số điện thoại" />
-        </Form.Item>
 
-        {/* <Form.Item
-          className="flex-1"
-          label="Quốc gia"
-          name={["country", "countryId"]}
-          rules={[
-            {
-              required: true,
-              message: "Vui lòng chọn quốc gia",
-            },
-          ]}
-        >
-          <Select
-            showSearch
-            placeholder="Vui lòng chọn quốc tịch"
-            options={countryOptions}
-            optionFilterProp="label"
-            filterOption={(input, option) =>
-              option?.label.toLowerCase().includes(input.toLowerCase()) ?? false
-            }
-            filterSort={(optionA, optionB) =>
-              (optionA?.label ?? "")
-                .toLowerCase()
-                .localeCompare((optionB?.label ?? "").toLowerCase())
-            }
-          />
-        </Form.Item> */}
-      </div>
       <div className="flex gap-8">
-        {/* <Form.Item
-          className="flex-1"
-          label="Vai trò"
-          name={["role", "roleId"]}
-          rules={[
-            {
-              required: true,
-              message: "Vui lòng chọn vai trò",
-            },
-          ]}
-        >
-          <Select
-            disabled={viewOnly}
-            placeholder="Chọn vai trò"
-            options={roleOptions}
-          />
-        </Form.Item> */}
         <Form.Item
           className="flex-1"
           label="Trạng thái"
-          name="active"
+          name="isActivated"
           valuePropName="checked"
         >
           <Switch
+            defaultValue={true}
             disabled={viewOnly}
             checkedChildren="ACTIVE"
             unCheckedChildren="INACTIVE"
           />
         </Form.Item>
       </div>
-      <div className="flex gap-8">
-        <Form.Item
-          className="flex-1"
-          label="Hộ chiếu/CCCD"
-          name="identityNumber"
-          rules={[
-            {
-              required: true,
-              message: "Vui lòng nhập số hộ chiếu/CCCD",
-            },
-            {
-              pattern: /^[0-9]{9,12}$/,
-              message: "Số hộ chiếu/CCCD không hợp lệ",
-            },
-          ]}
-        >
-          <Input readOnly={viewOnly} placeholder="Hộ chiếu/CCCD" />
-        </Form.Item>
 
+      <div className="flex gap-8">
         <Form.Item
           className="flex-1"
           label="Email"
@@ -344,16 +252,18 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
               message: "Vui lòng nhập email",
             },
             {
-              pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+              type: "email",
               message: "Email không hợp lệ",
             },
           ]}
         >
-          <Input readOnly={viewOnly} placeholder="Email" />
+          <Input
+            readOnly={userToUpdate != undefined || viewOnly}
+            placeholder="Email"
+          />
         </Form.Item>
-      </div>
-      {!userToUpdate && (
-        <div className="flex gap-8">
+
+        {!userToUpdate && (
           <Form.Item
             className="flex-1"
             label="Mật khẩu"
@@ -371,8 +281,9 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
           >
             <Input.Password placeholder="Mật khẩu" />
           </Form.Item>
-        </div>
-      )}
+        )}
+      </div>
+
       {!viewOnly && (
         <Form.Item className="text-right" wrapperCol={{ span: 24 }}>
           <Space>
