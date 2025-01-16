@@ -1,7 +1,6 @@
 import { blue, green, grey, orange, red } from "@ant-design/colors";
 import { SortOrder } from "antd/es/table/interface";
 import dayjs from "dayjs";
-// import { FileType, TicketClassName } from "../interfaces";
 import { useEffect } from "react";
 
 export function useDynamicTitle(title: string) {
@@ -13,11 +12,11 @@ export function useDynamicTitle(title: string) {
 export function colorMethod(method: "GET" | "POST" | "PUT" | "DELETE") {
   switch (method) {
     case "POST":
-      return green[5];
+      return blue[6];
     case "PUT":
       return orange[5];
     case "GET":
-      return blue[5];
+      return green[6];
     case "DELETE":
       return red[5];
     default:
@@ -35,19 +34,6 @@ export function colorSortUpIcon(sortOrder: SortOrder | undefined) {
 
 export function colorSortDownIcon(sortOrder: SortOrder | undefined) {
   return sortOrder === "descend" ? "#60C158" : "#fff";
-}
-
-export function colorFlightStatus(status: string) {
-  switch (status) {
-    case "SCHEDULED":
-      return blue[5];
-    case "DELAYED":
-      return orange[5];
-    case "CANCELLED":
-      return red[5];
-    case "COMPLETED":
-      return green[5];
-  }
 }
 
 export function groupBy<T, K>(

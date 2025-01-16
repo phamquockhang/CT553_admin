@@ -12,11 +12,11 @@ import {
 import dayjs, { Dayjs } from "dayjs";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
-import { IStaff } from "../../interfaces";
-import { staffService } from "../../services";
+import { ICustomer } from "../../../interfaces";
+import { customerService } from "../../../services/auth/customer-service";
 
-interface UpdateStaffFormProps {
-  userToUpdate?: IStaff;
+interface UpdateCustomerFormProps {
+  userToUpdate?: ICustomer;
   onCancel: () => void;
   viewOnly?: boolean;
 }
@@ -29,15 +29,15 @@ const genderOptions = [
 
 interface UpdateUserArgs {
   userId: string;
-  updatedUser: IStaff;
+  updatedUser: ICustomer;
 }
 
-const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
+const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
   userToUpdate,
   onCancel,
   viewOnly = false,
 }) => {
-  const [form] = Form.useForm<IStaff>();
+  const [form] = Form.useForm<ICustomer>();
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -48,13 +48,13 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
     }
   }, [userToUpdate, form]);
 
-  const { mutate: createUser, isPending: isCreating } = useMutation({
-    mutationFn: staffService.create,
+  const { mutate: createCustomer, isPending: isCreating } = useMutation({
+    mutationFn: customerService.create,
 
     onSuccess: (data) => {
       queryClient.invalidateQueries({
         predicate: (query) => {
-          return query.queryKey.includes("staffs");
+          return query.queryKey.includes("customers");
         },
       });
       toast.success(data.message || "Operation successful");
@@ -72,15 +72,15 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
     },
   });
 
-  const { mutate: updateUser, isPending: isUpdating } = useMutation({
+  const { mutate: updateCustomer, isPending: isUpdating } = useMutation({
     mutationFn: ({ userId, updatedUser }: UpdateUserArgs) => {
-      return staffService.update(userId, updatedUser);
+      return customerService.update(userId, updatedUser);
     },
 
     onSuccess: (data) => {
       queryClient.invalidateQueries({
         predicate: (query) => {
-          return query.queryKey.includes("staffs");
+          return query.queryKey.includes("customers");
         },
       });
       toast.success(data.message || "Operation successful");
@@ -102,7 +102,7 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
     return current && dayjs(current).isAfter(dayjs().endOf("day"));
   };
 
-  function handleFinish(values: IStaff) {
+  function handleFinish(values: ICustomer) {
     if (userToUpdate) {
       const updatedUser = {
         ...userToUpdate,
@@ -110,14 +110,14 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
         firstName: values.firstName.toUpperCase(),
         lastName: values.lastName.toUpperCase(),
       };
-      updateUser({ userId: userToUpdate.id, updatedUser });
+      updateCustomer({ userId: userToUpdate.id, updatedUser });
     } else {
       const newUser = {
         ...values,
         firstName: values.firstName.toUpperCase(),
         lastName: values.lastName.toUpperCase(),
       };
-      createUser(newUser);
+      createCustomer(newUser);
     }
   }
 
@@ -151,7 +151,7 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
           ]}
         >
           <Input
-            readOnly={viewOnly}
+            readOnly={userToUpdate != undefined || viewOnly}
             placeholder="Họ, ví dụ PHẠM"
             style={{ textTransform: "uppercase" }}
           />
@@ -174,7 +174,7 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
           ]}
         >
           <Input
-            readOnly={viewOnly}
+            readOnly={userToUpdate != undefined || viewOnly}
             placeholder="Tên đệm & tên, ví dụ VAN A"
             style={{ textTransform: "uppercase" }}
           />
@@ -198,7 +198,7 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
           normalize={(value: Dayjs) => value && value.tz().format("YYYY-MM-DD")}
         >
           <DatePicker
-            disabled={viewOnly}
+            disabled={userToUpdate != undefined || viewOnly}
             className="w-full"
             format="DD/MM/YYYY"
             disabledDate={disabledDate}
@@ -218,7 +218,7 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
           ]}
         >
           <Radio.Group
-            disabled={viewOnly}
+            disabled={userToUpdate != undefined || viewOnly}
             className="space-x-4"
             options={genderOptions}
           />

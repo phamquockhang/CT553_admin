@@ -12,6 +12,7 @@ import { createApiClient } from "../api-client";
 interface IPermissionService {
   getPermissions(
     pagination: PaginationParams,
+    query: string,
     filter?: PermissionFilterCriteria,
     sort?: SortParams,
   ): Promise<ApiResponse<Page<IPermission>>>;
@@ -27,6 +28,7 @@ const apiClient: AxiosInstance = createApiClient("permissions");
 class PermissionService implements IPermissionService {
   async getPermissions(
     pagination: PaginationParams,
+    query: string,
     filter?: PermissionFilterCriteria,
     sort?: SortParams,
   ): Promise<ApiResponse<Page<IPermission>>> {
@@ -35,6 +37,7 @@ class PermissionService implements IPermissionService {
         params: {
           ...pagination,
           ...filter,
+          query,
           sortBy: sort?.sortBy !== "" ? sort?.sortBy : undefined,
           direction: sort?.direction !== "" ? sort?.direction : undefined,
         },

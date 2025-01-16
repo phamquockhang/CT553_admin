@@ -91,7 +91,7 @@ const AdminLayout: React.FC = () => {
         ...(hasAuthChildren
           ? [
               {
-                label: "Xác thực",
+                label: "Quyền hạn",
                 key: "auth",
                 icon: <IoShieldCheckmark />,
                 children: [

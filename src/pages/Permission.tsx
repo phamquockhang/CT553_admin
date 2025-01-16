@@ -1,20 +1,20 @@
-import { useQuery } from "@tanstack/react-query";
-import { Input } from "antd";
-import { SearchProps } from "antd/es/input";
 import { useSearchParams } from "react-router-dom";
-import Access from "../features/auth/Access";
-import AddStaff from "../features/auth/staffs/AddStaff";
-import StaffsTable from "../features/auth/staffs/StaffsTable";
 import {
   Module,
+  PermissionFilterCriteria,
   PERMISSIONS,
   SortParams,
-  StaffFilterCriteria,
 } from "../interfaces";
-import { staffService } from "../services";
+import { useQuery } from "@tanstack/react-query";
+import { permissionService } from "../services";
+import { SearchProps } from "antd/es/input";
 import { useDynamicTitle } from "../utils";
+import Access from "../features/auth/Access";
+import { Input } from "antd/lib";
+import AddPermission from "../features/auth/permissions/AddPermission";
+import PermissionsTable from "../features/auth/permissions/PermissionsTable";
 
-const Staffs: React.FC = () => {
+const Permission: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const pagination = {
@@ -28,12 +28,13 @@ const Staffs: React.FC = () => {
     sortBy: searchParams.get("sortBy") || "",
     direction: searchParams.get("direction") || "",
   };
-  const filter: StaffFilterCriteria = {
-    isActivated: searchParams.get("isActivated") || undefined,
+  const filter: PermissionFilterCriteria = {
+    method: searchParams.get("method") || "",
+    module: searchParams.get("module") || "",
   };
 
   const { data, isLoading } = useQuery({
-    queryKey: ["staffs", pagination, query, sort, filter].filter((key) => {
+    queryKey: ["permissions", pagination, query, sort, filter].filter((key) => {
       if (typeof key === "string") {
         return key !== "";
       } else if (key instanceof Object) {
@@ -42,7 +43,8 @@ const Staffs: React.FC = () => {
         );
       }
     }),
-    queryFn: () => staffService.getStaffs(pagination, query, filter, sort),
+    queryFn: () =>
+      permissionService.getPermissions(pagination, query, filter, sort),
   });
 
   const handleSearch: SearchProps["onSearch"] = (value) => {
@@ -54,18 +56,18 @@ const Staffs: React.FC = () => {
     setSearchParams(searchParams);
   };
 
-  useDynamicTitle("Quản lý nhân viên");
+  useDynamicTitle("Quản lý quyền hạn");
 
   return (
     <Access permission={PERMISSIONS[Module.STAFF].GET_PAGINATION}>
       <div className="card">
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Quản lý nhân viên</h2>
+          <h2 className="text-xl font-semibold">Quản lý quyền hạn</h2>
 
           <div className="w-[60%]">
             <div className="flex gap-3">
               <Input.Search
-                placeholder="Nhập tên hoặc email của Nhân viên để tìm kiếm..."
+                placeholder="Nhập tên hoặc url của Quyền hạn để tìm kiếm..."
                 defaultValue={query}
                 enterButton
                 allowClear
@@ -74,13 +76,16 @@ const Staffs: React.FC = () => {
             </div>
           </div>
           <Access permission={PERMISSIONS[Module.STAFF].CREATE} hideChildren>
-            <AddStaff />
+            <AddPermission />
           </Access>
         </div>
-        <StaffsTable staffPage={data?.payload} isLoading={isLoading} />
+        <PermissionsTable
+          permissionPage={data?.payload}
+          isLoading={isLoading}
+        />
       </div>
     </Access>
   );
 };
 
-export default Staffs;
+export default Permission;

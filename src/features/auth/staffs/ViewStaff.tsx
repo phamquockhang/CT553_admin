@@ -2,7 +2,7 @@ import { EyeOutlined } from "@ant-design/icons";
 import { Modal, Tooltip } from "antd";
 import { useState } from "react";
 import UpdateUserForm from "./UpdateStaffForm";
-import { IStaff } from "../../interfaces";
+import { IStaff } from "../../../interfaces";
 
 interface ViewUserProps {
   user: IStaff;

@@ -5,6 +5,8 @@ import AdminLayout from "../layouts/AdminLayout";
 import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
 import Staffs from "../pages/Staffs";
+import Customer from "../pages/Customer";
+import Permission from "../pages/Permission";
 
 const router = createBrowserRouter([
   {
@@ -27,6 +29,18 @@ const router = createBrowserRouter([
       {
         path: "staffs",
         element: <Staffs />,
+      },
+      {
+        path: "customers",
+        element: <Customer />,
+      },
+      {
+        path: "roles",
+        element: <div>Roles</div>,
+      },
+      {
+        path: "permissions",
+        element: <Permission />,
       },
     ],
   },

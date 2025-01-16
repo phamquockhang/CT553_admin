@@ -8,7 +8,11 @@ import { SorterResult } from "antd/es/table/interface";
 import { GetProp } from "antd/lib";
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { IStaff, Module, Page, PERMISSIONS } from "../../interfaces";
+
+import DeleteCustomer from "./DeleteCustomer";
+import UpdateCustomer from "./UpdateCustomer";
+import ViewCustomer from "./ViewCustomer";
+import { ICustomer, Module, Page, PERMISSIONS } from "../../../interfaces";
 import {
   colorFilterIcon,
   colorSortDownIcon,
@@ -17,48 +21,48 @@ import {
   getDefaultFilterValue,
   getDefaultSortOrder,
   getSortDirection,
-} from "../../utils";
-import Access from "../auth/Access";
-import DeleteStaff from "./DeleteStaff";
-import UpdateStaff from "./UpdateStaff";
-import ViewStaff from "./ViewStaff";
+} from "../../../utils";
+import Access from "../Access";
 
 interface TableParams {
   pagination: TablePaginationConfig;
   filters?: Parameters<GetProp<TableProps, "onChange">>[1];
-  sorter?: SorterResult<IStaff> | SorterResult<IStaff>[];
+  sorter?: SorterResult<ICustomer> | SorterResult<ICustomer>[];
 }
 
-interface StaffTableProps {
-  staffPage?: Page<IStaff>;
+interface CustomerTableProps {
+  customerPage?: Page<ICustomer>;
   isLoading: boolean;
 }
 
-const StaffsTable: React.FC<StaffTableProps> = ({ staffPage, isLoading }) => {
+const CustomersTable: React.FC<CustomerTableProps> = ({
+  customerPage,
+  isLoading,
+}) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [tableParams, setTableParams] = useState<TableParams>(() => ({
     pagination: {
       current: Number(searchParams.get("page")) || 1,
       pageSize: Number(searchParams.get("pageSize")) || 10,
       showSizeChanger: true,
-      showTotal: (total) => `Tổng ${total} nhân viên`,
+      showTotal: (total) => `Tổng ${total} khách hàng`,
     },
   }));
 
   useEffect(() => {
-    if (staffPage) {
+    if (customerPage) {
       setTableParams((prev) => ({
         ...prev,
         pagination: {
           ...prev.pagination,
-          total: staffPage.meta?.total || 0,
-          showTotal: (total) => `Tổng ${total} nhân viên`,
+          total: customerPage.meta?.total || 0,
+          showTotal: (total) => `Tổng ${total} khách hàng`,
         },
       }));
     }
-  }, [staffPage]);
+  }, [customerPage]);
 
-  const handleTableChange: TableProps<IStaff>["onChange"] = (
+  const handleTableChange: TableProps<ICustomer>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -108,7 +112,7 @@ const StaffsTable: React.FC<StaffTableProps> = ({ staffPage, isLoading }) => {
     setSearchParams(searchParams);
   };
 
-  const columns: TableProps<IStaff>["columns"] = [
+  const columns: TableProps<ICustomer>["columns"] = [
     {
       title: "STT",
       width: "2%",
@@ -197,14 +201,14 @@ const StaffsTable: React.FC<StaffTableProps> = ({ staffPage, isLoading }) => {
       width: "10%",
       align: "center",
 
-      render: (record: IStaff) => (
+      render: (record: ICustomer) => (
         <Space>
-          <ViewStaff user={record} />
+          <ViewCustomer user={record} />
           <Access permission={PERMISSIONS[Module.STAFF].UPDATE} hideChildren>
-            <UpdateStaff user={record} />
+            <UpdateCustomer user={record} />
           </Access>
           <Access permission={PERMISSIONS[Module.STAFF].DELETE} hideChildren>
-            <DeleteStaff userId={record.id} />
+            <DeleteCustomer userId={record.id} />
           </Access>
         </Space>
       ),
@@ -215,9 +219,9 @@ const StaffsTable: React.FC<StaffTableProps> = ({ staffPage, isLoading }) => {
     <Table
       bordered={false}
       columns={columns}
-      rowKey={(record: IStaff) => record.id}
+      rowKey={(record: ICustomer) => record.id}
       pagination={tableParams.pagination}
-      dataSource={staffPage?.data}
+      dataSource={customerPage?.data}
       rowClassName={(_, index) =>
         index % 2 === 0 ? "table-row-light" : "table-row-gray"
       }
@@ -232,4 +236,4 @@ const StaffsTable: React.FC<StaffTableProps> = ({ staffPage, isLoading }) => {
   );
 };
 
-export default StaffsTable;
+export default CustomersTable;

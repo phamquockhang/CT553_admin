@@ -7,9 +7,8 @@ export enum Method {
 }
 
 export enum Module {
-  MANAGER = "MANAGER",
   STAFF = "STAFF",
   CUSTOMER = "CUSTOMER",
-  ROLES = "ROLES",
-  PERMISSIONS = "PERMISSIONS",
+  ROLES = "ROLE",
+  PERMISSIONS = "PERMISSION",
 }

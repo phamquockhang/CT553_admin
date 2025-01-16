@@ -34,8 +34,8 @@ const LoginForm: React.FC = () => {
       onSuccess: () => {
         toast.success("Đăng nhập thành công");
       },
-      onError: () => {
-        toast.error("Đăng nhập thất bại");
+      onError: (error: any) => {
+        toast.error(error.response?.data.message);
       },
     });
   }
@@ -88,14 +88,14 @@ const LoginForm: React.FC = () => {
           </button>
         </Form.Item>
 
-        <div className="flex flex-col gap-5 text-center text-xs">
+        {/* <div className="flex flex-col gap-5 text-center text-xs">
           <a
             href="#"
             className="text-sm font-semibold text-blue-700 hover:text-blue-900"
           >
             Quên mật khẩu?
           </a>
-        </div>
+        </div> */}
       </Form>
     </>
   );

@@ -2,7 +2,7 @@ import { DeleteOutlined } from "@ant-design/icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Popconfirm, Tooltip } from "antd";
 import toast from "react-hot-toast";
-import { staffService } from "../../services";
+import { staffService } from "../../../services";
 
 interface DeleteStaffProps {
   userId: string;
