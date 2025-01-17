@@ -1,3 +1,36 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  html {
+    height: 100%;
+    line-height: 1.2;
+  }
+
+  body {
+    min-width: 440px;
+  }
+
+  .card {
+    @apply rounded-lg bg-white px-6 py-4;
+  }
+
+  .table-icon {
+    @apply h-6 w-6 cursor-pointer;
+  }
+
+  .table-row-light,
+  .table-row-light .ant-table-cell.ant-table-column-sort {
+    @apply bg-white;
+  }
+
+  .table-row-gray,
+  .table-row-gray .ant-table-cell.ant-table-column-sort {
+    @apply bg-gray-200/60;
+  }
+
+  .ant-timeline-item.timeline-item-content {
+    @apply pb-[4rem];
+  }
+}

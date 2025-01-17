@@ -4,9 +4,11 @@ import ErrorPage from "../pages/ErrorPage";
 import AdminLayout from "../layouts/AdminLayout";
 import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
-import Staffs from "../pages/Staffs";
+import Staff from "../pages/Staff";
 import Customer from "../pages/Customer";
 import Permission from "../pages/Permission";
+import Role from "../pages/Role";
+import Profile from "../pages/Profile";
 
 const router = createBrowserRouter([
   {
@@ -27,8 +29,12 @@ const router = createBrowserRouter([
         element: <Dashboard />,
       },
       {
+        path: "profile",
+        element: <Profile />,
+      },
+      {
         path: "staffs",
-        element: <Staffs />,
+        element: <Staff />,
       },
       {
         path: "customers",
@@ -36,7 +42,7 @@ const router = createBrowserRouter([
       },
       {
         path: "roles",
-        element: <div>Roles</div>,
+        element: <Role />,
       },
       {
         path: "permissions",

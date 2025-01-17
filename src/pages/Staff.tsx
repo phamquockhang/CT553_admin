@@ -14,7 +14,7 @@ import {
 import { staffService } from "../services";
 import { useDynamicTitle } from "../utils";
 
-const Staffs: React.FC = () => {
+const Staff: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const pagination = {
@@ -83,4 +83,4 @@ const Staffs: React.FC = () => {
   );
 };
 
-export default Staffs;
+export default Staff;

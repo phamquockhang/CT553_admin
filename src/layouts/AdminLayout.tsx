@@ -46,6 +46,14 @@ const AdminLayout: React.FC = () => {
         </span>
       ),
     },
+    {
+      key: "profile",
+      label: (
+        <NavLink to="/profile" className="px-1">
+          Thông tin cá nhân
+        </NavLink>
+      ),
+    },
   ];
 
   useEffect(() => {

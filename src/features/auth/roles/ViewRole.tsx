@@ -1,14 +1,14 @@
 import { EyeOutlined } from "@ant-design/icons";
 import { Modal, Tooltip } from "antd";
 import { useState } from "react";
-import UpdateUserForm from "./UpdatePermissionForm";
-import { IStaff } from "../../../interfaces";
+import { type IRole } from "../../../interfaces";
+import UpdateRoleForm from "./UpdateRoleForm";
 
-interface ViewUserProps {
-  user: IStaff;
+interface ViewRoleProps {
+  role: IRole;
 }
 
-const ViewStaff: React.FC<ViewUserProps> = ({ user }) => {
+const ViewRole: React.FC<ViewRoleProps> = ({ role }) => {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 
   const handleOpenModal = () => {
@@ -18,7 +18,6 @@ const ViewStaff: React.FC<ViewUserProps> = ({ user }) => {
   const handleCloseModal = () => {
     setIsOpenModal(false);
   };
-
   return (
     <>
       <Tooltip title="Xem chi tiết">
@@ -30,13 +29,13 @@ const ViewStaff: React.FC<ViewUserProps> = ({ user }) => {
       <Modal
         open={isOpenModal}
         width="50%"
-        title={<span className="text-lg">Xem thông tin người dùng</span>}
+        title={<span className="text-lg">Xem thông tin vai trò</span>}
         destroyOnClose
         onCancel={handleCloseModal}
         footer={null}
       >
-        <UpdateUserForm
-          userToUpdate={user}
+        <UpdateRoleForm
+          roleToUpdate={role}
           onCancel={handleCloseModal}
           viewOnly
         />
@@ -45,4 +44,4 @@ const ViewStaff: React.FC<ViewUserProps> = ({ user }) => {
   );
 };
 
-export default ViewStaff;
+export default ViewRole;

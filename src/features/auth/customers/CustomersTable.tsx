@@ -204,10 +204,10 @@ const CustomersTable: React.FC<CustomerTableProps> = ({
       render: (record: ICustomer) => (
         <Space>
           <ViewCustomer user={record} />
-          <Access permission={PERMISSIONS[Module.STAFF].UPDATE} hideChildren>
+          <Access permission={PERMISSIONS[Module.CUSTOMER].UPDATE} hideChildren>
             <UpdateCustomer user={record} />
           </Access>
-          <Access permission={PERMISSIONS[Module.STAFF].DELETE} hideChildren>
+          <Access permission={PERMISSIONS[Module.CUSTOMER].DELETE} hideChildren>
             <DeleteCustomer userId={record.id} />
           </Access>
         </Space>

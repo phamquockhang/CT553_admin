@@ -1,9 +1,9 @@
 import { PlusOutlined } from "@ant-design/icons";
 import { Button, Modal } from "antd";
 import { useState } from "react";
-import UpdatePermissionForm from "./UpdatePermissionForm";
+import UpdateRoleForm from "./UpdateRoleForm";
 
-const AddPermission: React.FC = () => {
+const AddRole: React.FC = () => {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 
   const handleOpenModal = () => {
@@ -13,7 +13,6 @@ const AddPermission: React.FC = () => {
   const handleCloseModal = () => {
     setIsOpenModal(false);
   };
-
   return (
     <>
       <Button type="primary" icon={<PlusOutlined />} onClick={handleOpenModal}>
@@ -22,15 +21,15 @@ const AddPermission: React.FC = () => {
       <Modal
         open={isOpenModal}
         width="50%"
-        title={<span className="text-lg">Thêm quyền hạn</span>}
+        title={<span className="text-lg">Thêm vai trò</span>}
         destroyOnClose
         onCancel={handleCloseModal}
         footer={null}
       >
-        <UpdatePermissionForm onCancel={handleCloseModal} />
+        <UpdateRoleForm onCancel={handleCloseModal} />
       </Modal>
     </>
   );
 };
 
-export default AddPermission;
+export default AddRole;

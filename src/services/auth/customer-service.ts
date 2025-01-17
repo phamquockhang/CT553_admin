@@ -10,7 +10,7 @@ import {
 import { createApiClient } from "../api-client";
 
 interface ICustomerService {
-  getLoggedInCustomer(): Promise<ApiResponse<ICustomer>>;
+  // getLoggedInCustomer(): Promise<ApiResponse<ICustomer>>;
   getCustomers(
     pagination: PaginationParams,
     query: string,
@@ -29,9 +29,9 @@ interface ICustomerService {
 
 const apiClient: AxiosInstance = createApiClient("customers");
 class CustomerService implements ICustomerService {
-  async getLoggedInCustomer(): Promise<ApiResponse<ICustomer>> {
-    return (await apiClient.get("/logged-in")).data;
-  }
+  // async getLoggedInCustomer(): Promise<ApiResponse<ICustomer>> {
+  //   return (await apiClient.get("/logged-in")).data;
+  // }
 
   async getCustomers(
     pagination: PaginationParams,

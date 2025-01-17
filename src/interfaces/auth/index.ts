@@ -55,12 +55,16 @@ export interface PermissionFilterCriteria {
 
 export interface IRole {
   roleId: number;
-  roleName: string;
-  active: boolean;
-  description?: string;
+  name: string;
+  description: string;
+  isActivated: boolean;
   permissions: IPermission[];
   createdAt: string;
   updatedAt?: string;
+}
+
+export interface RoleFilterCriteria {
+  isActivated?: string;
 }
 
 export interface IAuthRequest {

@@ -3,21 +3,16 @@ import {
   CaretUpFilled,
   FilterFilled,
 } from "@ant-design/icons";
-import { Space, Table, TablePaginationConfig, TableProps } from "antd";
+import { Space, Table, TablePaginationConfig, TableProps, Tag } from "antd";
 import { SorterResult } from "antd/es/table/interface";
 import { GetProp } from "antd/lib";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import {
-  IPermission,
-  Method,
-  Module,
-  Page,
-  PERMISSIONS,
-} from "../../../interfaces";
+import { IRole, Page } from "../../../interfaces";
+import { PERMISSIONS } from "../../../interfaces/common/constants";
+import { Module } from "../../../interfaces/common/enums";
 import {
   colorFilterIcon,
-  colorMethod,
   colorSortDownIcon,
   colorSortUpIcon,
   formatTimestamp,
@@ -26,47 +21,45 @@ import {
   getSortDirection,
 } from "../../../utils";
 import Access from "../Access";
-import UpdatePermission from "./UpdatePermission";
+import UpdateRole from "./UpdateRole";
+import ViewRole from "./ViewRole";
 
 interface TableParams {
   pagination: TablePaginationConfig;
   filters?: Parameters<GetProp<TableProps, "onChange">>[1];
-  sorter?: SorterResult<IPermission> | SorterResult<IPermission>[];
+  sorter?: SorterResult<IRole> | SorterResult<IRole>[];
 }
 
-interface PermissionTableProps {
-  permissionPage?: Page<IPermission>;
+interface RolesTableProps {
+  rolePage?: Page<IRole>;
   isLoading: boolean;
 }
 
-const PermissionsTable: React.FC<PermissionTableProps> = ({
-  permissionPage,
-  isLoading,
-}) => {
+const RolesTable: React.FC<RolesTableProps> = ({ rolePage, isLoading }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [tableParams, setTableParams] = useState<TableParams>(() => ({
     pagination: {
       current: Number(searchParams.get("page")) || 1,
       pageSize: Number(searchParams.get("pageSize")) || 10,
       showSizeChanger: true,
-      showTotal: (total) => `Tổng ${total} quyền hạn`,
+      showTotal: (total) => `Tổng ${total} vai trò`,
     },
   }));
 
   useEffect(() => {
-    if (permissionPage) {
+    if (rolePage) {
       setTableParams((prev) => ({
         ...prev,
         pagination: {
           ...prev.pagination,
-          total: permissionPage.meta?.total || 0,
-          showTotal: (total) => `Tổng ${total} quyền hạn`,
+          total: rolePage.meta.total || 0,
+          showTotal: (total) => `Tổng ${total} vai trò`,
         },
       }));
     }
-  }, [permissionPage]);
+  }, [rolePage]);
 
-  const handleTableChange: TableProps<IPermission>["onChange"] = (
+  const handleTableChange: TableProps<IRole>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -74,8 +67,8 @@ const PermissionsTable: React.FC<PermissionTableProps> = ({
     setTableParams((prev) => ({
       ...prev,
       pagination,
-      filters,
       sorter,
+      filters,
     }));
     searchParams.set("page", String(pagination.current));
     searchParams.set("pageSize", String(pagination.pageSize));
@@ -116,75 +109,42 @@ const PermissionsTable: React.FC<PermissionTableProps> = ({
     setSearchParams(searchParams);
   };
 
-  const columns: TableProps<IPermission>["columns"] = [
+  const columns: TableProps<IRole>["columns"] = [
     {
-      title: "STT",
-      width: "2%",
+      title: "ID",
+      dataIndex: "roleId",
+      key: "roleId",
+      width: "5%",
       align: "center",
-      render: (_, __, index) =>
-        ((tableParams.pagination.current || 1) - 1) *
-          (tableParams.pagination.pageSize || 10) +
-        index +
-        1,
     },
     {
       title: "Tên",
-      key: "name",
       dataIndex: "name",
-      width: "10%",
+      key: "name",
+      width: "20%",
     },
     {
-      title: "URL",
-      key: "apiPath",
-      dataIndex: "apiPath",
-      width: "15%",
-      sorter: true,
-      defaultSortOrder: getDefaultSortOrder(searchParams, "apiPath"),
-      sortIcon: ({ sortOrder }) => (
-        <div className="flex flex-col text-[10px]">
-          <CaretUpFilled style={{ color: colorSortUpIcon(sortOrder) }} />
-          <CaretDownFilled style={{ color: colorSortDownIcon(sortOrder) }} />
-        </div>
-      ),
+      title: "Mô tả",
+      dataIndex: "description",
+      key: "description",
+      width: "20%",
     },
     {
-      title: "Phương thức",
-      key: "method",
-      dataIndex: "method",
-      width: "10%",
+      key: "isActivated",
+      title: "Trạng thái",
+      dataIndex: "isActivated",
+      width: "8%",
       align: "center",
-      render(method: IPermission["method"]) {
-        return (
-          <p
-            style={{
-              fontWeight: "bold",
-              color: colorMethod(method),
-            }}
-          >
-            {method}
-          </p>
-        );
-      },
-      filters: Object.values(Method).map((method: string) => ({
-        text: method,
-        value: method,
-      })),
-      defaultFilteredValue: getDefaultFilterValue(searchParams, "method"),
-      filterIcon: (filtered) => (
-        <FilterFilled style={{ color: colorFilterIcon(filtered) }} />
+      render: (isActivated: boolean) => (
+        <Tag color={isActivated ? "green" : "red"}>
+          {isActivated ? "ACTIVE" : "INACTIVE"}
+        </Tag>
       ),
-    },
-    {
-      title: "Module",
-      dataIndex: "module",
-      key: "module",
-      width: "10%",
-      align: "center",
-      filters: Object.values(Module).map((module: string) => ({
-        text: module,
-        value: module,
-      })),
-      defaultFilteredValue: getDefaultFilterValue(searchParams, "module"),
+      filters: [
+        { text: "ACTIVE", value: true },
+        { text: "INACTIVE", value: false },
+      ],
+      defaultFilteredValue: getDefaultFilterValue(searchParams, "isActivated"),
       filterIcon: (filtered) => (
         <FilterFilled style={{ color: colorFilterIcon(filtered) }} />
       ),
@@ -226,29 +186,26 @@ const PermissionsTable: React.FC<PermissionTableProps> = ({
     {
       title: "Hành động",
       key: "action",
-      width: "10%",
       align: "center",
-
-      render: (record: IPermission) => (
-        <Space>
-          <Access
-            permission={PERMISSIONS[Module.PERMISSIONS].UPDATE}
-            hideChildren
-          >
-            <UpdatePermission permission={record} />
+      width: "10%",
+      render: (record: IRole) => (
+        <Space size="middle">
+          <ViewRole role={record} />
+          <Access permission={PERMISSIONS[Module.ROLES].UPDATE} hideChildren>
+            <UpdateRole role={record} />
           </Access>
+          {/* <DeleteRole roleId={record.roleId} /> */}
         </Space>
       ),
     },
   ];
-
   return (
     <Table
       bordered={false}
       columns={columns}
-      rowKey={(record: IPermission) => record.permissionId}
+      rowKey={(record: IRole) => record.roleId}
       pagination={tableParams.pagination}
-      dataSource={permissionPage?.data}
+      dataSource={rolePage?.data}
       rowClassName={(_, index) =>
         index % 2 === 0 ? "table-row-light" : "table-row-gray"
       }
@@ -263,4 +220,4 @@ const PermissionsTable: React.FC<PermissionTableProps> = ({
   );
 };
 
-export default PermissionsTable;
+export default RolesTable;

@@ -1,14 +1,14 @@
 import { EditOutlined } from "@ant-design/icons";
 import { Modal, Tooltip } from "antd";
 import { useState } from "react";
-import UpdatePermissionForm from "./UpdatePermissionForm";
-import { IPermission } from "../../../interfaces";
+import { type IRole } from "../../../interfaces";
+import UpdateRoleForm from "./UpdateRoleForm";
 
-interface UpdatePermissionProps {
-  permission: IPermission;
+interface UpdateRoleProps {
+  role: IRole;
 }
 
-const UpdatePermission: React.FC<UpdatePermissionProps> = ({ permission }) => {
+const UpdateRole: React.FC<UpdateRoleProps> = ({ role }) => {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 
   const handleOpenModal = () => {
@@ -18,7 +18,6 @@ const UpdatePermission: React.FC<UpdatePermissionProps> = ({ permission }) => {
   const handleCloseModal = () => {
     setIsOpenModal(false);
   };
-
   return (
     <>
       <Tooltip title="Chỉnh sửa">
@@ -30,18 +29,15 @@ const UpdatePermission: React.FC<UpdatePermissionProps> = ({ permission }) => {
       <Modal
         open={isOpenModal}
         width="50%"
-        title={<span className="text-lg">Cập nhật quyền hạn</span>}
+        title={<span className="text-lg">Chỉnh sửa vai trò</span>}
         destroyOnClose
         onCancel={handleCloseModal}
         footer={null}
       >
-        <UpdatePermissionForm
-          permissionToUpdate={permission}
-          onCancel={handleCloseModal}
-        />
+        <UpdateRoleForm roleToUpdate={role} onCancel={handleCloseModal} />
       </Modal>
     </>
   );
 };
 
-export default UpdatePermission;
+export default UpdateRole;
