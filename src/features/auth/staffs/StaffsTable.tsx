@@ -212,7 +212,7 @@ const StaffsTable: React.FC<StaffTableProps> = ({ staffPage, isLoading }) => {
             <UpdateStaff user={record} />
           </Access>
           <Access permission={PERMISSIONS[Module.STAFF].DELETE} hideChildren>
-            <DeleteStaff userId={record.id} />
+            <DeleteStaff userId={record.staffId} />
           </Access>
         </Space>
       ),
@@ -223,7 +223,7 @@ const StaffsTable: React.FC<StaffTableProps> = ({ staffPage, isLoading }) => {
     <Table
       bordered={false}
       columns={columns}
-      rowKey={(record: IStaff) => record.id}
+      rowKey={(record: IStaff) => record.staffId}
       pagination={tableParams.pagination}
       dataSource={staffPage?.data}
       rowClassName={(_, index) =>

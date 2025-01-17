@@ -1,7 +1,7 @@
 import { Dayjs } from "dayjs";
 
 export interface IStaff {
-  id: string;
+  staffId: string;
   email: string;
   firstName: string;
   lastName: string;
@@ -20,7 +20,7 @@ export interface StaffFilterCriteria {
 }
 
 export interface ICustomer {
-  id: string;
+  customerId: string;
   email: string;
   firstName: string;
   lastName: string;

@@ -107,15 +107,11 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
       const updatedUser = {
         ...userToUpdate,
         ...values,
-        firstName: values.firstName.toUpperCase(),
-        lastName: values.lastName.toUpperCase(),
       };
-      updateCustomer({ userId: userToUpdate.id, updatedUser });
+      updateCustomer({ userId: userToUpdate.customerId, updatedUser });
     } else {
       const newUser = {
         ...values,
-        firstName: values.firstName.toUpperCase(),
-        lastName: values.lastName.toUpperCase(),
       };
       createCustomer(newUser);
     }
@@ -153,7 +149,6 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
           <Input
             readOnly={userToUpdate != undefined || viewOnly}
             placeholder="Họ, ví dụ PHẠM"
-            style={{ textTransform: "uppercase" }}
           />
         </Form.Item>
 
@@ -176,7 +171,6 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
           <Input
             readOnly={userToUpdate != undefined || viewOnly}
             placeholder="Tên đệm & tên, ví dụ VAN A"
-            style={{ textTransform: "uppercase" }}
           />
         </Form.Item>
       </div>

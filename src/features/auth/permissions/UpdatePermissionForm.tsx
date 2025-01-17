@@ -95,8 +95,6 @@ const UpdatePermissionForm: React.FC<UpdatePermissionFormProps> = ({
       const updatedPermission = {
         ...permissionToUpdate,
         ...values,
-        // firstName: values.firstName.toUpperCase(),
-        // lastName: values.lastName.toUpperCase(),
       };
       updatePermission({
         updatedPermission: updatedPermission,
@@ -104,8 +102,6 @@ const UpdatePermissionForm: React.FC<UpdatePermissionFormProps> = ({
     } else {
       const newPermission = {
         ...values,
-        // firstName: values.firstName.toUpperCase(),
-        // lastName: values.lastName.toUpperCase(),
       };
       createPermission(newPermission);
     }

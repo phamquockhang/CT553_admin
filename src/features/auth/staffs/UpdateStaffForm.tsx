@@ -107,15 +107,11 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
       const updatedUser = {
         ...userToUpdate,
         ...values,
-        firstName: values.firstName.toUpperCase(),
-        lastName: values.lastName.toUpperCase(),
       };
-      updateUser({ userId: userToUpdate.id, updatedUser });
+      updateUser({ userId: userToUpdate.staffId, updatedUser });
     } else {
       const newUser = {
         ...values,
-        firstName: values.firstName.toUpperCase(),
-        lastName: values.lastName.toUpperCase(),
       };
       createUser(newUser);
     }
@@ -150,11 +146,7 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
             },
           ]}
         >
-          <Input
-            readOnly={viewOnly}
-            placeholder="Họ, ví dụ PHẠM"
-            style={{ textTransform: "uppercase" }}
-          />
+          <Input readOnly={viewOnly} placeholder="Họ, ví dụ PHẠM" />
         </Form.Item>
 
         <Form.Item
@@ -173,11 +165,7 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
             },
           ]}
         >
-          <Input
-            readOnly={viewOnly}
-            placeholder="Tên đệm & tên, ví dụ VAN A"
-            style={{ textTransform: "uppercase" }}
-          />
+          <Input readOnly={viewOnly} placeholder="Tên đệm & tên, ví dụ VAN A" />
         </Form.Item>
       </div>
 

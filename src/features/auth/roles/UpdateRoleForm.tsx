@@ -88,7 +88,6 @@ const UpdateRoleForm: React.FC<UpdateRoleFormProps> = ({
       if (data?.payload) {
         const newRole = {
           ...values,
-          roleName: values.name.toUpperCase(),
           permissions: form.getFieldValue("permissions"),
         };
 
@@ -124,7 +123,7 @@ const UpdateRoleForm: React.FC<UpdateRoleFormProps> = ({
             name="name"
             rules={[{ required: true, message: "Vui lòng nhập tên vai trò" }]}
           >
-            <Input readOnly={viewOnly} className="uppercase" />
+            <Input readOnly={viewOnly} />
           </Form.Item>
         </Col>
         <Col span={8} offset={1}>

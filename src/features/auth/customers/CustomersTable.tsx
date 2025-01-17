@@ -208,7 +208,7 @@ const CustomersTable: React.FC<CustomerTableProps> = ({
             <UpdateCustomer user={record} />
           </Access>
           <Access permission={PERMISSIONS[Module.CUSTOMER].DELETE} hideChildren>
-            <DeleteCustomer userId={record.id} />
+            <DeleteCustomer userId={record.customerId} />
           </Access>
         </Space>
       ),
@@ -219,7 +219,7 @@ const CustomersTable: React.FC<CustomerTableProps> = ({
     <Table
       bordered={false}
       columns={columns}
-      rowKey={(record: ICustomer) => record.id}
+      rowKey={(record: ICustomer) => record.customerId}
       pagination={tableParams.pagination}
       dataSource={customerPage?.data}
       rowClassName={(_, index) =>
