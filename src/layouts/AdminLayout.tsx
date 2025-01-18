@@ -1,4 +1,4 @@
-import { Button, Dropdown, Layout, Menu, theme } from "antd";
+import { Button, Dropdown, Layout, Menu, theme, Tooltip } from "antd";
 import Loading from "../common/components/Loading";
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -11,6 +11,7 @@ import { FaKey, FaUserCircle, FaUserCog, FaUsers } from "react-icons/fa";
 import { Module, PERMISSIONS } from "../interfaces";
 import { MdDashboard } from "react-icons/md";
 import { IoShieldCheckmark } from "react-icons/io5";
+import { IoIosNotifications } from "react-icons/io";
 
 const { Header, Sider } = Layout;
 
@@ -239,7 +240,15 @@ const AdminLayout: React.FC = () => {
                 fontSize: "20px",
               }}
             />
-            <div className="relative mr-5 flex items-center gap-2">
+            <div className="relative mr-5 flex items-center gap-3">
+              <Tooltip title="Thông báo">
+                <NavLink to="/notifications">
+                  <div className="flex items-center gap-1">
+                    <IoIosNotifications className="text-2xl" />
+                  </div>
+                </NavLink>
+              </Tooltip>
+
               <Dropdown
                 menu={{ items }}
                 placement="bottom"

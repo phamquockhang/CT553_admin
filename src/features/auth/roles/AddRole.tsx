@@ -19,6 +19,7 @@ const AddRole: React.FC = () => {
         Thêm
       </Button>
       <Modal
+        centered
         open={isOpenModal}
         width="50%"
         title={<span className="text-lg">Thêm vai trò</span>}

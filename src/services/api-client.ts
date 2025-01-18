@@ -48,7 +48,9 @@ export function createApiClient(
             return Promise.reject(error);
           }
         }
-        return Promise.reject(error);
+        return error && error.response && error.response.data
+          ? error.response.data
+          : Promise.reject(error);
       },
     );
   }

@@ -2,6 +2,7 @@ import { blue, green, grey, orange, red } from "@ant-design/colors";
 import { SortOrder } from "antd/es/table/interface";
 import dayjs from "dayjs";
 import { useEffect } from "react";
+import { IDistrict, IProvince, IWard } from "../interfaces/address";
 
 export function useDynamicTitle(title: string) {
   useEffect(() => {
@@ -119,4 +120,43 @@ export function isInDateRange(
   endDate: string,
 ): boolean {
   return dayjs(date).tz().isBetween(startDate, endDate, null, "[]");
+}
+
+export function getProvinceNameById(
+  provinceId?: number,
+  provinces?: IProvince[],
+): string {
+  return (
+    provinces?.find((province) => province.ProvinceID === provinceId)
+      ?.ProvinceName || ""
+  );
+}
+
+export function getDistrictNameById(
+  districtId?: number,
+  districts?: IDistrict[],
+): string {
+  return (
+    districts?.find((district) => district.DistrictID === districtId)
+      ?.DistrictName || ""
+  );
+}
+
+export function getWardNameById(wardCode?: string, wards?: IWard[]): string {
+  return wards?.find((ward) => ward.WardCode === wardCode)?.WardName || "";
+}
+
+export function formatAddressName(
+  provinceId?: number,
+  districtId?: number,
+  wardCode?: string,
+  description?: string,
+  provinces?: IProvince[],
+  districts?: IDistrict[],
+  wards?: IWard[],
+): string {
+  return `${description}, ${getWardNameById(wardCode, wards)}, ${getDistrictNameById(
+    districtId,
+    districts,
+  )}, ${getProvinceNameById(provinceId, provinces)}`;
 }

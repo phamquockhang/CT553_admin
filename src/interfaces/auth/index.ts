@@ -38,6 +38,14 @@ export interface CustomerFilterCriteria {
   isActivated?: string;
 }
 
+export interface IScore {
+  scoreId: string;
+  changeAmount: number;
+  newValue: number;
+  isCurrent: boolean;
+  createdAt: string;
+}
+
 export interface IPermission {
   permissionId: number;
   name: string;

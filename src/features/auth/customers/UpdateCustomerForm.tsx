@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Button,
   DatePicker,
@@ -6,14 +6,20 @@ import {
   Form,
   Input,
   Radio,
+  Select,
   Space,
   Switch,
 } from "antd";
 import dayjs, { Dayjs } from "dayjs";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import Loading from "../../../common/components/Loading";
 import { ICustomer } from "../../../interfaces";
+import { scoreService } from "../../../services";
+import { addressPublicApiService } from "../../../services/address/address-publicApi-service";
+import { addressService } from "../../../services/address/address-service";
 import { customerService } from "../../../services/auth/customer-service";
+import { formatAddressName } from "../../../utils";
 
 interface UpdateCustomerFormProps {
   userToUpdate?: ICustomer;
@@ -39,6 +45,9 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
 }) => {
   const [form] = Form.useForm<ICustomer>();
   const queryClient = useQueryClient();
+  const [provinceId, setProvinceId] = useState<number>();
+  const [districtId, setDistrictId] = useState<number>();
+  const [wardCode, setWardCode] = useState<string>();
 
   useEffect(() => {
     if (userToUpdate) {
@@ -117,9 +126,110 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
     }
   }
 
-  // if (isRolesLoading) {
-  //   return <Loading />;
-  // }
+  const { data: scoreData, isLoading: isLoadingScore } = useQuery({
+    queryKey: ["scores", userToUpdate?.customerId],
+    queryFn: async () => {
+      const res = await scoreService.getCurrentScoreByCustomerId(
+        userToUpdate?.customerId || "",
+      );
+      if (res && res.success) {
+        return res;
+      }
+    },
+  });
+
+  const { data: addressData, isLoading: isLoadingAddress } = useQuery({
+    queryKey: ["addresses", userToUpdate?.customerId],
+    queryFn: async () => {
+      const res = await addressService.getDefaultAddressByCustomerId(
+        userToUpdate?.customerId || "",
+      );
+      if (res && res.success) {
+        return res;
+      }
+    },
+  });
+
+  const { data: provinceData, isLoading: isLoadingProvince } = useQuery({
+    queryKey: ["province"],
+    queryFn: async () => {
+      const response = await addressPublicApiService.getProvinces();
+      return response.data;
+    },
+  });
+
+  const provinceOptions = provinceData?.map((province) => ({
+    value: province.ProvinceID,
+    label: province.ProvinceName,
+  }));
+
+  const { data: districtData, isLoading: isLoadingDistrict } = useQuery({
+    queryKey: [
+      "district",
+      userToUpdate ? addressData?.payload?.provinceId : provinceId,
+    ],
+    queryFn: async () => {
+      const response = await addressPublicApiService.getDistricts(
+        addressData?.payload?.provinceId,
+      );
+      return response.data;
+    },
+  });
+
+  console.log("provinceId", provinceId);
+  console.log("districtId", districtId);
+  console.log("wardCode", wardCode);
+
+  const districtOptions = districtData?.map((district) => ({
+    value: district.DistrictID,
+    label: district.DistrictName,
+  }));
+
+  const { data: wardData, isLoading: isLoadingWard } = useQuery({
+    queryKey: [
+      "ward",
+      userToUpdate ? addressData?.payload?.districtId : districtId,
+    ],
+    queryFn: async () => {
+      const response = await addressPublicApiService.getWards(
+        addressData?.payload?.districtId,
+      );
+      return response.data;
+    },
+  });
+
+  useEffect(() => {
+    if (userToUpdate) {
+      setProvinceId(addressData?.payload?.provinceId);
+      setDistrictId(addressData?.payload?.districtId);
+      setWardCode(addressData?.payload?.wardCode);
+    }
+  }, [provinceId, districtId, wardCode]);
+
+  const wardOptions = wardData?.map((ward) => ({
+    value: ward.WardCode,
+    label: ward.WardName,
+  }));
+
+  const formattedAddress = formatAddressName(
+    addressData?.payload?.provinceId,
+    addressData?.payload?.districtId,
+    addressData?.payload?.wardCode,
+    addressData?.payload?.description,
+    provinceData,
+    districtData,
+    wardData,
+  );
+
+  if (
+    isLoadingScore ||
+    isLoadingAddress ||
+    isLoadingProvince ||
+    isLoadingDistrict ||
+    isLoadingWard
+  ) {
+    return <Loading />;
+  }
 
   return (
     <Form
@@ -220,6 +330,19 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
       </div>
 
       <div className="flex gap-8">
+        <Form.Item className="flex-1" label=" ">
+          <p className="flex-1">
+            Điểm tích lũy:{" "}
+            <span className="font-semibold text-blue-800">
+              {isLoadingScore
+                ? "0"
+                : scoreData?.success
+                  ? scoreData.payload?.newValue
+                  : "0"}
+            </span>
+          </p>
+        </Form.Item>
+
         <Form.Item
           className="flex-1"
           label="Trạng thái"
@@ -275,6 +398,86 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
           >
             <Input.Password placeholder="Mật khẩu" />
           </Form.Item>
+        )}
+      </div>
+
+      <div className="flex gap-8">
+        {userToUpdate ? (
+          <Form.Item className="flex-1" label="Địa chỉ">
+            <Input
+              readOnly={userToUpdate != undefined || viewOnly}
+              value={
+                addressData?.payload?.description
+                  ? formattedAddress
+                  : "Chưa cập nhật địa chỉ"
+              }
+            />
+          </Form.Item>
+        ) : (
+          <>
+            <Form.Item
+              className="flex-1"
+              label="Tỉnh/Thành phố"
+              name="provinceId"
+              rules={[
+                {
+                  required: true,
+                  message: "Vui lòng chọn tỉnh/thành phố",
+                },
+              ]}
+            >
+              <Select
+                disabled={userToUpdate != undefined || viewOnly}
+                placeholder="Chọn tỉnh/thành phố"
+                options={provinceOptions}
+                onSelect={(value) => {
+                  setProvinceId(value as number);
+                }}
+              />
+            </Form.Item>
+
+            <Form.Item
+              className="flex-1"
+              label="Quận/Huyện"
+              name="districtId"
+              rules={[
+                {
+                  required: true,
+                  message: "Vui lòng chọn quận/huyện",
+                },
+              ]}
+            >
+              <Select
+                disabled={userToUpdate != undefined || viewOnly}
+                placeholder="Chọn quận/huyện"
+                options={districtOptions}
+                onSelect={(value) => {
+                  setDistrictId(value as number);
+                }}
+              />
+            </Form.Item>
+
+            <Form.Item
+              className="flex-1"
+              label="Phường/Xã"
+              name="wardCode"
+              rules={[
+                {
+                  required: true,
+                  message: "Vui lòng chọn phường/xã",
+                },
+              ]}
+            >
+              <Select
+                disabled={userToUpdate != undefined || viewOnly}
+                placeholder="Chọn phường/xã"
+                options={wardOptions}
+                onSelect={(value) => {
+                  setWardCode(value as string);
+                }}
+              />
+            </Form.Item>
+          </>
         )}
       </div>
 

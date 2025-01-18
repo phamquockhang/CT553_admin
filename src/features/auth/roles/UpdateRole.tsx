@@ -27,6 +27,7 @@ const UpdateRole: React.FC<UpdateRoleProps> = ({ role }) => {
         />
       </Tooltip>
       <Modal
+        centered
         open={isOpenModal}
         width="50%"
         title={<span className="text-lg">Chỉnh sửa vai trò</span>}
