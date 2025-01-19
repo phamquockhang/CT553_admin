@@ -25,19 +25,16 @@ const LoginForm: React.FC = () => {
         const { accessToken } = data.payload;
         window.localStorage.setItem("access_token", accessToken);
         navigate("/");
+        toast.success(data?.message || "Operation successful");
       }
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data.message);
     },
   });
 
   function onFinish(data: IAuthRequest): void {
-    login(data, {
-      onSuccess: () => {
-        toast.success("Đăng nhập thành công");
-      },
-      onError: (error: any) => {
-        toast.error(error.response?.data.message);
-      },
-    });
+    login(data);
   }
 
   return (

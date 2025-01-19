@@ -27,14 +27,14 @@ class AddressService implements IAddressService {
   async getDefaultAddressByCustomerId(
     customerId: string,
   ): Promise<ApiResponse<IAddress>> {
-    return (await apiClient.get(`/default/${customerId}`))?.data;
+    return await apiClient.get(`/default/${customerId}`);
   }
 
   async create(
     customerId: string,
     newAddress: IAddress,
   ): Promise<ApiResponse<IAddress>> {
-    return (await apiClient.post(`/${customerId}`, newAddress)).data;
+    return await apiClient.post(`/${customerId}`, newAddress);
   }
 }
 

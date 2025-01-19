@@ -32,6 +32,12 @@ export interface ICustomer {
   role: IRole;
   createdAt: string;
   updatedAt?: string;
+
+  // Custom fields to init address for new customer
+  provinceId: number;
+  districtId: number;
+  wardCode: string;
+  description: string;
 }
 
 export interface CustomerFilterCriteria {

@@ -49,18 +49,16 @@ const UpdatePermissionForm: React.FC<UpdatePermissionFormProps> = ({
           return query.queryKey.includes("permissions");
         },
       });
-      toast.success(data.message || "Operation successful");
-
-      onCancel();
-      form.resetFields();
+      if (data && data.success) {
+        toast.success(data?.message || "Operation successful");
+        onCancel();
+        form.resetFields();
+      } else if (data && !data.success)
+        toast.error(data?.message || "Operation failed");
     },
 
-    onError: (error: { response?: { data?: { message?: string } } }) => {
-      if (error.response?.data?.message) {
-        toast.error(error.response.data.message);
-      } else {
-        toast.error("An error occurred");
-      }
+    onError: (error) => {
+      console.log(error);
     },
   });
 
@@ -75,18 +73,16 @@ const UpdatePermissionForm: React.FC<UpdatePermissionFormProps> = ({
           return query.queryKey.includes("permissions");
         },
       });
-      toast.success(data.message || "Operation successful");
-
-      onCancel();
-      form.resetFields();
+      if (data && data.success) {
+        toast.success(data?.message || "Operation successful");
+        onCancel();
+        form.resetFields();
+      } else if (data && !data.success)
+        toast.error(data?.message || "Operation failed");
     },
 
-    onError: (error: { response?: { data?: { message?: string } } }) => {
-      if (error.response?.data?.message) {
-        toast.error(error.response.data.message);
-      } else {
-        toast.error("An error occurred");
-      }
+    onError: (error) => {
+      console.log(error);
     },
   });
 

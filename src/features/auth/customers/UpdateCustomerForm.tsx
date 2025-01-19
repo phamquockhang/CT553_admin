@@ -15,11 +15,14 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import Loading from "../../../common/components/Loading";
 import { ICustomer } from "../../../interfaces";
-import { scoreService } from "../../../services";
-import { addressPublicApiService } from "../../../services/address/address-publicApi-service";
-import { addressService } from "../../../services/address/address-service";
-import { customerService } from "../../../services/auth/customer-service";
+import {
+  addressPublicApiService,
+  addressService,
+  customerService,
+  scoreService,
+} from "../../../services";
 import { formatAddressName } from "../../../utils";
+import { IAddress } from "../../../interfaces/address";
 
 interface UpdateCustomerFormProps {
   userToUpdate?: ICustomer;
@@ -48,6 +51,7 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
   const [provinceId, setProvinceId] = useState<number>();
   const [districtId, setDistrictId] = useState<number>();
   const [wardCode, setWardCode] = useState<string>();
+  const [description, setDescription] = useState<string>();
 
   useEffect(() => {
     if (userToUpdate) {
@@ -66,18 +70,40 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
           return query.queryKey.includes("customers");
         },
       });
-      toast.success(data.message || "Operation successful");
-
-      onCancel();
-      form.resetFields();
+      if (data && data.success) {
+        toast.success(data?.message || "Operation successful");
+        onCancel();
+        form.resetFields();
+      } else if (data && !data.success)
+        toast.error(data?.message || "Operation failed");
     },
 
-    onError: (error: { response?: { data?: { message?: string } } }) => {
-      if (error.response?.data?.message) {
-        toast.error(error.response.data.message);
-      } else {
-        toast.error("An error occurred");
-      }
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
+  const { mutate: createAddress, isPending: isCreatingAddress } = useMutation({
+    mutationFn: ({
+      customerId,
+      newAddress,
+    }: {
+      customerId: string;
+      newAddress: IAddress;
+    }) => {
+      return addressService.create(customerId, newAddress);
+    },
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        predicate: (query) => {
+          return query.queryKey.includes("addresses");
+        },
+      });
+    },
+
+    onError: (error) => {
+      console.log(error);
     },
   });
 
@@ -92,24 +118,28 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
           return query.queryKey.includes("customers");
         },
       });
-      toast.success(data.message || "Operation successful");
-
-      onCancel();
-      form.resetFields();
+      if (data && data.success) {
+        toast.success(data?.message || "Operation successful");
+        onCancel();
+        form.resetFields();
+      } else if (data && !data.success)
+        toast.error(data?.message || "Operation failed");
     },
 
-    onError: (error: { response?: { data?: { message?: string } } }) => {
-      if (error.response?.data?.message) {
-        toast.error(error.response.data.message);
-      } else {
-        toast.error("An error occurred");
-      }
+    onError: (error) => {
+      console.log(error);
     },
   });
 
   const disabledDate: DatePickerProps["disabledDate"] = (current) => {
     return current && dayjs(current).isAfter(dayjs().endOf("day"));
   };
+
+  // const { data: customerIdByEmail } = useQuery({
+  //   queryKey: ["customerId", form.getFieldValue("email")],
+  //   queryFn: ({ queryKey }) =>
+  //     customerService.getCustomerIdByEmail(queryKey[1]),
+  // });
 
   function handleFinish(values: ICustomer) {
     if (userToUpdate) {
@@ -122,18 +152,38 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
       const newUser = {
         ...values,
       };
-      createCustomer(newUser);
+      createCustomer(newUser, {
+        onSuccess: (newCustomer) => {
+          // if (newCustomer && newCustomer.success) {
+          if (provinceId && districtId && wardCode && description) {
+            createAddress({
+              // customerId: customerIdByEmail?.payload || "",
+              customerId: newCustomer.payload?.customerId || "",
+              newAddress: {
+                provinceId,
+                districtId,
+                wardCode,
+                description,
+                isDefault: true,
+              },
+            });
+          }
+          // }
+        },
+      });
     }
   }
 
   const { data: scoreData, isLoading: isLoadingScore } = useQuery({
     queryKey: ["scores", userToUpdate?.customerId],
     queryFn: async () => {
-      const res = await scoreService.getCurrentScoreByCustomerId(
-        userToUpdate?.customerId || "",
-      );
-      if (res && res.success) {
-        return res;
+      if (userToUpdate) {
+        const res = await scoreService.getCurrentScoreByCustomerId(
+          userToUpdate?.customerId || "",
+        );
+        if (res && res.success) {
+          return res;
+        }
       }
     },
   });
@@ -141,11 +191,13 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
   const { data: addressData, isLoading: isLoadingAddress } = useQuery({
     queryKey: ["addresses", userToUpdate?.customerId],
     queryFn: async () => {
-      const res = await addressService.getDefaultAddressByCustomerId(
-        userToUpdate?.customerId || "",
-      );
-      if (res && res.success) {
-        return res;
+      if (userToUpdate) {
+        const res = await addressService.getDefaultAddressByCustomerId(
+          userToUpdate?.customerId || "",
+        );
+        if (res && res.success) {
+          return res;
+        }
       }
     },
   });
@@ -170,15 +222,11 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
     ],
     queryFn: async () => {
       const response = await addressPublicApiService.getDistricts(
-        addressData?.payload?.provinceId,
+        userToUpdate ? addressData?.payload?.provinceId : provinceId,
       );
       return response.data;
     },
   });
-
-  console.log("provinceId", provinceId);
-  console.log("districtId", districtId);
-  console.log("wardCode", wardCode);
 
   const districtOptions = districtData?.map((district) => ({
     value: district.DistrictID,
@@ -192,19 +240,11 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
     ],
     queryFn: async () => {
       const response = await addressPublicApiService.getWards(
-        addressData?.payload?.districtId,
+        userToUpdate ? addressData?.payload?.districtId : districtId,
       );
       return response.data;
     },
   });
-
-  useEffect(() => {
-    if (userToUpdate) {
-      setProvinceId(addressData?.payload?.provinceId);
-      setDistrictId(addressData?.payload?.districtId);
-      setWardCode(addressData?.payload?.wardCode);
-    }
-  }, [provinceId, districtId, wardCode]);
 
   const wardOptions = wardData?.map((ward) => ({
     value: ward.WardCode,
@@ -221,13 +261,7 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
     wardData,
   );
 
-  if (
-    isLoadingScore ||
-    isLoadingAddress ||
-    isLoadingProvince ||
-    isLoadingDistrict ||
-    isLoadingWard
-  ) {
+  if (isLoadingScore || isLoadingAddress) {
     return <Loading />;
   }
 
@@ -284,7 +318,6 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
           />
         </Form.Item>
       </div>
-
       <div className="flex gap-8">
         <Form.Item
           className="flex-1"
@@ -328,20 +361,21 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
           />
         </Form.Item>
       </div>
-
       <div className="flex gap-8">
-        <Form.Item className="flex-1" label=" ">
-          <p className="flex-1">
-            Điểm tích lũy:{" "}
-            <span className="font-semibold text-blue-800">
-              {isLoadingScore
-                ? "0"
-                : scoreData?.success
-                  ? scoreData.payload?.newValue
-                  : "0"}
-            </span>
-          </p>
-        </Form.Item>
+        {userToUpdate && (
+          <Form.Item className="flex-1" label=" ">
+            <p className="flex-1">
+              Điểm tích lũy:{" "}
+              <span className={`font-semibold text-[#003F8F]`}>
+                {isLoadingScore
+                  ? "0"
+                  : scoreData?.success
+                    ? scoreData.payload?.newValue
+                    : "0"}
+              </span>
+            </p>
+          </Form.Item>
+        )}
 
         <Form.Item
           className="flex-1"
@@ -357,7 +391,6 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
           />
         </Form.Item>
       </div>
-
       <div className="flex gap-8">
         <Form.Item
           className="flex-1"
@@ -401,8 +434,8 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
         )}
       </div>
 
-      <div className="flex gap-8">
-        {userToUpdate ? (
+      {userToUpdate ? (
+        <div className="flex gap-8">
           <Form.Item className="flex-1" label="Địa chỉ">
             <Input
               readOnly={userToUpdate != undefined || viewOnly}
@@ -413,25 +446,58 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
               }
             />
           </Form.Item>
-        ) : (
-          <>
+        </div>
+      ) : (
+        <>
+          <div className="flex gap-8">
             <Form.Item
               className="flex-1"
               label="Tỉnh/Thành phố"
               name="provinceId"
               rules={[
                 {
-                  required: true,
+                  required: provinceId ? true : false,
                   message: "Vui lòng chọn tỉnh/thành phố",
                 },
               ]}
             >
               <Select
-                disabled={userToUpdate != undefined || viewOnly}
+                allowClear
+                showSearch
                 placeholder="Chọn tỉnh/thành phố"
                 options={provinceOptions}
-                onSelect={(value) => {
-                  setProvinceId(value as number);
+                filterOption={(input, option) =>
+                  (
+                    option?.label
+                      ?.normalize("NFD")
+                      .replace(/[\u0300-\u036f]/g, "")
+                      .toLowerCase() ?? ""
+                  ).indexOf(
+                    input
+                      .normalize("NFD")
+                      .replace(/[\u0300-\u036f]/g, "")
+                      .toLowerCase(),
+                  ) >= 0
+                }
+                onSelect={(value: number) => {
+                  if (value !== provinceId) {
+                    setProvinceId(value);
+                    setDistrictId(undefined);
+                    setWardCode(undefined);
+                    form.setFieldsValue({
+                      districtId: undefined,
+                      wardCode: undefined,
+                    });
+                  }
+                }}
+                onClear={() => {
+                  setProvinceId(undefined);
+                  setDistrictId(undefined);
+                  setWardCode(undefined);
+                  form.setFieldsValue({
+                    districtId: undefined,
+                    wardCode: undefined,
+                  });
                 }}
               />
             </Form.Item>
@@ -442,45 +508,106 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
               name="districtId"
               rules={[
                 {
-                  required: true,
+                  required: provinceId ? true : false,
                   message: "Vui lòng chọn quận/huyện",
                 },
               ]}
             >
               <Select
-                disabled={userToUpdate != undefined || viewOnly}
+                loading={isLoadingDistrict}
+                allowClear
+                showSearch
                 placeholder="Chọn quận/huyện"
                 options={districtOptions}
-                onSelect={(value) => {
-                  setDistrictId(value as number);
+                filterOption={(input, option) =>
+                  (
+                    option?.label
+                      ?.normalize("NFD")
+                      .replace(/[\u0300-\u036f]/g, "")
+                      .toLowerCase() ?? ""
+                  ).indexOf(
+                    input
+                      .normalize("NFD")
+                      .replace(/[\u0300-\u036f]/g, "")
+                      .toLowerCase(),
+                  ) >= 0
+                }
+                onSelect={(value: number) => {
+                  if (value !== districtId) {
+                    setDistrictId(value);
+                    setWardCode(undefined);
+                    form.setFieldsValue({
+                      wardCode: undefined,
+                    });
+                  }
+                }}
+                onClear={() => {
+                  setDistrictId(undefined);
+                  setWardCode(undefined);
+                  form.setFieldsValue({
+                    wardCode: undefined,
+                  });
                 }}
               />
             </Form.Item>
+          </div>
 
+          <div className="flex gap-8">
             <Form.Item
               className="flex-1"
               label="Phường/Xã"
               name="wardCode"
               rules={[
                 {
-                  required: true,
+                  required: provinceId ? true : false,
                   message: "Vui lòng chọn phường/xã",
                 },
               ]}
             >
               <Select
-                disabled={userToUpdate != undefined || viewOnly}
+                allowClear
+                showSearch
                 placeholder="Chọn phường/xã"
                 options={wardOptions}
-                onSelect={(value) => {
-                  setWardCode(value as string);
+                filterOption={(input, option) =>
+                  (
+                    option?.label
+                      ?.normalize("NFD")
+                      .replace(/[\u0300-\u036f]/g, "")
+                      .toLowerCase() ?? ""
+                  ).indexOf(
+                    input
+                      .normalize("NFD")
+                      .replace(/[\u0300-\u036f]/g, "")
+                      .toLowerCase(),
+                  ) >= 0
+                }
+                onSelect={(value: string) => {
+                  setWardCode(value);
                 }}
               />
             </Form.Item>
-          </>
-        )}
-      </div>
 
+            <Form.Item
+              className="flex-1"
+              label="Địa chỉ chi tiết"
+              name="description"
+              rules={[
+                {
+                  required: provinceId ? true : false,
+                  message: "Vui lòng nhập địa chỉ chi tiết",
+                },
+              ]}
+            >
+              <Input
+                allowClear
+                placeholder="Địa chỉ chi tiết"
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </Form.Item>
+          </div>
+        </>
+      )}
       {!viewOnly && (
         <Form.Item className="text-right" wrapperCol={{ span: 24 }}>
           <Space>

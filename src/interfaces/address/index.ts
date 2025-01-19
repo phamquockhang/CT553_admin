@@ -20,12 +20,12 @@ export interface IWard {
 }
 
 export interface IAddress {
-  addressId: number;
+  addressId?: number;
   provinceId: number;
   districtId: number;
   wardCode: string;
   description: string;
   isDefault: boolean;
-  createdAt: string;
+  createdAt?: string;
   updatedAt?: string;
 }

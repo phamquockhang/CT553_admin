@@ -24,9 +24,12 @@ export function createApiClient(
     });
 
     axiosInstance.interceptors.response.use(
+      // when success
       (response) => {
-        return response;
+        return response.data;
       },
+
+      // when error
       async (error) => {
         const originalRequest = error.config;
         if (error.response?.status === 401 && !originalRequest._retry) {
@@ -48,6 +51,8 @@ export function createApiClient(
             return Promise.reject(error);
           }
         }
+
+        // handle orther errors from 3xx to 5xx here,  e.g. 3xx is redirect, 403 Forbidden, 404 Not Found, 500 Internal Server Error
         return error && error.response && error.response.data
           ? error.response.data
           : Promise.reject(error);

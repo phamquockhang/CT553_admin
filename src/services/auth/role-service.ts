@@ -29,29 +29,27 @@ class RoleService implements IRoleService {
     filter?: RoleFilterCriteria,
     sort?: SortParams,
   ): Promise<ApiResponse<Page<IRole>>> {
-    return (
-      await apiClient.get("", {
-        params: {
-          ...pagination,
-          ...filter,
-          query,
-          sortBy: sort?.sortBy !== "" ? sort?.sortBy : undefined,
-          direction: sort?.direction !== "" ? sort?.direction : undefined,
-        },
-      })
-    ).data;
+    return await apiClient.get("", {
+      params: {
+        ...pagination,
+        ...filter,
+        query,
+        sortBy: sort?.sortBy !== "" ? sort?.sortBy : undefined,
+        direction: sort?.direction !== "" ? sort?.direction : undefined,
+      },
+    });
   }
 
   async getAllRoles(): Promise<ApiResponse<IRole[]>> {
-    return (await apiClient.get("/all")).data;
+    return await apiClient.get("/all");
   }
 
   async create(newRole: Omit<IRole, "roleId">): Promise<ApiResponse<IRole>> {
-    return (await apiClient.post("", newRole)).data;
+    return await apiClient.post("", newRole);
   }
 
   async update(updatedRole: IRole): Promise<ApiResponse<IRole>> {
-    return (await apiClient.put(`/${updatedRole.roleId}`, updatedRole)).data;
+    return await apiClient.put(`/${updatedRole.roleId}`, updatedRole);
   }
 }
 

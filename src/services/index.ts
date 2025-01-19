@@ -1,3 +1,3 @@
 //AUTH
-export * from "./auth/index";
-// export * from "./address/index";
+export * from "./auth";
+export * from "./address";

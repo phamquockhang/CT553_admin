@@ -14,7 +14,7 @@ class AuthService implements IAuthService {
   }
 
   async logout(): Promise<ApiResponse<void>> {
-    return (await apiClient.post("/logout")).data;
+    return await apiClient.post("/logout");
   }
 }
 

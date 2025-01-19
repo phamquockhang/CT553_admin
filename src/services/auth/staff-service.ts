@@ -25,7 +25,7 @@ interface IStaffService {
 const apiClient: AxiosInstance = createApiClient("staffs");
 class StaffService implements IStaffService {
   async getLoggedInStaff(): Promise<ApiResponse<IStaff>> {
-    return (await apiClient.get("/logged-in")).data;
+    return await apiClient.get("/logged-in");
   }
 
   async getStaffs(
@@ -34,34 +34,32 @@ class StaffService implements IStaffService {
     filter?: StaffFilterCriteria,
     sort?: SortParams,
   ): Promise<ApiResponse<Page<IStaff>>> {
-    return (
-      await apiClient.get("", {
-        params: {
-          ...pagination,
-          ...filter,
-          query,
-          sortBy: sort?.sortBy !== "" ? sort?.sortBy : undefined,
-          direction: sort?.direction !== "" ? sort?.direction : undefined,
-        },
-      })
-    ).data;
+    return await apiClient.get("", {
+      params: {
+        ...pagination,
+        ...filter,
+        query,
+        sortBy: sort?.sortBy !== "" ? sort?.sortBy : undefined,
+        direction: sort?.direction !== "" ? sort?.direction : undefined,
+      },
+    });
   }
 
   async create(
     newStaff: Omit<IStaff, "staffId">,
   ): Promise<ApiResponse<IStaff>> {
-    return (await apiClient.post("", newStaff)).data;
+    return await apiClient.post("", newStaff);
   }
 
   async update(
     staffId: string,
     updatedStaff: IStaff,
   ): Promise<ApiResponse<IStaff>> {
-    return (await apiClient.put(`/${staffId}`, updatedStaff)).data;
+    return await apiClient.put(`/${staffId}`, updatedStaff);
   }
 
   async delete(staffId: string): Promise<ApiResponse<void>> {
-    return (await apiClient.delete(`/${staffId}`)).data;
+    return await apiClient.delete(`/${staffId}`);
   }
 }
 

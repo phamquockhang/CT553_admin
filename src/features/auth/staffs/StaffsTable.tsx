@@ -8,7 +8,13 @@ import { SorterResult } from "antd/es/table/interface";
 import { GetProp } from "antd/lib";
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { IStaff, Module, Page, PERMISSIONS } from "../../../interfaces";
+import {
+  IStaff,
+  Module,
+  Page,
+  PERMISSIONS,
+  RoleName,
+} from "../../../interfaces";
 import {
   colorFilterIcon,
   colorSortDownIcon,
@@ -211,9 +217,11 @@ const StaffsTable: React.FC<StaffTableProps> = ({ staffPage, isLoading }) => {
           <Access permission={PERMISSIONS[Module.STAFF].UPDATE} hideChildren>
             <UpdateStaff user={record} />
           </Access>
-          <Access permission={PERMISSIONS[Module.STAFF].DELETE} hideChildren>
-            <DeleteStaff userId={record.staffId} />
-          </Access>
+          {record.role.name !== RoleName.MANAGER && (
+            <Access permission={PERMISSIONS[Module.STAFF].DELETE} hideChildren>
+              <DeleteStaff userId={record.staffId} />
+            </Access>
+          )}
         </Space>
       ),
     },

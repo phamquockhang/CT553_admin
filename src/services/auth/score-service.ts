@@ -13,20 +13,20 @@ class ScoreService implements IScoreService {
   async getAllScoresByCustomerId(
     customerId: string,
   ): Promise<ApiResponse<IScore>> {
-    return (await apiClient.get(`/${customerId}`)).data;
+    return await apiClient.get(`/${customerId}`);
   }
 
   async getCurrentScoreByCustomerId(
     customerId: string,
   ): Promise<ApiResponse<IScore>> {
-    return (await apiClient.get(`/current/${customerId}`))?.data;
+    return await apiClient.get(`/current/${customerId}`);
   }
 
   async create(
     customerId: string,
     newScore: IScore,
   ): Promise<ApiResponse<IScore>> {
-    return (await apiClient.post(`/${customerId}`, newScore)).data;
+    return await apiClient.post(`/${customerId}`, newScore);
   }
 }
 
