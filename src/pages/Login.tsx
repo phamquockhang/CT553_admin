@@ -1,5 +1,5 @@
 import LoginForm from "../features/auth/LoginForm";
-import useDynamicTitle from "../hooks/useDynamicTitle";
+import { useDynamicTitle } from "../utils";
 
 const Login: React.FC = () => {
   useDynamicTitle("Đăng nhập");

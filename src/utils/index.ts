@@ -91,15 +91,6 @@ export function formatTimestamp(timestamp: string) {
   return dayjs(timestamp).format("DD-MM-YYYY HH:mm:ss");
 }
 
-// export async function getBase64(file: FileType): Promise<string> {
-//   return new Promise((resolve, reject) => {
-//     const reader = new FileReader();
-//     reader.readAsDataURL(file);
-//     reader.onload = () => resolve(reader.result as string);
-//     reader.onerror = (error) => reject(error);
-//   });
-// }
-
 export function getFormattedDuration(durationInMinutes: number): string {
   const hours = Math.floor(durationInMinutes / 60);
   const minutes = durationInMinutes % 60;
