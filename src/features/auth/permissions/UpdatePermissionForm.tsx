@@ -1,123 +1,105 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  Button,
-  DatePicker,
-  DatePickerProps,
-  Form,
-  Input,
-  Radio,
-  Space,
-  Switch,
-} from "antd";
-import dayjs, { Dayjs } from "dayjs";
+import { Button, Col, Form, Input, Row, Select, Space } from "antd";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
-import { IStaff } from "../../../interfaces";
-import { staffService } from "../../../services";
+import { IPermission, Method, Module } from "../../../interfaces";
+import { permissionService } from "../../../services";
 
-interface UpdateStaffFormProps {
-  userToUpdate?: IStaff;
+interface UpdatePermissionFormProps {
+  permissionToUpdate?: IPermission;
   onCancel: () => void;
   viewOnly?: boolean;
 }
 
-const genderOptions = [
-  { value: "MALE", label: "Nam" },
-  { value: "FEMALE", label: "Nữ" },
-  { value: "OTHER", label: "Khác" },
-];
+const methodOptions = Object.values(Method).map((method: string) => ({
+  value: method,
+  label: method,
+}));
 
-interface UpdateUserArgs {
-  userId: string;
-  updatedUser: IStaff;
+const moduleOptions = Object.values(Module).map((module: string) => ({
+  value: module,
+  label: module,
+}));
+
+interface UpdatePermissionArgs {
+  updatedPermission: IPermission;
 }
 
-const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
-  userToUpdate,
+const UpdatePermissionForm: React.FC<UpdatePermissionFormProps> = ({
+  permissionToUpdate,
   onCancel,
-  viewOnly = false,
 }) => {
-  const [form] = Form.useForm<IStaff>();
+  const [form] = Form.useForm<IPermission>();
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (userToUpdate) {
+    if (permissionToUpdate) {
       form.setFieldsValue({
-        ...userToUpdate,
+        ...permissionToUpdate,
       });
     }
-  }, [userToUpdate, form]);
+  }, [permissionToUpdate, form]);
 
-  const { mutate: createUser, isPending: isCreating } = useMutation({
-    mutationFn: staffService.create,
-
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({
-        predicate: (query) => {
-          return query.queryKey.includes("staffs");
-        },
-      });
-      toast.success(data.message || "Operation successful");
-
-      onCancel();
-      form.resetFields();
-    },
-
-    onError: (error: { response?: { data?: { message?: string } } }) => {
-      if (error.response?.data?.message) {
-        toast.error(error.response.data.message);
-      } else {
-        toast.error("An error occurred");
-      }
-    },
-  });
-
-  const { mutate: updateUser, isPending: isUpdating } = useMutation({
-    mutationFn: ({ userId, updatedUser }: UpdateUserArgs) => {
-      return staffService.update(userId, updatedUser);
-    },
+  const { mutate: createPermission, isPending: isCreating } = useMutation({
+    mutationFn: permissionService.create,
 
     onSuccess: (data) => {
       queryClient.invalidateQueries({
         predicate: (query) => {
-          return query.queryKey.includes("staffs");
+          return query.queryKey.includes("permissions");
         },
       });
-      toast.success(data.message || "Operation successful");
-
-      onCancel();
-      form.resetFields();
+      if (data && data.success) {
+        toast.success(data?.message || "Operation successful");
+        onCancel();
+        form.resetFields();
+      } else if (data && !data.success)
+        toast.error(data?.message || "Operation failed");
     },
 
-    onError: (error: { response?: { data?: { message?: string } } }) => {
-      if (error.response?.data?.message) {
-        toast.error(error.response.data.message);
-      } else {
-        toast.error("An error occurred");
-      }
+    onError: (error) => {
+      console.log(error);
     },
   });
 
-  const disabledDate: DatePickerProps["disabledDate"] = (current) => {
-    return current && dayjs(current).isAfter(dayjs().endOf("day"));
-  };
+  const { mutate: updatePermission, isPending: isUpdating } = useMutation({
+    mutationFn: ({ updatedPermission }: UpdatePermissionArgs) => {
+      return permissionService.update(updatedPermission);
+    },
 
-  function handleFinish(values: IStaff) {
-    if (userToUpdate) {
-      const updatedUser = {
-        ...userToUpdate,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        predicate: (query) => {
+          return query.queryKey.includes("permissions");
+        },
+      });
+      if (data && data.success) {
+        toast.success(data?.message || "Operation successful");
+        onCancel();
+        form.resetFields();
+      } else if (data && !data.success)
+        toast.error(data?.message || "Operation failed");
+    },
+
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
+  function handleFinish(values: IPermission) {
+    if (permissionToUpdate) {
+      const updatedPermission = {
+        ...permissionToUpdate,
         ...values,
-        firstName: values.firstName.toUpperCase(),
-        lastName: values.lastName.toUpperCase(),
       };
-      updateUser({ userId: userToUpdate.id, updatedUser });
+      updatePermission({
+        updatedPermission: updatedPermission,
+      });
     } else {
-      const newUser = {
+      const newPermission = {
         ...values,
-        firstName: values.firstName.toUpperCase(),
-        lastName: values.lastName.toUpperCase(),
       };
-      createUser(newUser);
+      createPermission(newPermission);
     }
   }
 
@@ -126,183 +108,73 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
   // }
 
   return (
-    <Form
-      layout="vertical"
-      form={form}
-      onFinish={handleFinish}
-      initialValues={{ active: true }}
-    >
-      <div className="flex gap-8">
-        <Form.Item
-          className="flex-1"
-          label="Họ"
-          name="lastName"
-          rules={[
-            {
-              required: true,
-              message: "Vui lòng nhập họ",
-            },
-            {
-              // vietnamese name has anccent characters
-              pattern:
-                /^[a-zA-ZăâđêôơưàảãáạăằẳẵắặâầẩẫấậèẻẽéẹêềểễếệìỉĩíịòỏõóọôồổỗốộơờởỡớợùủũúụưừửữứựỳỷỹýỵĂÂĐÊÔƠƯÀẢÃÁẠĂẰẲẴẮẶÂẦẨẪẤẬÈẺẼÉẸÊỀỂỄẾỆÌỈĨÍỊÒỎÕÓỌÔỒỔỖỐỘƠỜỞỠỚOỢÙỦŨÚỤƯỪỬỮỨỰỲỶỸÝỴ\s]+$/,
-              message: "Họ không chứa ký tự đặc biệt",
-            },
-          ]}
-        >
-          <Input
-            readOnly={viewOnly}
-            placeholder="Họ, ví dụ PHẠM"
-            style={{ textTransform: "uppercase" }}
-          />
-        </Form.Item>
-
-        <Form.Item
-          className="flex-1"
-          label="Tên đệm & tên"
-          name="firstName"
-          rules={[
-            {
-              required: true,
-              message: "Vui lòng nhập tên đệm & tên",
-            },
-            {
-              pattern:
-                /^[a-zA-ZăâđêôơưàảãáạăằẳẵắặâầẩẫấậèẻẽéẹêềểễếệìỉĩíịòỏõóọôồổỗốộơờởỡớợùủũúụưừửữứựỳỷỹýỵĂÂĐÊÔƠƯÀẢÃÁẠĂẰẲẴẮẶÂẦẨẪẤẬÈẺẼÉẸÊỀỂỄẾỆÌỈĨÍỊÒỎÕÓỌÔỒỔỖỐỘƠỜỞỠỚOỢÙỦŨÚỤƯỪỬỮỨỰỲỶỸÝỴ\s]+$/,
-              message: "Tên đệm & tên không chứa ký tự đặc biệt",
-            },
-          ]}
-        >
-          <Input
-            readOnly={viewOnly}
-            placeholder="Tên đệm & tên, ví dụ VAN A"
-            style={{ textTransform: "uppercase" }}
-          />
-        </Form.Item>
-      </div>
-
-      <div className="flex gap-8">
-        <Form.Item
-          className="flex-1"
-          label="Ngày sinh"
-          name="dob"
-          rules={[
-            {
-              required: true,
-              message: "Ngày sinh không hợp lệ",
-            },
-          ]}
-          getValueProps={(value: string) => ({
-            value: value && dayjs(value),
-          })}
-          normalize={(value: Dayjs) => value && value.tz().format("YYYY-MM-DD")}
-        >
-          <DatePicker
-            disabled={viewOnly}
-            className="w-full"
-            format="DD/MM/YYYY"
-            disabledDate={disabledDate}
-            placeholder="Chọn ngày sinh"
-          />
-        </Form.Item>
-
-        <Form.Item
-          className="flex-1"
-          label="Giới tính"
-          name="gender"
-          rules={[
-            {
-              required: true,
-              message: "Vui lòng chọn giới tính",
-            },
-          ]}
-        >
-          <Radio.Group
-            disabled={viewOnly}
-            className="space-x-4"
-            options={genderOptions}
-          />
-        </Form.Item>
-      </div>
-
-      <div className="flex gap-8">
-        <Form.Item
-          className="flex-1"
-          label="Trạng thái"
-          name="isActivated"
-          valuePropName="checked"
-        >
-          <Switch
-            defaultValue={true}
-            disabled={viewOnly}
-            checkedChildren="ACTIVE"
-            unCheckedChildren="INACTIVE"
-          />
-        </Form.Item>
-      </div>
-
-      <div className="flex gap-8">
-        <Form.Item
-          className="flex-1"
-          label="Email"
-          name="email"
-          rules={[
-            {
-              required: true,
-              message: "Vui lòng nhập email",
-            },
-            {
-              type: "email",
-              message: "Email không hợp lệ",
-            },
-          ]}
-        >
-          <Input
-            readOnly={userToUpdate != undefined || viewOnly}
-            placeholder="Email"
-          />
-        </Form.Item>
-
-        {!userToUpdate && (
+    <Form onFinish={handleFinish} layout="vertical" form={form}>
+      <Row>
+        <Col span={24}>
           <Form.Item
-            className="flex-1"
-            label="Mật khẩu"
-            name="password"
+            label="Tên quyền hạn"
+            name="name"
             rules={[
               {
                 required: true,
-                message: "Vui lòng nhập mật khẩu",
-              },
-              {
-                min: 6,
-                message: "Mật khẩu phải chứa ít nhất 6 ký tự",
+                message: "Tên quyền hạn không được để trống",
               },
             ]}
           >
-            <Input.Password placeholder="Mật khẩu" />
+            <Input placeholder="Ví dụ: Lấy danh sách nhân viên..." />
           </Form.Item>
-        )}
-      </div>
-
-      {!viewOnly && (
-        <Form.Item className="text-right" wrapperCol={{ span: 24 }}>
-          <Space>
-            <Button onClick={onCancel} loading={isCreating || isUpdating}>
-              Hủy
-            </Button>
-
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={isCreating || isUpdating}
-            >
-              {userToUpdate ? "Cập nhật" : "Thêm mới"}
-            </Button>
-          </Space>
-        </Form.Item>
-      )}
+          <Form.Item
+            label="Đường dẫn API"
+            name="apiPath"
+            rules={[
+              {
+                required: true,
+                message: "Đường dẫn API không được để trống",
+              },
+            ]}
+          >
+            <Input placeholder="Ví dụ: /api/v1/staffs" />
+          </Form.Item>
+          <Form.Item
+            label="Phương thức"
+            name="method"
+            rules={[
+              { required: true, message: "Phương thức không được để trống" },
+            ]}
+          >
+            <Select
+              allowClear
+              options={methodOptions}
+              placeholder="Chọn phương thức"
+            />
+          </Form.Item>
+          <Form.Item
+            label="Module"
+            name="module"
+            rules={[{ required: true, message: "Module không được để trống" }]}
+          >
+            <Select
+              allowClear
+              options={moduleOptions}
+              placeholder="Chọn module"
+            />
+          </Form.Item>
+        </Col>
+      </Row>
+      <Form.Item className="text-right" wrapperCol={{ span: 24 }}>
+        <Space>
+          <Button onClick={onCancel}>Hủy</Button>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={isCreating || isUpdating}
+          >
+            {permissionToUpdate ? "Cập nhật" : "Thêm mới"}
+          </Button>
+        </Space>
+      </Form.Item>
     </Form>
   );
 };
 
-export default UpdateUserForm;
+export default UpdatePermissionForm;

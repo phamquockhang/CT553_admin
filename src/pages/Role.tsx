@@ -1,20 +1,17 @@
-import { useSearchParams } from "react-router-dom";
-import {
-  CustomerFilterCriteria,
-  Module,
-  PERMISSIONS,
-  SortParams,
-} from "../interfaces";
-import { useQuery } from "@tanstack/react-query";
-import { customerService } from "../services/auth/customer-service";
-import { SearchProps } from "antd/es/input";
-import { useDynamicTitle } from "../utils";
+import { PERMISSIONS } from "../interfaces/common/constants";
+import { Module } from "../interfaces/common/enums";
 import Access from "../features/auth/Access";
-import AddCustomer from "../features/auth/customers/AddCustomer";
-import CustomersTable from "../features/auth/customers/CustomersTable";
+import AddRole from "../features/auth/roles/AddRole";
+import RolesTable from "../features/auth/roles/RolesTable";
+import { useDynamicTitle } from "../utils";
 import { Input } from "antd";
+import { useSearchParams } from "react-router-dom";
+import { RoleFilterCriteria, SortParams } from "../interfaces";
+import { useQuery } from "@tanstack/react-query";
+import { roleService } from "../services";
+import { SearchProps } from "antd/es/input";
 
-const Customer: React.FC = () => {
+const Role: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const pagination = {
@@ -28,12 +25,12 @@ const Customer: React.FC = () => {
     sortBy: searchParams.get("sortBy") || "",
     direction: searchParams.get("direction") || "",
   };
-  const filter: CustomerFilterCriteria = {
-    isActivated: searchParams.get("isActivated") || undefined,
+  const filter: RoleFilterCriteria = {
+    isActivated: searchParams.get("isActivated") || "",
   };
 
   const { data, isLoading } = useQuery({
-    queryKey: ["customers", pagination, query, sort, filter].filter((key) => {
+    queryKey: ["roles", pagination, query, sort, filter].filter((key) => {
       if (typeof key === "string") {
         return key !== "";
       } else if (key instanceof Object) {
@@ -42,8 +39,7 @@ const Customer: React.FC = () => {
         );
       }
     }),
-    queryFn: () =>
-      customerService.getCustomers(pagination, query, filter, sort),
+    queryFn: () => roleService.getRoles(pagination, query, filter, sort),
   });
 
   const handleSearch: SearchProps["onSearch"] = (value) => {
@@ -55,18 +51,18 @@ const Customer: React.FC = () => {
     setSearchParams(searchParams);
   };
 
-  useDynamicTitle("Quản lý khách hàng");
+  useDynamicTitle("Quản lý vai trò");
 
   return (
-    <Access permission={PERMISSIONS[Module.CUSTOMER].GET_PAGINATION}>
+    <Access permission={PERMISSIONS[Module.ROLES].GET_PAGINATION}>
       <div className="card">
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Quản lý Khách hàng</h2>
+          <h2 className="text-xl font-semibold">Quản lý vai trò</h2>
 
           <div className="w-[60%]">
             <div className="flex gap-3">
               <Input.Search
-                placeholder="Nhập tên hoặc email của Khách hàng để tìm kiếm"
+                placeholder="Nhập tên hoặc mô tả của vai trò để tìm kiếm..."
                 defaultValue={query}
                 enterButton
                 allowClear
@@ -74,14 +70,15 @@ const Customer: React.FC = () => {
               />
             </div>
           </div>
-          <Access permission={PERMISSIONS[Module.CUSTOMER].CREATE} hideChildren>
-            <AddCustomer />
+
+          <Access permission={PERMISSIONS[Module.ROLES].CREATE} hideChildren>
+            <AddRole />
           </Access>
         </div>
-        <CustomersTable customerPage={data?.payload} isLoading={isLoading} />
+        <RolesTable rolePage={data?.payload} isLoading={isLoading} />
       </div>
     </Access>
   );
 };
 
-export default Customer;
+export default Role;

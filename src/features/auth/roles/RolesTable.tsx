@@ -6,15 +6,11 @@ import {
 import { Space, Table, TablePaginationConfig, TableProps, Tag } from "antd";
 import { SorterResult } from "antd/es/table/interface";
 import { GetProp } from "antd/lib";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import {
-  IStaff,
-  Module,
-  Page,
-  PERMISSIONS,
-  RoleName,
-} from "../../../interfaces";
+import { IRole, Page } from "../../../interfaces";
+import { PERMISSIONS } from "../../../interfaces/common/constants";
+import { Module } from "../../../interfaces/common/enums";
 import {
   colorFilterIcon,
   colorSortDownIcon,
@@ -25,46 +21,45 @@ import {
   getSortDirection,
 } from "../../../utils";
 import Access from "../Access";
-import DeleteStaff from "./DeleteStaff";
-import UpdateStaff from "./UpdateStaff";
-import ViewStaff from "./ViewStaff";
+import UpdateRole from "./UpdateRole";
+import ViewRole from "./ViewRole";
 
 interface TableParams {
   pagination: TablePaginationConfig;
   filters?: Parameters<GetProp<TableProps, "onChange">>[1];
-  sorter?: SorterResult<IStaff> | SorterResult<IStaff>[];
+  sorter?: SorterResult<IRole> | SorterResult<IRole>[];
 }
 
-interface StaffTableProps {
-  staffPage?: Page<IStaff>;
+interface RolesTableProps {
+  rolePage?: Page<IRole>;
   isLoading: boolean;
 }
 
-const StaffsTable: React.FC<StaffTableProps> = ({ staffPage, isLoading }) => {
+const RolesTable: React.FC<RolesTableProps> = ({ rolePage, isLoading }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [tableParams, setTableParams] = useState<TableParams>(() => ({
     pagination: {
       current: Number(searchParams.get("page")) || 1,
       pageSize: Number(searchParams.get("pageSize")) || 10,
       showSizeChanger: true,
-      showTotal: (total) => `Tổng ${total} nhân viên`,
+      showTotal: (total) => `Tổng ${total} vai trò`,
     },
   }));
 
   useEffect(() => {
-    if (staffPage) {
+    if (rolePage) {
       setTableParams((prev) => ({
         ...prev,
         pagination: {
           ...prev.pagination,
-          total: staffPage.meta?.total || 0,
-          showTotal: (total) => `Tổng ${total} nhân viên`,
+          total: rolePage.meta.total || 0,
+          showTotal: (total) => `Tổng ${total} vai trò`,
         },
       }));
     }
-  }, [staffPage]);
+  }, [rolePage]);
 
-  const handleTableChange: TableProps<IStaff>["onChange"] = (
+  const handleTableChange: TableProps<IRole>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -72,8 +67,8 @@ const StaffsTable: React.FC<StaffTableProps> = ({ staffPage, isLoading }) => {
     setTableParams((prev) => ({
       ...prev,
       pagination,
-      filters,
       sorter,
+      filters,
     }));
     searchParams.set("page", String(pagination.current));
     searchParams.set("pageSize", String(pagination.pageSize));
@@ -114,42 +109,25 @@ const StaffsTable: React.FC<StaffTableProps> = ({ staffPage, isLoading }) => {
     setSearchParams(searchParams);
   };
 
-  const columns: TableProps<IStaff>["columns"] = [
+  const columns: TableProps<IRole>["columns"] = [
     {
-      title: "STT",
-      width: "2%",
+      title: "ID",
+      dataIndex: "roleId",
+      key: "roleId",
+      width: "5%",
       align: "center",
-      render: (_, __, index) =>
-        ((tableParams.pagination.current || 1) - 1) *
-          (tableParams.pagination.pageSize || 10) +
-        index +
-        1,
-    },
-    {
-      title: "Họ",
-      key: "lastName",
-      dataIndex: "lastName",
-      width: "10%",
     },
     {
       title: "Tên",
-      key: "firstName",
-      dataIndex: "firstName",
-      width: "10%",
+      dataIndex: "name",
+      key: "name",
+      width: "20%",
     },
     {
-      key: "email",
-      title: "Email",
-      dataIndex: "email",
-      width: "15%",
-      sorter: true,
-      defaultSortOrder: getDefaultSortOrder(searchParams, "email"),
-      sortIcon: ({ sortOrder }) => (
-        <div className="flex flex-col text-[10px]">
-          <CaretUpFilled style={{ color: colorSortUpIcon(sortOrder) }} />
-          <CaretDownFilled style={{ color: colorSortDownIcon(sortOrder) }} />
-        </div>
-      ),
+      title: "Mô tả",
+      dataIndex: "description",
+      key: "description",
+      width: "20%",
     },
     {
       key: "isActivated",
@@ -208,32 +186,26 @@ const StaffsTable: React.FC<StaffTableProps> = ({ staffPage, isLoading }) => {
     {
       title: "Hành động",
       key: "action",
-      width: "10%",
       align: "center",
-
-      render: (record: IStaff) => (
-        <Space>
-          <ViewStaff user={record} />
-          <Access permission={PERMISSIONS[Module.STAFF].UPDATE} hideChildren>
-            <UpdateStaff user={record} />
+      width: "10%",
+      render: (record: IRole) => (
+        <Space size="middle">
+          <ViewRole role={record} />
+          <Access permission={PERMISSIONS[Module.ROLES].UPDATE} hideChildren>
+            <UpdateRole role={record} />
           </Access>
-          {record.role.name !== RoleName.MANAGER && (
-            <Access permission={PERMISSIONS[Module.STAFF].DELETE} hideChildren>
-              <DeleteStaff userId={record.staffId} />
-            </Access>
-          )}
+          {/* <DeleteRole roleId={record.roleId} /> */}
         </Space>
       ),
     },
   ];
-
   return (
     <Table
       bordered={false}
       columns={columns}
-      rowKey={(record: IStaff) => record.staffId}
+      rowKey={(record: IRole) => record.roleId}
       pagination={tableParams.pagination}
-      dataSource={staffPage?.data}
+      dataSource={rolePage?.data}
       rowClassName={(_, index) =>
         index % 2 === 0 ? "table-row-light" : "table-row-gray"
       }
@@ -248,4 +220,4 @@ const StaffsTable: React.FC<StaffTableProps> = ({ staffPage, isLoading }) => {
   );
 };
 
-export default StaffsTable;
+export default RolesTable;

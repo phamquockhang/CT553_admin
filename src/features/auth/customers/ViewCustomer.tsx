@@ -1,8 +1,8 @@
 import { EyeOutlined } from "@ant-design/icons";
 import { Modal, Tooltip } from "antd";
 import { useState } from "react";
-import UpdateUserForm from "./UpdateCustomerForm";
 import { ICustomer } from "../../../interfaces";
+import UpdateUserForm from "./UpdateCustomerForm";
 
 interface ViewUserProps {
   user: ICustomer;

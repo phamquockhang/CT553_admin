@@ -10,6 +10,7 @@ export interface ApiResponse<T> {
   error?: string;
   message?: string;
   payload?: T;
+  data?: T;
 }
 
 export interface PaginationParams {

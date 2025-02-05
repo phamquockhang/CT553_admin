@@ -5,11 +5,16 @@ import NotPermitted from "./NotPermitted";
 
 const RoleBasedRoute: React.FC<PropsWithChildren> = ({ children }) => {
   const { user, isLoading } = useLoggedInUser();
-  const isNormalUser = user?.role.roleName === "USER";
+  const isBlockedUser =
+    user?.role.isActivated === false ||
+    user?.isActivated === false ||
+    user === undefined;
+
   if (isLoading) {
     return <Loading />;
   }
-  if (isNormalUser) {
+
+  if (isBlockedUser) {
     localStorage.removeItem("access_token");
     return <NotPermitted />;
   }

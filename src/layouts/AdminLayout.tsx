@@ -1,16 +1,17 @@
-import { Button, Dropdown, Layout, Menu, theme } from "antd";
-import Loading from "../common/components/Loading";
-import { useEffect, useState } from "react";
-import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { MenuProps } from "antd/lib";
-import { useLoggedInUser } from "../features/auth/hooks/useLoggedInUser";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { authService } from "../services";
+import { Button, Dropdown, Layout, Menu, theme, Tooltip } from "antd";
+import { MenuProps } from "antd/lib";
+import { useEffect, useState } from "react";
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
 import { FaKey, FaUserCircle, FaUserCog, FaUsers } from "react-icons/fa";
-import { Module, PERMISSIONS } from "../interfaces";
-import { MdDashboard } from "react-icons/md";
+import { IoIosNotifications } from "react-icons/io";
 import { IoShieldCheckmark } from "react-icons/io5";
+import { MdDashboard } from "react-icons/md";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import Loading from "../common/components/Loading";
+import { useLoggedInUser } from "../features/auth/hooks/useLoggedInUser";
+import { Module, PERMISSIONS } from "../interfaces";
+import { authService } from "../services";
 
 const { Header, Sider } = Layout;
 
@@ -44,6 +45,14 @@ const AdminLayout: React.FC = () => {
         <span onClick={() => logout()} className="px-1">
           Đăng xuất
         </span>
+      ),
+    },
+    {
+      key: "profile",
+      label: (
+        <NavLink to="/profile" className="px-1">
+          Thông tin cá nhân
+        </NavLink>
       ),
     },
   ];
@@ -231,7 +240,15 @@ const AdminLayout: React.FC = () => {
                 fontSize: "20px",
               }}
             />
-            <div className="relative mr-5 flex items-center gap-2">
+            <div className="relative mr-5 flex items-center gap-3">
+              <Tooltip title="Thông báo">
+                <NavLink to="/notifications">
+                  <div className="flex items-center gap-1">
+                    <IoIosNotifications className="text-2xl" />
+                  </div>
+                </NavLink>
+              </Tooltip>
+
               <Dropdown
                 menu={{ items }}
                 placement="bottom"
