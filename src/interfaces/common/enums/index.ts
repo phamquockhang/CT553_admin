@@ -11,6 +11,8 @@ export enum Module {
   CUSTOMER = "CUSTOMER",
   ROLES = "ROLE",
   PERMISSIONS = "PERMISSION",
+  ITEMS = "ITEM",
+  PRODUCTS = "PRODUCT",
 }
 
 export enum RoleName {

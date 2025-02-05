@@ -34,6 +34,20 @@ export const PERMISSIONS = {
     UPDATE: { method: "PUT", apiPath: "/api/v1/permissions/{id}" },
     DELETE: { method: "DELETE", apiPath: "/api/v1/permissions/{id}" },
   },
+  [Module.ITEMS]: {
+    GET_PAGINATION: { method: "GET", apiPath: "/api/v1/items" },
+    GET_BY_ID: { method: "GET", apiPath: "/api/v1/items/{id}" },
+    CREATE: { method: "POST", apiPath: "/api/v1/items" },
+    UPDATE: { method: "PUT", apiPath: "/api/v1/items/{id}" },
+    DELETE: { method: "DELETE", apiPath: "/api/v1/items/{id}" },
+  },
+  [Module.PRODUCTS]: {
+    GET_PAGINATION: { method: "GET", apiPath: "/api/v1/products" },
+    GET_BY_ID: { method: "GET", apiPath: "/api/v1/products/{id}" },
+    CREATE: { method: "POST", apiPath: "/api/v1/products" },
+    UPDATE: { method: "PUT", apiPath: "/api/v1/products/{id}" },
+    DELETE: { method: "DELETE", apiPath: "/api/v1/products/{id}" },
+  },
 };
 
 // export const ROUTE_TYPE_TRANSLATION: Record<RouteType, string> = {

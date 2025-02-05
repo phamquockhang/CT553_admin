@@ -9,6 +9,8 @@ import Customer from "../pages/Customer";
 import Permission from "../pages/Permission";
 import Role from "../pages/Role";
 import Profile from "../pages/Profile";
+import Item from "../pages/Item";
+import Product from "../pages/Product";
 
 const router = createBrowserRouter([
   {
@@ -47,6 +49,18 @@ const router = createBrowserRouter([
       {
         path: "permissions",
         element: <Permission />,
+      },
+      {
+        path: "items",
+        element: <Item />,
+      },
+      {
+        path: "items/:id",
+        element: <div>Item Detail</div>,
+      },
+      {
+        path: "products",
+        element: <Product />,
       },
     ],
   },

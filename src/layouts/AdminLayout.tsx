@@ -2,7 +2,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button, Dropdown, Layout, Menu, theme, Tooltip } from "antd";
 import { MenuProps } from "antd/lib";
 import { useEffect, useState } from "react";
-import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
+import {
+  AiFillProduct,
+  AiOutlineMenuFold,
+  AiOutlineMenuUnfold,
+} from "react-icons/ai";
 import { FaKey, FaUserCircle, FaUserCog, FaUsers } from "react-icons/fa";
 import { IoIosNotifications } from "react-icons/io";
 import { IoShieldCheckmark } from "react-icons/io5";
@@ -12,6 +16,7 @@ import Loading from "../common/components/Loading";
 import { useLoggedInUser } from "../features/auth/hooks/useLoggedInUser";
 import { Module, PERMISSIONS } from "../interfaces";
 import { authService } from "../services";
+import { BiSolidCategory, BiSolidPurchaseTagAlt } from "react-icons/bi";
 
 const { Header, Sider } = Layout;
 
@@ -83,8 +88,25 @@ const AdminLayout: React.FC = () => {
             PERMISSIONS[Module.PERMISSIONS].GET_PAGINATION.apiPath &&
           item.method === PERMISSIONS[Module.PERMISSIONS].GET_PAGINATION.method,
       );
+      const viewItems = permissions.find(
+        (item) =>
+          item.apiPath === PERMISSIONS[Module.ITEMS].GET_PAGINATION.apiPath &&
+          item.method === PERMISSIONS[Module.ITEMS].GET_PAGINATION.method,
+      );
+      const viewProducts = permissions.find(
+        (item) =>
+          item.apiPath ===
+            PERMISSIONS[Module.PRODUCTS].GET_PAGINATION.apiPath &&
+          item.method === PERMISSIONS[Module.PRODUCTS].GET_PAGINATION.method,
+      );
+
       const hasAuthChildren: boolean = Boolean(
-        viewStaffs || viewRoles || viewPermissions || viewCustomers,
+        viewStaffs ||
+          viewRoles ||
+          viewPermissions ||
+          viewCustomers ||
+          viewItems ||
+          viewProducts,
       );
 
       const menuItems = [
@@ -137,6 +159,31 @@ const AdminLayout: React.FC = () => {
                           label: <NavLink to="/permissions">Quyền hạn</NavLink>,
                           key: "permissions",
                           icon: <FaKey />,
+                        },
+                      ]
+                    : []),
+                ],
+              },
+              {
+                label: "Danh mục",
+                key: "categories",
+                icon: <BiSolidCategory />,
+                children: [
+                  ...(viewItems
+                    ? [
+                        {
+                          label: <NavLink to="/items">Mặt hàng</NavLink>,
+                          key: "items",
+                          icon: <AiFillProduct />,
+                        },
+                      ]
+                    : []),
+                  ...(viewProducts
+                    ? [
+                        {
+                          label: <NavLink to="/products">Sản phẩm</NavLink>,
+                          key: "products",
+                          icon: <BiSolidPurchaseTagAlt />,
                         },
                       ]
                     : []),

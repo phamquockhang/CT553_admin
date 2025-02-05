@@ -89,3 +89,38 @@ export interface IAuthRequest {
 export interface IAuthResponse {
   accessToken: string;
 }
+
+export interface IItem {
+  itemId: number;
+  name: string;
+  isActivated: boolean;
+  products: IProduct[];
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface ItemFilterCriteria {
+  isActivated?: string;
+}
+
+export interface IProduct {
+  productId: number;
+  name: string;
+  description: string;
+  isActivated: boolean;
+  itemId: number;
+  productImages: IProductImage[];
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface ProductFilterCriteria {
+  isActivated?: string;
+}
+
+export interface IProductImage {
+  productImageId: number;
+  imageUrl: string;
+  productId: number;
+  createdAt: string;
+}
