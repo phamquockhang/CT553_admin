@@ -1,9 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Button, Col, Form, Input, Row, Space, Switch } from "antd";
+import { Button, Form, Space } from "antd";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
 import { IItem } from "../../../interfaces";
 import { itemService } from "../../../services/booking";
+import FormItemAddItem from "./components/FormItemAddItem";
+import FormItemAddProduct from "./components/FormItemAddProduct";
+import ProductsOfItem from "./components/ProductsOfItem";
 
 interface UpdateItemFormProps {
   itemToUpdate?: IItem;
@@ -69,12 +72,12 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
         },
       });
       if (data && data.success) {
-        console.log("success", data.success);
+        // console.log("success", data.success);
         onCancel();
         form.resetFields();
         toast.success(data?.message || "Operation successful");
       } else if (data && !data.success) {
-        console.log("success", data.success);
+        // console.log("success", data.success);
         toast.error(data?.message || "Operation failed");
       }
     },
@@ -89,12 +92,15 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
       const updatedItem = {
         ...itemToUpdate,
         ...values,
+        itemName: values.itemName,
+        isActivated: values.isActivated,
       };
       updateItem({ itemId: itemToUpdate.itemId, updatedItem: updatedItem });
-      console.log("updatedUser", updatedItem);
     } else {
       const newItem = {
         ...values,
+        name: values.itemName,
+        isActivated: values.isActivated,
       };
       createItem(newItem);
     }
@@ -105,83 +111,13 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
       layout="vertical"
       form={form}
       onFinish={handleFinish}
-      initialValues={{ active: true }}
+      initialValues={{ active: true, products: [{}] }}
     >
-      <div className="flex gap-8">
-        <Form.Item
-          className="flex-1"
-          label="Tên mặt hàng"
-          name="name"
-          rules={[
-            {
-              required: true,
-              message: "Vui lòng nhập tên mặt hàng",
-            },
-            {
-              // vietnamese name has anccent characters
-              pattern:
-                /^[0-9a-zA-ZăâđêôơưàảãáạăằẳẵắặâầẩẫấậèẻẽéẹêềểễếệìỉĩíịòỏõóọôồổỗốộơờởỡớợùủũúụưừửữứựỳỷỹýỵĂÂĐÊÔƠƯÀẢÃÁẠĂẰẲẴẮẶÂẦẨẪẤẬÈẺẼÉẸÊỀỂỄẾỆÌỈĨÍỊÒỎÕÓỌÔỒỔỖỐỘƠỜỞỠỚOỢÙỦŨÚỤƯỪỬỮỨỰỲỶỸÝỴ\s]+$/,
-              message: "Tên mặt hàng không chứa ký tự đặc biệt",
-            },
-          ]}
-        >
-          <Input
-            readOnly={viewOnly}
-            placeholder="Tên mặt hàng, ví dụ: Tôm, Cua, ..."
-          />
-        </Form.Item>
+      <FormItemAddItem viewOnly={viewOnly} />
 
-        <Form.Item
-          className="flex-1"
-          label="Trạng thái"
-          name="isActivated"
-          valuePropName="checked"
-        >
-          <Switch
-            defaultValue={true}
-            disabled={viewOnly}
-            checkedChildren="ACTIVE"
-            unCheckedChildren="INACTIVE"
-          />
-        </Form.Item>
-      </div>
+      <FormItemAddProduct viewOnly={viewOnly} />
 
-      <Row>
-        <p>Các sản phẩm</p>
-      </Row>
-
-      <Row>
-        {itemToUpdate &&
-          itemToUpdate.products &&
-          itemToUpdate.products.length > 0 && (
-            <>
-              {itemToUpdate.products.map((product) => (
-                <Col span={8} key={product.productId}>
-                  <div className="m-1 overflow-hidden rounded-md border border-gray-300 bg-white">
-                    <img
-                      src={
-                        product.productImages &&
-                        product.productImages.length > 0 &&
-                        product.productImages[0].imageUrl
-                          ? product.productImages[0].imageUrl
-                          : "https://placehold.co/400"
-                      }
-                      alt={product.name}
-                      className="h-36 w-full object-cover"
-                    />
-
-                    <div className="p-1">
-                      <p>{product.name}</p>
-                      <p className="text-base font-semibold text-red-600">
-                        250.000đ
-                      </p>
-                    </div>
-                  </div>
-                </Col>
-              ))}
-            </>
-          )}
-      </Row>
+      <ProductsOfItem itemToUpdate={itemToUpdate} />
 
       {!viewOnly && (
         <Form.Item className="text-right" wrapperCol={{ span: 24 }}>

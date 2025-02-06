@@ -120,8 +120,8 @@ const ItemsTable: React.FC<ItemTableProps> = ({ itemPage, isLoading }) => {
     },
     {
       title: "Tên mặt hàng",
-      key: "name",
-      dataIndex: "name",
+      key: "itemName",
+      dataIndex: "itemName",
       width: "10%",
     },
     {

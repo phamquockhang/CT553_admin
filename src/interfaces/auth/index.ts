@@ -92,7 +92,7 @@ export interface IAuthResponse {
 
 export interface IItem {
   itemId: number;
-  name: string;
+  itemName: string;
   isActivated: boolean;
   products: IProduct[];
   createdAt: string;
@@ -105,7 +105,7 @@ export interface ItemFilterCriteria {
 
 export interface IProduct {
   productId: number;
-  name: string;
+  productName: string;
   description: string;
   isActivated: boolean;
   itemId: number;

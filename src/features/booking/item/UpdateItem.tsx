@@ -28,8 +28,9 @@ const UpdateItem: React.FC<UpdateItemProps> = ({ item }) => {
         />
       </Tooltip>
       <Modal
+        centered
         open={isOpenModal}
-        width="50%"
+        width="60%"
         title={<span className="text-lg">Cập nhật thông tin mặt hàng</span>}
         destroyOnClose
         onCancel={handleCloseModal}

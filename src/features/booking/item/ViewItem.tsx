@@ -28,8 +28,9 @@ const ViewItem: React.FC<ViewItemProps> = ({ item }) => {
         />
       </Tooltip>
       <Modal
+        centered
         open={isOpenModal}
-        width="80%"
+        width="60%"
         title={<span className="text-lg">Xem thông tin mặt hàng</span>}
         destroyOnClose
         onCancel={handleCloseModal}

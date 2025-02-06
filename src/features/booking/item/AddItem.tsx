@@ -22,7 +22,7 @@ const AddItem: React.FC = () => {
       <Modal
         centered
         open={isOpenModal}
-        width="50%"
+        width="60%"
         title={<span className="text-lg">Thêm mặt hàng</span>}
         destroyOnClose
         onCancel={handleCloseModal}
