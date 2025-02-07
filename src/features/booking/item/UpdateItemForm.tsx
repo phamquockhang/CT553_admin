@@ -35,6 +35,8 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
     }
   }, [itemToUpdate, form]);
 
+  console.log("form", form.getFieldsValue());
+
   const { mutate: createItem, isPending: isCreating } = useMutation({
     mutationFn: itemService.create,
 

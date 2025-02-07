@@ -8,7 +8,11 @@ interface ProductsOfItemProps {
 const ProductsOfItem: React.FC<ProductsOfItemProps> = ({ itemToUpdate }) => {
   return (
     <div className="mb-2">
-      <p className="mb-1 mt-4">Các sản phẩm</p>
+      {itemToUpdate &&
+        itemToUpdate.products &&
+        itemToUpdate.products.length > 0 && (
+          <p className="mb-1 mt-4">Các sản phẩm</p>
+        )}
 
       <Row>
         {itemToUpdate &&
@@ -17,7 +21,7 @@ const ProductsOfItem: React.FC<ProductsOfItemProps> = ({ itemToUpdate }) => {
             <>
               {itemToUpdate.products.map((product) => (
                 <Col span={8} key={product.productId}>
-                  <div className="m-1 overflow-hidden rounded-md border border-gray-300 bg-white">
+                  <div className="m-1 overflow-hidden rounded-md border border-gray-300 bg-white transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0px_0px_5px_1px_rgba(0,0,0,0.24)]">
                     <img
                       src={
                         product.productImages &&
@@ -31,9 +35,32 @@ const ProductsOfItem: React.FC<ProductsOfItemProps> = ({ itemToUpdate }) => {
                     />
 
                     <div className="p-1">
-                      <p>{product.productName}</p>
-                      <p className="text-base font-semibold text-red-600">
-                        250.000đ
+                      <p className="font-semibold">{product.productName}</p>
+
+                      <p className="text-xs">
+                        Bán ra:
+                        <span className="font-semibold text-blue-800">
+                          {" "}
+                          250,000{" "}
+                        </span>
+                        VNĐ/kg (
+                        <span className="font-semibold text-blue-800">
+                          ±3,000{" "}
+                        </span>
+                        VNĐ/con)
+                      </p>
+
+                      <p className="text-xs">
+                        Mua vào:
+                        <span className="font-semibold text-green-700">
+                          {" "}
+                          200,000{" "}
+                        </span>
+                        VNĐ/kg (
+                        <span className="font-semibold text-green-700">
+                          ±2,000{" "}
+                        </span>
+                        VNĐ/con)
                       </p>
                     </div>
                   </div>

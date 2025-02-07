@@ -14,7 +14,7 @@ import {
 } from "antd";
 import { UploadFile } from "antd/lib";
 import { useState } from "react";
-import { FileType, PRIMARY_COLOR } from "../../../../interfaces";
+import { FileType } from "../../../../interfaces";
 import { getBase64 } from "../../../../utils";
 
 interface FormItemAddProductProps {
@@ -28,7 +28,6 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
   //   fileList,
   //   setFileList,
 }) => {
-  // use Map instead of array to store multiple file lists
   const [fileList, setFileList] = useState<Map<number, UploadFile[]>>(
     new Map(),
   );
@@ -43,6 +42,8 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
     setPreviewOpen(true);
   }
 
+  console.log("fileList", fileList);
+
   return (
     <>
       <Form.List name="products">
@@ -50,10 +51,10 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
           <div style={{ display: "flex", rowGap: 16, flexDirection: "column" }}>
             {fields.map((field) => (
               <Card
+                className="border border-gray-300 shadow-md transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0px_0px_5px_1px_rgba(0,0,0,0.24)]"
                 size="small"
                 title={`Sản phẩm ${field.name + 1}`}
                 key={field.key}
-                className="border border-gray-300 shadow-md transition-all duration-200 hover:shadow-[0px_0px_5px_1px_rgba(0,0,0,0.24)]"
                 extra={
                   viewOnly ? null : (
                     <Popconfirm
@@ -68,9 +69,12 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                         // when remove a product, remove its images from fileList and update fileList state from index this product to the end
                         const newFileList = new Map(fileList);
                         newFileList.delete(field.name);
-                        for (let i = field.name; i < fields.length; i++) {
-                          newFileList.set(i, fileList.get(i + 1) || []);
-                        }
+                        newFileList.forEach((value, key) => {
+                          if (key > field.name) {
+                            newFileList.set(key - 1, value);
+                            newFileList.delete(key);
+                          }
+                        });
                         setFileList(newFileList);
 
                         console.log("newFileList", newFileList);
@@ -85,6 +89,7 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
               >
                 <Row className="flex justify-between">
                   <Col span={11}>
+                    {/* productName */}
                     <Form.Item
                       name={[field.name, "productName"]}
                       rules={[
@@ -107,6 +112,29 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                       />
                     </Form.Item>
 
+                    {/* description */}
+                    <Form.Item
+                      name={[field.name, "description"]}
+                      rules={[
+                        {
+                          // vietnamese name has anccent characters
+                          pattern:
+                            /^[-/0-9a-zA-ZăâđêôơưàảãáạăằẳẵắặâầẩẫấậèẻẽéẹêềểễếệìỉĩíịòỏõóọôồổỗốộơờởỡớợùủũúụưừửữứựỳỷỹýỵĂÂĐÊÔƠƯÀẢÃÁẠĂẰẲẴẮẶÂẦẨẪẤẬÈẺẼÉẸÊỀỂỄẾỆÌỈĨÍỊÒỎÕÓỌÔỒỔỖỐỘƠỜỞỠỚOỢÙỦŨÚỤƯỪỬỮỨỰỲỶỸÝỴ\s]+$/,
+                          message: "Mô tả sản phẩm không chứa ký tự đặc biệt",
+                        },
+                      ]}
+                    >
+                      <Input.TextArea
+                        allowClear
+                        readOnly={viewOnly}
+                        rows={6}
+                        placeholder="Mô tả sản phẩm, ví dụ: Tôm sú hàng 2 có kích thước 15-24 con/kg"
+                      />
+                    </Form.Item>
+                  </Col>
+
+                  <Col span={11}>
+                    {/* sellinPriceValue */}
                     <Form.Item
                       name={[field.name, "sellingPriceValue"]}
                       rules={[
@@ -127,10 +155,38 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                         // parser={(value) =>
                         //   value?.replace(/\$\s?|(,*)/g, "") as unknown as number
                         // }
-                        placeholder="Giá bán ra, ví dụ: 250,000"
+                        placeholder="Ví dụ: 250,000"
+                        readOnly={viewOnly}
                       />
                     </Form.Item>
 
+                    {/* sellinPriceFluctuation */}
+                    <Form.Item
+                      name={[field.name, "sellingPriceFluctuation"]}
+                      rules={[
+                        {
+                          required: true,
+                          message: "Vui lòng nhập giá biến động bán ra",
+                        },
+                      ]}
+                    >
+                      <InputNumber
+                        style={{ width: "100%" }}
+                        min={0}
+                        addonBefore="Biến động bán ra"
+                        addonAfter="VNĐ/con"
+                        formatter={(value) =>
+                          `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        }
+                        // parser={(value) =>
+                        //   value?.replace(/\$\s?|(,*)/g, "") as unknown as number
+                        // }
+                        placeholder="Ví dụ: 10,000"
+                        readOnly={viewOnly}
+                      />
+                    </Form.Item>
+
+                    {/* buyingPriceValue */}
                     <Form.Item
                       name={[field.name, "buyingPriceValue"]}
                       rules={[
@@ -151,28 +207,34 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                         // parser={(value) =>
                         //   value?.replace(/\$\s?|(,*)/g, "") as unknown as number
                         // }
-                        placeholder="Giá mua vào, ví dụ: 200,000"
+                        placeholder="Ví dụ: 200,000"
+                        readOnly={viewOnly}
                       />
                     </Form.Item>
-                  </Col>
 
-                  <Col span={11}>
+                    {/* buyingPriceFluctuation */}
                     <Form.Item
-                      name={[field.name, "description"]}
+                      name={[field.name, "buyingPriceFluctuation"]}
                       rules={[
                         {
-                          // vietnamese name has anccent characters
-                          pattern:
-                            /^[-/0-9a-zA-ZăâđêôơưàảãáạăằẳẵắặâầẩẫấậèẻẽéẹêềểễếệìỉĩíịòỏõóọôồổỗốộơờởỡớợùủũúụưừửữứựỳỷỹýỵĂÂĐÊÔƠƯÀẢÃÁẠĂẰẲẴẮẶÂẦẨẪẤẬÈẺẼÉẸÊỀỂỄẾỆÌỈĨÍỊÒỎÕÓỌÔỒỔỖỐỘƠỜỞỠỚOỢÙỦŨÚỤƯỪỬỮỨỰỲỶỸÝỴ\s]+$/,
-                          message: "Mô tả sản phẩm không chứa ký tự đặc biệt",
+                          required: true,
+                          message: "Vui lòng nhập giá biến động mua vào",
                         },
                       ]}
                     >
-                      <Input.TextArea
-                        allowClear
+                      <InputNumber
+                        style={{ width: "100%" }}
+                        min={0}
+                        addonBefore="Biến động mua vào"
+                        addonAfter="VNĐ/con"
+                        formatter={(value) =>
+                          `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        }
+                        // parser={(value) =>
+                        //   value?.replace(/\$\s?|(,*)/g, "") as unknown as number
+                        // }
+                        placeholder="Ví dụ: 10,000"
                         readOnly={viewOnly}
-                        rows={6}
-                        placeholder="Mô tả sản phẩm, ví dụ: Tôm sú hàng 2 có kích thước 15-24 con/kg"
                       />
                     </Form.Item>
                   </Col>
@@ -181,14 +243,18 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                 <Row>
                   <Form.Item
                     name="productImages"
-                    label="Hình ảnh"
+                    label="Hình ảnh (tối đa 3 ảnh)"
                     valuePropName="fileList"
                     rules={[
                       {
                         validator: () => {
-                          if (fileList && fileList.size < 1) {
+                          if (
+                            // (fileList.get(field.name) &&
+                            //   fileList.get(field.name)?.length === 0) ||
+                            !fileList.get(field.name)
+                          ) {
                             return Promise.reject(
-                              new Error("Vui lòng tải ảnh lên"),
+                              new Error("Vui lòng tải lên ít nhất 1 ảnh"),
                             );
                           }
                           return Promise.resolve();
@@ -203,23 +269,26 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                       maxCount={3}
                       disabled={viewOnly}
                       listType="picture-card"
-                      //   fileList={Array.from(fileList.values()).flat()}
-                      //   fileList={Array.from(fileList.values())
-                      //     .flat()
-                      //     .map((file, index) => ({
-                      //       ...file,
-                      //       uid: `${file.name}-${index}`,
-                      //     }))}
                       fileList={fileList.get(field.name) || []}
                       beforeUpload={() => false}
                       onPreview={handlePreview}
                       onChange={(info) => {
-                        setFileList((prev) => {
-                          const newFileList = new Map(prev);
-                          newFileList.set(field.name, info.fileList);
-                          console.log("newFileList", newFileList);
-                          return newFileList;
-                        });
+                        //when remove a file, if the file list is empty, remove the key from fileList
+                        if (info.fileList.length === 0) {
+                          setFileList((prev) => {
+                            const newFileList = new Map(prev);
+                            newFileList.delete(field.name);
+                            // console.log("newFileList", newFileList);
+                            return newFileList;
+                          });
+                        } else {
+                          setFileList((prev) => {
+                            const newFileList = new Map(prev);
+                            newFileList.set(field.name, info.fileList);
+                            // console.log("newFileList", newFileList);
+                            return newFileList;
+                          });
+                        }
                       }}
                       showUploadList={{
                         showRemoveIcon: !viewOnly,
@@ -227,11 +296,13 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                     >
                       {(fileList.get(field.name)?.length ?? 0) < 3 && (
                         <button
+                          className={`${viewOnly ? "cursor-not-allowed" : ""}`}
                           style={{ border: 0, background: "none" }}
                           type="button"
+                          disabled={viewOnly}
                         >
                           <PlusOutlined />
-                          <div style={{ marginTop: 8 }}>Tải ảnh lên</div>
+                          <div className="mt-2">Tải ảnh lên</div>
                         </button>
                       )}
                     </Upload>
@@ -253,9 +324,11 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
               </Card>
             ))}
 
-            <Button type="dashed" onClick={() => add()} block>
-              + Thêm sản phẩm
-            </Button>
+            {!viewOnly && (
+              <Button type="dashed" onClick={() => add()} block>
+                + Thêm sản phẩm
+              </Button>
+            )}
           </div>
         )}
       </Form.List>
