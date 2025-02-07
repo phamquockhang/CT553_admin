@@ -198,9 +198,9 @@ const ItemsTable: React.FC<ItemTableProps> = ({ itemPage, isLoading }) => {
     },
   ];
 
-  if (!isLoading) {
-    console.log(itemPage?.data);
-  }
+  // if (!isLoading) {
+  //   console.log(itemPage?.data);
+  // }
 
   return (
     <Table

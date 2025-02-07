@@ -83,7 +83,7 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
     },
   });
 
-  const { mutate: createAddress, isPending: isCreatingAddress } = useMutation({
+  const { mutate: createAddress } = useMutation({
     mutationFn: ({
       customerId,
       newAddress,
@@ -462,6 +462,7 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
               ]}
             >
               <Select
+                loading={isLoadingProvince}
                 allowClear
                 showSearch
                 placeholder="Chọn tỉnh/thành phố"
@@ -565,6 +566,7 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
               ]}
             >
               <Select
+                loading={isLoadingWard}
                 allowClear
                 showSearch
                 placeholder="Chọn phường/xã"

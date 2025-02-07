@@ -47,12 +47,10 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
         },
       });
       if (data && data.success) {
-        console.log("success", data.success);
         onCancel();
         form.resetFields();
         toast.success(data?.message || "Operation successful");
       } else if (data && !data.success) {
-        console.log("success", data.success);
         toast.error(data?.message || "Operation failed");
       }
     },
@@ -94,17 +92,18 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
       const updatedItem = {
         ...itemToUpdate,
         ...values,
-        itemName: values.itemName,
-        isActivated: values.isActivated,
       };
       updateItem({ itemId: itemToUpdate.itemId, updatedItem: updatedItem });
     } else {
       const newItem = {
-        ...values,
-        name: values.itemName,
+        itemName: values.itemName,
         isActivated: values.isActivated,
       };
-      createItem(newItem);
+      createItem(newItem, {
+        onSuccess: (newItem) => {
+          // create product and product image here
+        },
+      });
     }
   }
 

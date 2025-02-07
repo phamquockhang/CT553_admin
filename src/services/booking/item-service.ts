@@ -2,6 +2,7 @@ import { AxiosInstance } from "axios";
 import { createApiClient } from "../api-client";
 import {
   ApiResponse,
+  IBriefItem,
   IItem,
   ItemFilterCriteria,
   Page,
@@ -16,7 +17,7 @@ interface IItemService {
     filter?: ItemFilterCriteria,
     sort?: SortParams,
   ): Promise<ApiResponse<Page<IItem>>>;
-  create(newItem: Omit<IItem, "itemId">): Promise<ApiResponse<IItem>>;
+  create(newItem: Omit<IBriefItem, "itemId">): Promise<ApiResponse<IItem>>;
   update(itemId: number, updatedItem: IItem): Promise<ApiResponse<IItem>>;
   delete(itemId: number): Promise<ApiResponse<void>>;
 }
@@ -40,7 +41,9 @@ class ItemService implements IItemService {
     });
   }
 
-  async create(newItem: Omit<IItem, "itemId">): Promise<ApiResponse<IItem>> {
+  async create(
+    newItem: Omit<IBriefItem, "itemId">,
+  ): Promise<ApiResponse<IItem>> {
     return await apiClient.post("", newItem);
   }
 

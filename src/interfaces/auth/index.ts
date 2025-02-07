@@ -99,6 +99,14 @@ export interface IItem {
   updatedAt?: string;
 }
 
+export interface IBriefItem {
+  itemId: number;
+  itemName: string;
+  isActivated: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface ItemFilterCriteria {
   isActivated?: string;
 }

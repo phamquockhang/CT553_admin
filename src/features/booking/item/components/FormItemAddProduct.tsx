@@ -42,7 +42,7 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
     setPreviewOpen(true);
   }
 
-  console.log("fileList", fileList);
+  // console.log("fileList", fileList);
 
   return (
     <>
@@ -242,7 +242,7 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
 
                 <Row>
                   <Form.Item
-                    name="productImages"
+                    name={[field.name, "productImageFiles"]}
                     label="Hình ảnh (tối đa 3 ảnh)"
                     valuePropName="fileList"
                     rules={[
