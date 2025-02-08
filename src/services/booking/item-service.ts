@@ -18,7 +18,7 @@ interface IItemService {
     sort?: SortParams,
   ): Promise<ApiResponse<Page<IItem>>>;
   create(newItem: Omit<IBriefItem, "itemId">): Promise<ApiResponse<IItem>>;
-  update(itemId: number, updatedItem: IItem): Promise<ApiResponse<IItem>>;
+  update(itemId: number, updatedItem: IBriefItem): Promise<ApiResponse<IItem>>;
   delete(itemId: number): Promise<ApiResponse<void>>;
 }
 
@@ -49,7 +49,7 @@ class ItemService implements IItemService {
 
   async update(
     itemId: number,
-    updatedItem: IItem,
+    updatedItem: IBriefItem,
   ): Promise<ApiResponse<IItem>> {
     return await apiClient.put(`/${itemId}`, updatedItem);
   }

@@ -19,18 +19,18 @@ import { getBase64 } from "../../../../utils";
 
 interface FormItemAddProductProps {
   viewOnly?: boolean;
-  //   fileList: Map<number, UploadFile[]>;
-  //   setFileList: React.Dispatch<React.SetStateAction<Map<number, UploadFile[]>>>;
+  fileList: Map<number, UploadFile[]>;
+  setFileList: React.Dispatch<React.SetStateAction<Map<number, UploadFile[]>>>;
 }
 
 const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
   viewOnly,
-  //   fileList,
-  //   setFileList,
+  fileList,
+  setFileList,
 }) => {
-  const [fileList, setFileList] = useState<Map<number, UploadFile[]>>(
-    new Map(),
-  );
+  // const [fileList, setFileList] = useState<Map<number, UploadFile[]>>(
+  //   new Map(),
+  // );
   const [previewOpen, setPreviewOpen] = useState<boolean>(false);
   const [previewImage, setPreviewImage] = useState<string>("");
 
@@ -56,7 +56,7 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                 title={`Sản phẩm ${field.name + 1}`}
                 key={field.key}
                 extra={
-                  viewOnly ? null : (
+                  viewOnly || fields.length === 1 ? null : (
                     <Popconfirm
                       title="Xóa sản phẩm"
                       description="Bạn có chắc muốn xóa sản phẩm này không?"
@@ -242,6 +242,7 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
 
                 <Row>
                   <Form.Item
+                    // name="productImageFiles"
                     name={[field.name, "productImageFiles"]}
                     label="Hình ảnh (tối đa 3 ảnh)"
                     valuePropName="fileList"

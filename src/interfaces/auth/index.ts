@@ -1,3 +1,4 @@
+import { UploadFile } from "antd";
 import { Dayjs } from "dayjs";
 
 export interface IStaff {
@@ -119,6 +120,18 @@ export interface IProduct {
   itemId: number;
   productImages: IProductImage[];
   createdAt: string;
+  updatedAt?: string;
+
+  productImageFiles?: UploadFile[];
+}
+
+export interface IBriefProduct {
+  productId: number;
+  productName: string;
+  description: string;
+  isActivated: boolean;
+  itemId?: number;
+  createdAt?: string;
   updatedAt?: string;
 }
 

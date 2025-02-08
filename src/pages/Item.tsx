@@ -1,18 +1,18 @@
+import { useQuery } from "@tanstack/react-query";
 import { Input } from "antd";
+import { SearchProps } from "antd/es/input";
+import { useSearchParams } from "react-router-dom";
 import Access from "../features/auth/Access";
+import AddItem from "../features/booking/item/AddItem";
+import ItemsTable from "../features/booking/item/ItemsTable";
 import {
   ItemFilterCriteria,
   Module,
   PERMISSIONS,
   SortParams,
 } from "../interfaces";
-import { useDynamicTitle } from "../utils";
-import { useSearchParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
 import { itemService } from "../services/booking";
-import { SearchProps } from "antd/es/input";
-import AddItem from "../features/booking/item/AddItem";
-import ItemsTable from "../features/booking/item/ItemsTable";
+import { useDynamicTitle } from "../utils";
 
 const Item: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
