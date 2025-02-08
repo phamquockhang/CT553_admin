@@ -1,13 +1,17 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button, Form, Space, UploadFile } from "antd";
+import axios from "axios";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { IItem, IProduct } from "../../../interfaces";
-import { itemService, productService } from "../../../services/booking";
+import { ApiResponse, IItem, IProduct } from "../../../interfaces";
+import {
+  itemService,
+  productImageService,
+  productService,
+} from "../../../services/booking";
 import FormItemAddItem from "./components/FormItemAddItem";
 import FormItemAddProduct from "./components/FormItemAddProduct";
 import ProductsOfItem from "./components/ProductsOfItem";
-import { productImageService } from "../../../services/booking/product-image-service";
 
 interface UpdateItemFormProps {
   itemToUpdate?: IItem;
@@ -36,13 +40,46 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
   );
   const queryClient = useQueryClient();
 
+  async function urlToUploadFile(url: string): Promise<UploadFile> {
+    const response = await axios.get(url, { responseType: "blob" });
+    const blob = response.data;
+    const file = new File([blob], url.split("/").pop() || "image.jpg", {
+      type: blob.type,
+    });
+
+    return {
+      uid: url,
+      name: file.name,
+      status: "done",
+      url: url,
+      originFileObj: file,
+    };
+  }
+
   useEffect(() => {
     if (itemToUpdate) {
       form.setFieldsValue({
         ...itemToUpdate,
       });
+
+      const fetchImages = async () => {
+        const fileListMap = new Map();
+        for (const [index, product] of itemToUpdate.products.entries()) {
+          const productImages = await Promise.all(
+            product.productImages.map(async (productImage) => {
+              return await urlToUploadFile(productImage.imageUrl);
+            }),
+          );
+          fileListMap.set(index, productImages);
+        }
+        setFileList(fileListMap);
+      };
+
+      fetchImages();
     }
   }, [itemToUpdate, form]);
+
+  console.log("fileList", fileList);
 
   const { mutate: createItem, isPending: isCreatingItem } = useMutation({
     mutationFn: itemService.create,
@@ -54,9 +91,9 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
         },
       });
       if (data && data.success) {
-        onCancel();
-        form.resetFields();
-        toast.success(data?.message || "Operation successful");
+        // onCancel();
+        // form.resetFields();
+        // toast.success(data?.message || "Operation successful");
       } else if (data && !data.success) {
         toast.error(data?.message || "Operation failed");
       }
@@ -79,10 +116,9 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
         },
       });
       if (data && data.success) {
-        // console.log("success", data.success);
-        onCancel();
-        form.resetFields();
-        toast.success(data?.message || "Operation successful");
+        // onCancel();
+        // form.resetFields();
+        // toast.success(data?.message || "Operation successful");
       } else if (data && !data.success) {
         // console.log("success", data.success);
         toast.error(data?.message || "Operation failed");
@@ -104,11 +140,11 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
         },
       });
       if (data && data.success) {
-        onCancel();
-        form.resetFields();
+        // onCancel();
+        // form.resetFields();
         // toast.success(data?.message || "Operation successful");
       } else if (data && !data.success) {
-        toast.error(data?.message || "Operation failed");
+        // toast.error(data?.message || "Operation failed");
       }
     },
 
@@ -129,9 +165,9 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
         },
       });
       if (data && data.success) {
-        onCancel();
-        form.resetFields();
-        toast.success(data?.message || "Operation successful");
+        // onCancel();
+        // form.resetFields();
+        // toast.success(data?.message || "Operation successful");
       } else if (data && !data.success) {
         toast.error(data?.message || "Operation failed");
       }
@@ -142,71 +178,253 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
     },
   });
 
-  function handleFinish(values: IItem) {
+  const { mutate: createProductImage, isPending: isCreatingProductImage } =
+    useMutation({
+      mutationFn: (formData: FormData) => {
+        return productImageService.create(formData);
+      },
+
+      onSuccess: (data) => {
+        queryClient.invalidateQueries({
+          predicate: (query) => {
+            return query.queryKey.includes("product_images");
+          },
+        });
+        if (data && data.success) {
+          onCancel();
+          // form.resetFields();
+          // toast.success(data?.message || "Operation successful");
+        } else if (data && !data.success) {
+          toast.error(data?.message || "Operation failed");
+        }
+      },
+
+      onError: (error) => {
+        console.log(error);
+      },
+    });
+
+  const { mutate: updateProductImage, isPending: isUpdatingProductImage } =
+    useMutation({
+      mutationFn: ({
+        productId,
+        formData,
+      }: {
+        productId: number;
+        formData: FormData;
+      }) => {
+        return productImageService.update(productId, formData);
+      },
+
+      onSuccess: (data) => {
+        queryClient.invalidateQueries({
+          predicate: (query) => {
+            return query.queryKey.includes("product_images");
+          },
+        });
+        if (data && data.success) {
+          onCancel();
+          // form.resetFields();
+          // toast.success(data?.message || "Operation successful");
+        } else if (data && !data.success) {
+          toast.error(data?.message || "Operation failed");
+        }
+      },
+
+      onError: (error) => {
+        console.log(error);
+      },
+    });
+
+  async function handleFinish(values: IItem) {
     if (itemToUpdate) {
+      values.products.forEach(async (product, index) => {
+        if (product.productId) {
+          //
+        }
+        // new product
+        else {
+          const newProduct = {
+            productName: product.productName,
+            description: product.description,
+            isActivated: product.isActivated,
+            itemId: itemToUpdate.itemId,
+          };
+
+          await new Promise((resolve, reject) => {
+            createProduct(newProduct, {
+              onSuccess: (newProduct) => {
+                resolve(newProduct);
+
+                if (newProduct.payload) {
+                  values.products[index] = newProduct.payload;
+                }
+
+                queryClient.invalidateQueries({
+                  predicate: (query) => {
+                    return query.queryKey.includes("items");
+                  },
+                });
+              },
+              onError: (error) => {
+                reject(error);
+              },
+            });
+          });
+        }
+
+        const productImages = fileList.get(index);
+
+        console.log("productImages index", index);
+        console.log("productImages", productImages);
+
+        if (productImages) {
+          const formData = new FormData();
+          if (product.productId) {
+            formData.append("productId", product.productId.toString());
+          }
+          for (const image of productImages) {
+            formData.append("productImageFiles", image.originFileObj as File);
+          }
+          await new Promise((resolve, reject) => {
+            updateProductImage(
+              {
+                productId: product.productId,
+                formData,
+              },
+              {
+                onSuccess: () => {
+                  resolve(null);
+
+                  queryClient.invalidateQueries({
+                    predicate: (query) => {
+                      return query.queryKey.includes("items");
+                    },
+                  });
+                },
+                onError: (error) => {
+                  reject(error);
+                },
+              },
+            );
+          });
+        }
+      });
+
       const updatedItem = {
         ...itemToUpdate,
         ...values,
       };
-      updateItem({ itemId: itemToUpdate.itemId, updatedItem: updatedItem });
+      await new Promise((resolve, reject) => {
+        updateItem(
+          { itemId: itemToUpdate.itemId, updatedItem: updatedItem },
+          {
+            onSuccess: () => {
+              resolve(null);
+              queryClient.invalidateQueries({
+                predicate: (query) => {
+                  return query.queryKey.includes("items");
+                },
+              });
+              toast.success("Cập nhật mặt hàng thành công");
+            },
+            onError: (error) => {
+              reject(error);
+            },
+          },
+        );
+      });
     } else {
       const newItem = {
         itemName: values.itemName,
         isActivated: values.isActivated,
       };
-      createItem(newItem, {
-        onSuccess: (newItem) => {
-          // create product and product image here
-          const newProductList = values.products.map((product) => {
-            return {
-              productName: product.productName,
-              description: product.description,
-              isActivated: product.isActivated,
-              itemId: newItem.payload?.itemId,
-            };
-          });
-          newProductList.forEach((product) => {
-            createProduct(product, {
-              onSuccess: (newProduct) => {
-                const productImages = Array.from(fileList.values()).flat();
 
-                if (productImages) {
-                  productImages.forEach((image) => {
-                    const formData = new FormData();
-                    formData.append(
-                      "productImageFiles",
-                      image.originFileObj as File,
-                    );
+      try {
+        const createdItem = await new Promise<ApiResponse<IItem>>(
+          (resolve, reject) => {
+            createItem(newItem, {
+              onSuccess: (newItem) => {
+                resolve(newItem);
 
-                    console.log("formData", formData);
-
-                    if (newProduct.payload?.productId !== undefined) {
-                      productImageService
-                        .create(newProduct.payload.productId, formData)
-                        .then(() => {
-                          queryClient.invalidateQueries({
-                            predicate: (query) => {
-                              return query.queryKey.includes("products");
-                            },
-                          });
-                        })
-                        .catch((error) => {
-                          console.error("Error creating product image:", error);
-                        });
-                    }
-                  });
-                }
+                queryClient.invalidateQueries({
+                  predicate: (query) => {
+                    return query.queryKey.includes("items");
+                  },
+                });
+              },
+              onError: (error) => {
+                reject(error);
               },
             });
-          });
+          },
+        );
 
-          queryClient.invalidateQueries({
-            predicate: (query) => {
-              return query.queryKey.includes("items");
+        const newProductList = values.products.map((product) => ({
+          productName: product.productName,
+          description: product.description,
+          isActivated: product.isActivated,
+          itemId: createdItem.payload?.itemId,
+        }));
+
+        console.log("newProductList", newProductList);
+
+        for (const [index, product] of newProductList.entries()) {
+          const createdProduct = await new Promise<ApiResponse<IProduct>>(
+            (resolve, reject) => {
+              createProduct(product, {
+                onSuccess: (newProduct) => {
+                  if (newProduct.success) {
+                    resolve(newProduct);
+
+                    queryClient.invalidateQueries({
+                      predicate: (query) => {
+                        return query.queryKey.includes("items");
+                      },
+                    });
+                  }
+                },
+                onError: (error) => {
+                  reject(error);
+                },
+              });
             },
-          });
-        },
-      });
+          );
+
+          const productImages = fileList.get(index);
+          if (productImages) {
+            const formData = new FormData();
+            if (createdProduct.payload?.productId !== undefined) {
+              formData.append(
+                "productId",
+                createdProduct.payload.productId.toString(),
+              );
+            }
+            for (const image of productImages) {
+              formData.append("productImageFiles", image.originFileObj as File);
+            }
+            await new Promise((resolve, reject) => {
+              createProductImage(formData, {
+                onSuccess: () => {
+                  resolve(null);
+
+                  queryClient.invalidateQueries({
+                    predicate: (query) => {
+                      return query.queryKey.includes("items");
+                    },
+                  });
+                },
+                onError: (error) => {
+                  reject(error);
+                },
+              });
+            });
+          }
+        }
+        toast.success("Thêm mặt hàng thành công");
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
 
@@ -237,7 +455,13 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
             <Button
               type="primary"
               htmlType="submit"
-              loading={isCreatingItem || isUpdatingItem}
+              loading={
+                isCreatingItem ||
+                isUpdatingItem ||
+                isCreatingProduct ||
+                isCreatingProductImage ||
+                isUpdatingProductImage
+              }
             >
               {itemToUpdate ? "Cập nhật" : "Thêm mới"}
             </Button>

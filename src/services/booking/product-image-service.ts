@@ -3,31 +3,25 @@ import { ApiResponse, IProductImage } from "../../interfaces";
 import { createApiClient } from "../api-client";
 
 interface IProductImageService {
-  create(
-    productId: number,
-    newProductImage: FormData,
-  ): Promise<ApiResponse<IProductImage>>;
+  create(formData: FormData): Promise<ApiResponse<IProductImage>>;
   update(
     productId: number,
-    updatedProductImage: FormData,
+    formData: FormData,
   ): Promise<ApiResponse<IProductImage>>;
 }
 
-const apiClient: AxiosInstance = createApiClient("productImages");
+const apiClient: AxiosInstance = createApiClient("product_images");
 
 class ProductImageService implements IProductImageService {
-  async create(
-    productId: number,
-    newProductImage: FormData,
-  ): Promise<ApiResponse<IProductImage>> {
-    return await apiClient.post(`/${productId}`, newProductImage);
+  async create(formData: FormData): Promise<ApiResponse<IProductImage>> {
+    return await apiClient.post("", formData);
   }
 
   async update(
     productId: number,
-    updatedProductImage: FormData,
+    formData: FormData,
   ): Promise<ApiResponse<IProductImage>> {
-    return await apiClient.put(`/${productId}`, updatedProductImage);
+    return await apiClient.put(`/${productId}`, formData);
   }
 }
 
