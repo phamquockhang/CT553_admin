@@ -141,6 +141,7 @@ export interface ProductFilterCriteria {
 
 export interface IProductImage {
   productImageId: number;
+  publicId: string;
   imageUrl: string;
   productId: number;
   createdAt: string;

@@ -32,7 +32,7 @@ const Item: React.FC = () => {
     isActivated: searchParams.get("isActivated") || undefined,
   };
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isFetching } = useQuery({
     queryKey: ["items", pagination, query, sort, filter].filter((key) => {
       if (typeof key === "string") {
         return key !== "";
@@ -77,7 +77,11 @@ const Item: React.FC = () => {
             <AddItem />
           </Access>
         </div>
-        <ItemsTable itemPage={data?.payload} isLoading={isLoading} />
+        <ItemsTable
+          itemPage={data?.payload}
+          isLoading={isLoading}
+          isFetching={isFetching}
+        />
       </div>
     </Access>
   );

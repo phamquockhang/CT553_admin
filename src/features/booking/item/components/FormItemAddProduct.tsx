@@ -19,14 +19,29 @@ import { getBase64 } from "../../../../utils";
 
 interface FormItemAddProductProps {
   viewOnly?: boolean;
+
   fileList: Map<number, UploadFile[]>;
   setFileList: React.Dispatch<React.SetStateAction<Map<number, UploadFile[]>>>;
+
+  fileListToUpdate: Map<number, UploadFile[]>;
+  setFileListToUpdate: React.Dispatch<
+    React.SetStateAction<Map<number, UploadFile[]>>
+  >;
+
+  publicIdImageListToKeep: Map<number, string[]>;
+  setPublicIdImageListToKeep: React.Dispatch<
+    React.SetStateAction<Map<number, string[]>>
+  >;
 }
 
 const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
   viewOnly,
   fileList,
   setFileList,
+  fileListToUpdate,
+  setFileListToUpdate,
+  publicIdImageListToKeep,
+  setPublicIdImageListToKeep,
 }) => {
   // const [fileList, setFileList] = useState<Map<number, UploadFile[]>>(
   //   new Map(),
@@ -42,7 +57,35 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
     setPreviewOpen(true);
   }
 
-  // console.log("fileList", fileList);
+  function handleRemove(key: number, file: UploadFile) {
+    setFileListToUpdate((prev) => {
+      const newFileListToUpdate = new Map(prev);
+      if (newFileListToUpdate.get(key)?.length === 0) {
+        newFileListToUpdate.delete(key);
+      }
+      return newFileListToUpdate;
+    });
+
+    setPublicIdImageListToKeep((prev) => {
+      const newPublicIdImageListToKeep = new Map(prev);
+      newPublicIdImageListToKeep.set(
+        key,
+        newPublicIdImageListToKeep
+          .get(key)
+          ?.filter((publicId) => publicId !== "CT553/" + file.name) ?? [],
+      );
+
+      return newPublicIdImageListToKeep;
+    });
+
+    setPublicIdImageListToKeep((prev) => {
+      const newPublicIdImageListToKeep = new Map(prev);
+      if (newPublicIdImageListToKeep.get(key)?.length === 0) {
+        newPublicIdImageListToKeep.delete(key);
+      }
+      return newPublicIdImageListToKeep;
+    });
+  }
 
   return (
     <>
@@ -66,7 +109,7 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                       onConfirm={() => {
                         remove(field.name);
 
-                        // when remove a product, remove its images from fileList and update fileList state from index this product to the end
+                        // when remove a product, remove its images from fileList, publicIdImageListToKeep and update fileList, publicIdImageListToKeep state from index this product to the end
                         const newFileList = new Map(fileList);
                         newFileList.delete(field.name);
                         newFileList.forEach((value, key) => {
@@ -77,7 +120,27 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                         });
                         setFileList(newFileList);
 
-                        console.log("newFileList", newFileList);
+                        const newFileListToUpdate = new Map(fileListToUpdate);
+                        newFileListToUpdate.delete(field.name);
+                        newFileListToUpdate.forEach((value, key) => {
+                          if (key > field.name) {
+                            newFileListToUpdate.set(key - 1, value);
+                            newFileListToUpdate.delete(key);
+                          }
+                        });
+                        setFileListToUpdate(newFileListToUpdate);
+
+                        const newPublicIdImageListToKeep = new Map(
+                          publicIdImageListToKeep,
+                        );
+                        newPublicIdImageListToKeep.delete(field.name);
+                        newPublicIdImageListToKeep.forEach((value, key) => {
+                          if (key > field.name) {
+                            newPublicIdImageListToKeep.set(key - 1, value);
+                            newPublicIdImageListToKeep.delete(key);
+                          }
+                        });
+                        setPublicIdImageListToKeep(newPublicIdImageListToKeep);
                       }}
                     >
                       <Tooltip title="Xóa">
@@ -137,12 +200,12 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                     {/* sellinPriceValue */}
                     <Form.Item
                       name={[field.name, "sellingPriceValue"]}
-                      rules={[
-                        {
-                          required: true,
-                          message: "Vui lòng nhập giá bán ra",
-                        },
-                      ]}
+                      // rules={[
+                      //   {
+                      //     required: true,
+                      //     message: "Vui lòng nhập giá bán ra",
+                      //   },
+                      // ]}
                     >
                       <InputNumber
                         style={{ width: "100%" }}
@@ -163,12 +226,12 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                     {/* sellinPriceFluctuation */}
                     <Form.Item
                       name={[field.name, "sellingPriceFluctuation"]}
-                      rules={[
-                        {
-                          required: true,
-                          message: "Vui lòng nhập giá biến động bán ra",
-                        },
-                      ]}
+                      // rules={[
+                      //   {
+                      //     required: true,
+                      //     message: "Vui lòng nhập giá biến động bán ra",
+                      //   },
+                      // ]}
                     >
                       <InputNumber
                         style={{ width: "100%" }}
@@ -189,12 +252,12 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                     {/* buyingPriceValue */}
                     <Form.Item
                       name={[field.name, "buyingPriceValue"]}
-                      rules={[
-                        {
-                          required: true,
-                          message: "Vui lòng nhập giá mua vào",
-                        },
-                      ]}
+                      // rules={[
+                      //   {
+                      //     required: true,
+                      //     message: "Vui lòng nhập giá mua vào",
+                      //   },
+                      // ]}
                     >
                       <InputNumber
                         style={{ width: "100%" }}
@@ -215,12 +278,12 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                     {/* buyingPriceFluctuation */}
                     <Form.Item
                       name={[field.name, "buyingPriceFluctuation"]}
-                      rules={[
-                        {
-                          required: true,
-                          message: "Vui lòng nhập giá biến động mua vào",
-                        },
-                      ]}
+                      // rules={[
+                      //   {
+                      //     required: true,
+                      //     message: "Vui lòng nhập giá biến động mua vào",
+                      //   },
+                      // ]}
                     >
                       <InputNumber
                         style={{ width: "100%" }}
@@ -274,22 +337,43 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                       beforeUpload={() => false}
                       onPreview={handlePreview}
                       onChange={(info) => {
-                        //when remove a file, if the file list is empty, remove the key from fileList
+                        //when remove a file, if the file list is empty, remove the key from fileList and publicIdImageListToKeep
                         if (info.fileList.length === 0) {
                           setFileList((prev) => {
                             const newFileList = new Map(prev);
                             newFileList.delete(field.name);
-                            // console.log("newFileList", newFileList);
                             return newFileList;
+                          });
+                          setFileListToUpdate((prev) => {
+                            const newFileListToUpdate = new Map(prev);
+                            newFileListToUpdate.delete(field.name);
+                            return newFileListToUpdate;
+                          });
+                          setPublicIdImageListToKeep((prev) => {
+                            const newPublicIdImageListToKeep = new Map(prev);
+                            newPublicIdImageListToKeep.delete(field.name);
+                            return newPublicIdImageListToKeep;
                           });
                         } else {
                           setFileList((prev) => {
                             const newFileList = new Map(prev);
                             newFileList.set(field.name, info.fileList);
-                            // console.log("newFileList", newFileList);
                             return newFileList;
                           });
+                          setFileListToUpdate((prev) => {
+                            const newFileListToUpdate = new Map(prev);
+                            newFileListToUpdate.set(
+                              field.name,
+                              info.fileList.filter(
+                                (file) => file.status !== "done",
+                              ),
+                            );
+                            return newFileListToUpdate;
+                          });
                         }
+                      }}
+                      onRemove={(file) => {
+                        handleRemove(field.name, file);
                       }}
                       showUploadList={{
                         showRemoveIcon: !viewOnly,

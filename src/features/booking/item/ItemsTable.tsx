@@ -31,9 +31,14 @@ interface TableParams {
 interface ItemTableProps {
   itemPage?: Page<IItem>;
   isLoading: boolean;
+  isFetching: boolean;
 }
 
-const ItemsTable: React.FC<ItemTableProps> = ({ itemPage, isLoading }) => {
+const ItemsTable: React.FC<ItemTableProps> = ({
+  itemPage,
+  isLoading,
+  isFetching,
+}) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [tableParams, setTableParams] = useState<TableParams>(() => ({
     pagination: {
@@ -213,10 +218,17 @@ const ItemsTable: React.FC<ItemTableProps> = ({ itemPage, isLoading }) => {
         index % 2 === 0 ? "table-row-light" : "table-row-gray"
       }
       rowHoverable={false}
-      loading={{
-        spinning: isLoading,
-        tip: "Đang tải dữ liệu...",
-      }}
+      loading={
+        isLoading
+          ? {
+              spinning: true,
+              tip: "Đang tải dữ liệu...",
+            }
+          : isFetching && {
+              spinning: true,
+              tip: "Đang cập nhật dữ liệu...",
+            }
+      }
       onChange={handleTableChange}
       size="middle"
     />
