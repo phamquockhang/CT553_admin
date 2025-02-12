@@ -112,35 +112,39 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                         // when remove a product, remove its images from fileList, publicIdImageListToKeep and update fileList, publicIdImageListToKeep state from index this product to the end
                         const newFileList = new Map(fileList);
                         newFileList.delete(field.name);
-                        newFileList.forEach((value, key) => {
-                          if (key > field.name) {
-                            newFileList.set(key - 1, value);
-                            newFileList.delete(key);
-                          }
-                        });
-                        setFileList(newFileList);
+                        const tempFileList = new Map(
+                          Array.from(newFileList).map(([key, value]) => [
+                            key > field.name ? key - 1 : key,
+                            value,
+                          ]),
+                        );
+                        setFileList(tempFileList);
 
                         const newFileListToUpdate = new Map(fileListToUpdate);
                         newFileListToUpdate.delete(field.name);
-                        newFileListToUpdate.forEach((value, key) => {
-                          if (key > field.name) {
-                            newFileListToUpdate.set(key - 1, value);
-                            newFileListToUpdate.delete(key);
-                          }
-                        });
-                        setFileListToUpdate(newFileListToUpdate);
+                        const tempFileListToUpdate = new Map(
+                          Array.from(newFileListToUpdate).map(
+                            ([key, value]) => [
+                              key > field.name ? key - 1 : key,
+                              value,
+                            ],
+                          ),
+                        );
+                        setFileListToUpdate(tempFileListToUpdate);
 
                         const newPublicIdImageListToKeep = new Map(
                           publicIdImageListToKeep,
                         );
                         newPublicIdImageListToKeep.delete(field.name);
-                        newPublicIdImageListToKeep.forEach((value, key) => {
-                          if (key > field.name) {
-                            newPublicIdImageListToKeep.set(key - 1, value);
-                            newPublicIdImageListToKeep.delete(key);
-                          }
-                        });
-                        setPublicIdImageListToKeep(newPublicIdImageListToKeep);
+                        const tempPublicIdImageListToKeep = new Map(
+                          Array.from(newPublicIdImageListToKeep).map(
+                            ([key, value]) => [
+                              key > field.name ? key - 1 : key,
+                              value,
+                            ],
+                          ),
+                        );
+                        setPublicIdImageListToKeep(tempPublicIdImageListToKeep);
                       }}
                     >
                       <Tooltip title="Xóa">

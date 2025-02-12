@@ -1,6 +1,6 @@
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { useMutation } from "@tanstack/react-query";
-import { Form, Input } from "antd";
+import { Button, Form, Input } from "antd";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
@@ -83,6 +83,12 @@ const LoginForm: React.FC = () => {
           >
             Đăng nhập
           </button>
+        </Form.Item>
+
+        <Form.Item>
+          <Button type="primary" htmlType="submit" block>
+            Đăng nhập
+          </Button>
         </Form.Item>
 
         {/* <div className="flex flex-col gap-5 text-center text-xs">
