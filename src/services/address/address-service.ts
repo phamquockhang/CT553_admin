@@ -21,7 +21,7 @@ class AddressService implements IAddressService {
   async getAllAddressesByCustomerId(
     customerId: string,
   ): Promise<ApiResponse<IAddress[]>> {
-    return (await apiClient.get(`/${customerId}`)).data;
+    return await apiClient.get(`/${customerId}`);
   }
 
   async getDefaultAddressByCustomerId(

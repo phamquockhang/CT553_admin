@@ -2,7 +2,7 @@ import { blue, green, grey, orange, red } from "@ant-design/colors";
 import { SortOrder } from "antd/es/table/interface";
 import dayjs from "dayjs";
 import { useEffect } from "react";
-import { IDistrict, IProvince, IWard } from "../interfaces/address";
+import { IDistrict, IProvince, IWard } from "../interfaces";
 import { FileType } from "../interfaces";
 
 export function useDynamicTitle(title: string) {

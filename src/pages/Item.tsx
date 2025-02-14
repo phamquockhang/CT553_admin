@@ -11,7 +11,7 @@ import {
   PERMISSIONS,
   SortParams,
 } from "../interfaces";
-import { itemService } from "../services/booking";
+import { itemService } from "../services";
 import { useDynamicTitle } from "../utils";
 
 const Item: React.FC = () => {

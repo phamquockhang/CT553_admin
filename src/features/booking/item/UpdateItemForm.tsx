@@ -13,7 +13,7 @@ import {
   itemService,
   productImageService,
   productService,
-} from "../../../services/booking";
+} from "../../../services";
 import FormItemAddItem from "./components/FormItemAddItem";
 import FormItemAddProduct from "./components/FormItemAddProduct";
 import ProductsOfItem from "./components/ProductsOfItem";
@@ -442,7 +442,7 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
       layout="vertical"
       form={form}
       onFinish={handleFinish}
-      initialValues={{ active: true, products: [{}] }}
+      initialValues={{ products: [{}] }}
     >
       <FormItemAddItem viewOnly={viewOnly} />
 
