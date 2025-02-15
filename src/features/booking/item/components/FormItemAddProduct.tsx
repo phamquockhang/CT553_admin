@@ -203,13 +203,13 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                   <Col span={11}>
                     {/* sellinPriceValue */}
                     <Form.Item
-                      name={[field.name, "sellingPriceValue"]}
-                      // rules={[
-                      //   {
-                      //     required: true,
-                      //     message: "Vui lòng nhập giá bán ra",
-                      //   },
-                      // ]}
+                      name={[field.name, "sellingPrice", "sellingPriceValue"]}
+                      rules={[
+                        {
+                          required: true,
+                          message: "Vui lòng nhập giá bán ra",
+                        },
+                      ]}
                     >
                       <InputNumber
                         style={{ width: "100%" }}
@@ -229,13 +229,17 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
 
                     {/* sellinPriceFluctuation */}
                     <Form.Item
-                      name={[field.name, "sellingPriceFluctuation"]}
-                      // rules={[
-                      //   {
-                      //     required: true,
-                      //     message: "Vui lòng nhập giá biến động bán ra",
-                      //   },
-                      // ]}
+                      name={[
+                        field.name,
+                        "sellingPrice",
+                        "sellingPriceFluctuation",
+                      ]}
+                      rules={[
+                        {
+                          required: true,
+                          message: "Vui lòng nhập giá biến động bán ra",
+                        },
+                      ]}
                     >
                       <InputNumber
                         style={{ width: "100%" }}
@@ -255,13 +259,13 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
 
                     {/* buyingPriceValue */}
                     <Form.Item
-                      name={[field.name, "buyingPriceValue"]}
-                      // rules={[
-                      //   {
-                      //     required: true,
-                      //     message: "Vui lòng nhập giá mua vào",
-                      //   },
-                      // ]}
+                      name={[field.name, "buyingPrice", "buyingPriceValue"]}
+                      rules={[
+                        {
+                          required: true,
+                          message: "Vui lòng nhập giá mua vào",
+                        },
+                      ]}
                     >
                       <InputNumber
                         style={{ width: "100%" }}
@@ -281,13 +285,17 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
 
                     {/* buyingPriceFluctuation */}
                     <Form.Item
-                      name={[field.name, "buyingPriceFluctuation"]}
-                      // rules={[
-                      //   {
-                      //     required: true,
-                      //     message: "Vui lòng nhập giá biến động mua vào",
-                      //   },
-                      // ]}
+                      name={[
+                        field.name,
+                        "buyingPrice",
+                        "buyingPriceFluctuation",
+                      ]}
+                      rules={[
+                        {
+                          required: true,
+                          message: "Vui lòng nhập giá biến động mua vào",
+                        },
+                      ]}
                     >
                       <InputNumber
                         style={{ width: "100%" }}

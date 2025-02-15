@@ -37,28 +37,28 @@ const ProductsOfItem: React.FC<ProductsOfItemProps> = ({ itemToUpdate }) => {
                     <div className="p-1">
                       <p className="font-semibold">{product.productName}</p>
 
-                      <p className="text-xs">
+                      <p>
                         Bán ra:
                         <span className="font-semibold text-blue-800">
                           {" "}
-                          250,000{" "}
+                          {product.sellingPrice.sellingPriceValue.toLocaleString()}{" "}
                         </span>
                         VNĐ/kg (
                         <span className="font-semibold text-blue-800">
-                          ±3,000{" "}
+                          {product.sellingPrice.sellingPriceFluctuation.toLocaleString()}{" "}
                         </span>
                         VNĐ/con)
                       </p>
 
-                      <p className="text-xs">
+                      <p>
                         Mua vào:
                         <span className="font-semibold text-green-700">
                           {" "}
-                          200,000{" "}
+                          {product.buyingPrice.buyingPriceValue.toLocaleString()}{" "}
                         </span>
                         VNĐ/kg (
                         <span className="font-semibold text-green-700">
-                          ±2,000{" "}
+                          {product.buyingPrice.buyingPriceFluctuation.toLocaleString()}{" "}
                         </span>
                         VNĐ/con)
                       </p>

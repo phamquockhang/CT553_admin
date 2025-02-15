@@ -1,4 +1,3 @@
-import { UploadFile } from "antd";
 import { Dayjs } from "dayjs";
 
 export interface IStaff {
@@ -89,60 +88,4 @@ export interface IAuthRequest {
 
 export interface IAuthResponse {
   accessToken: string;
-}
-
-export interface IItem {
-  itemId: number;
-  itemName: string;
-  isActivated: boolean;
-  products: IProduct[];
-  createdAt: string;
-  updatedAt?: string;
-}
-
-export interface IBriefItem {
-  itemId: number;
-  itemName: string;
-  isActivated: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-export interface ItemFilterCriteria {
-  isActivated?: string;
-}
-
-export interface IProduct {
-  productId: number;
-  productName: string;
-  description: string;
-  isActivated: boolean;
-  itemId: number;
-  productImages: IProductImage[];
-  createdAt: string;
-  updatedAt?: string;
-
-  productImageFiles?: UploadFile[];
-}
-
-export interface IBriefProduct {
-  productId: number;
-  productName: string;
-  description: string;
-  isActivated: boolean;
-  itemId?: number;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-export interface ProductFilterCriteria {
-  isActivated?: string;
-}
-
-export interface IProductImage {
-  productImageId: number;
-  publicId: string;
-  imageUrl: string;
-  productId: number;
-  createdAt: string;
 }

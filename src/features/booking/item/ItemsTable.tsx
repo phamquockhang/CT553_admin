@@ -21,6 +21,7 @@ import {
 import Access from "../../auth/Access";
 import UpdateItem from "./UpdateItem";
 import ViewItem from "./ViewItem";
+import DeleteItem from "./DeleteItem";
 
 interface TableParams {
   pagination: TablePaginationConfig;
@@ -48,6 +49,8 @@ const ItemsTable: React.FC<ItemTableProps> = ({
       showTotal: (total) => `Tổng ${total} mặt hàng`,
     },
   }));
+
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   useEffect(() => {
     if (itemPage) {
@@ -195,9 +198,9 @@ const ItemsTable: React.FC<ItemTableProps> = ({
           <Access permission={PERMISSIONS[Module.STAFF].UPDATE} hideChildren>
             <UpdateItem item={record} />
           </Access>
-          {/* <Access permission={PERMISSIONS[Module.STAFF].DELETE} hideChildren>
-            <DeleteItem itemId={record.itemId} />
-          </Access> */}
+          <Access permission={PERMISSIONS[Module.STAFF].DELETE} hideChildren>
+            <DeleteItem itemId={record.itemId} setIsDeleting={setIsDeleting} />
+          </Access>
         </Space>
       ),
     },
@@ -224,7 +227,7 @@ const ItemsTable: React.FC<ItemTableProps> = ({
               spinning: true,
               tip: "Đang tải dữ liệu...",
             }
-          : isFetching && {
+          : (isFetching || isDeleting) && {
               spinning: true,
               tip: "Đang cập nhật dữ liệu...",
             }

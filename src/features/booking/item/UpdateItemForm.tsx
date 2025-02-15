@@ -5,13 +5,16 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import {
   ApiResponse,
+  IBuyingPrice,
   IItem,
   IProduct,
   IProductImage,
+  ISellingPrice,
 } from "../../../interfaces";
 import {
   itemService,
   productImageService,
+  productPriceService,
   productService,
 } from "../../../services";
 import FormItemAddItem from "./components/FormItemAddItem";
@@ -29,10 +32,10 @@ interface UpdateItemArgs {
   updatedItem: IItem;
 }
 
-interface UpdateProductArgs {
-  productId: number;
-  updatedProduct: IProduct;
-}
+// interface UpdateProductArgs {
+//   productId: number;
+//   updatedProduct: IProduct;
+// }
 
 const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
   itemToUpdate,
@@ -168,9 +171,41 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
     },
   });
 
-  const { mutate: updateProduct, isPending: isUpdatingProduct } = useMutation({
-    mutationFn: ({ productId, updatedProduct }: UpdateProductArgs) => {
-      return productService.update(productId, updatedProduct);
+  const { mutate: createBuyingPrice } = useMutation({
+    mutationFn: ({
+      productId,
+      newBuyingPrice,
+    }: {
+      productId: number;
+      newBuyingPrice: Omit<IBuyingPrice, "buyingPriceId">;
+    }) => {
+      return productPriceService.createBuyingPrice(productId, newBuyingPrice);
+    },
+
+    onSuccess: (data) => {
+      if (data && data.success) {
+        // onCancel();
+        // form.resetFields();
+        // toast.success(data?.message || "Operation successful");
+      } else if (data && !data.success) {
+        toast.error(data?.message || "Operation failed");
+      }
+    },
+
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
+  const { mutate: createSellingPrice } = useMutation({
+    mutationFn: ({
+      productId,
+      newSellingPrice,
+    }: {
+      productId: number;
+      newSellingPrice: Omit<ISellingPrice, "sellingPriceId">;
+    }) => {
+      return productPriceService.createSellingPrice(productId, newSellingPrice);
     },
 
     onSuccess: (data) => {
@@ -239,7 +274,7 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
   async function handleFinish(values: IItem) {
     if (itemToUpdate) {
       for (const [index, product] of values.products.entries()) {
-        // create new product
+        // create new product and product image if this product is new
         if (!product.productId) {
           const newProduct = {
             productName: product.productName,
@@ -255,6 +290,8 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
 
                 if (newProduct.payload) {
                   values.products[index] = newProduct.payload;
+                  values.products[index].buyingPrice = product.buyingPrice;
+                  values.products[index].sellingPrice = product.sellingPrice;
                 }
               },
               onError: (error) => {
@@ -262,6 +299,33 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
               },
             });
           });
+
+          const productImages = fileList.get(index);
+          console.log("productImages", productImages);
+
+          if (productImages) {
+            const formData = new FormData();
+            if (values.products[index].productId !== undefined) {
+              formData.append(
+                "productId",
+                values.products[index].productId.toString(),
+              );
+            }
+            for (const image of productImages) {
+              formData.append("productImageFiles", image.originFileObj as File);
+            }
+
+            await new Promise((resolve, reject) => {
+              createProductImage(formData, {
+                onSuccess: () => {
+                  resolve(null);
+                },
+                onError: (error) => {
+                  reject(error);
+                },
+              });
+            });
+          }
         }
       }
 
@@ -288,7 +352,30 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
 
       if (updatedItem.success) {
         for (const [index, product] of values.products.entries()) {
-          // values.products.forEach(async (product, index) => {
+          const newBuyingPrice = {
+            buyingPriceValue: product.buyingPrice.buyingPriceValue,
+            buyingPriceFluctuation:
+              product.buyingPrice.buyingPriceFluctuation || 0,
+          };
+          const newSellingPrice = {
+            sellingPriceValue: product.sellingPrice.sellingPriceValue,
+            sellingPriceFluctuation:
+              product.sellingPrice.sellingPriceFluctuation || 0,
+          };
+
+          await new Promise((resolve) => {
+            createBuyingPrice({
+              productId: product.productId,
+              newBuyingPrice: newBuyingPrice,
+            });
+            createSellingPrice({
+              productId: product.productId,
+              newSellingPrice: newSellingPrice,
+            });
+
+            resolve(null);
+          });
+
           const productImagesToUpdate = fileListToUpdate.get(index);
           const publicIdImagesToKeep = publicIdImageListToKeep.get(index);
           if (productImagesToUpdate || publicIdImagesToKeep) {
@@ -372,8 +459,6 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
             itemId: createdItem.payload?.itemId,
           }));
 
-          console.log("newProductList", newProductList);
-
           for (const [index, product] of newProductList.entries()) {
             const createdProduct = await new Promise<ApiResponse<IProduct>>(
               (resolve, reject) => {
@@ -387,6 +472,18 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
                 });
               },
             );
+
+            if (createdProduct.success && createdProduct.payload) {
+              createBuyingPrice({
+                productId: createdProduct.payload.productId,
+                newBuyingPrice: values.products[index].buyingPrice,
+              });
+
+              createSellingPrice({
+                productId: createdProduct.payload.productId,
+                newSellingPrice: values.products[index].sellingPrice,
+              });
+            }
 
             const productImages = fileList.get(index);
             if (productImages) {
@@ -461,7 +558,18 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
       {!viewOnly && (
         <Form.Item className="text-right" wrapperCol={{ span: 24 }}>
           <Space>
-            <Button onClick={onCancel}>Hủy</Button>
+            <Button
+              disabled={
+                isCreatingItem ||
+                isUpdatingItem ||
+                isCreatingProduct ||
+                isCreatingProductImage ||
+                isUpdatingProductImage
+              }
+              onClick={onCancel}
+            >
+              Hủy
+            </Button>
 
             <Button
               type="primary"

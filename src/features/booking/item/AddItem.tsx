@@ -25,6 +25,7 @@ const AddItem: React.FC = () => {
         width="60%"
         title={<span className="text-lg">Thêm mặt hàng</span>}
         destroyOnClose
+        maskClosable={false}
         onCancel={handleCloseModal}
         footer={null}
       >

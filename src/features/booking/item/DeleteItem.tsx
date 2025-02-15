@@ -5,16 +5,19 @@ import toast from "react-hot-toast";
 import { itemService } from "../../../services";
 
 interface DeleteItemProps {
-  itemId: string;
+  itemId: number;
+  setIsDeleting: (isDeleting: boolean) => void;
 }
 
-const DeleteItem: React.FC<DeleteItemProps> = ({ itemId }) => {
+const DeleteItem: React.FC<DeleteItemProps> = ({ itemId, setIsDeleting }) => {
   const queryClient = useQueryClient();
 
-  const { mutate: deleteUser, isPending: isDeleting } = useMutation({
+  const { mutate: deleteUser } = useMutation({
     mutationFn: itemService.delete,
 
     onSuccess: (data) => {
+      setIsDeleting(false);
+
       queryClient.invalidateQueries({
         predicate: (query) => query.queryKey.includes("items"),
       });
@@ -24,16 +27,26 @@ const DeleteItem: React.FC<DeleteItemProps> = ({ itemId }) => {
   });
 
   function handleConfirmDelete(): void {
+    setIsDeleting(true);
     deleteUser(itemId);
   }
 
   return (
     <Popconfirm
       title="Xóa mặt hàng này?"
-      description="Bạn có chắc muốn xóa mặt hàng này?"
+      description={
+        <span>
+          Bạn có chắc muốn xóa mặt hàng này?
+          <p className="text-red-500">
+            Lưu ý: Xóa mặt hàng sẽ xóa tất cả các sản phẩm liên quan và không
+            thể khôi phục.
+          </p>
+        </span>
+      }
       okText="Xóa"
       cancelText="Hủy"
-      okButtonProps={{ danger: true, loading: isDeleting }}
+      // okButtonProps={{ danger: true, loading: isDeleting }}
+      okButtonProps={{ danger: true }}
       onConfirm={handleConfirmDelete}
     >
       <Tooltip title="Xóa">

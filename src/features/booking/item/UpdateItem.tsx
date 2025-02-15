@@ -33,6 +33,7 @@ const UpdateItem: React.FC<UpdateItemProps> = ({ item }) => {
         width="60%"
         title={<span className="text-lg">Cập nhật thông tin mặt hàng</span>}
         destroyOnClose
+        maskClosable={false}
         onCancel={handleCloseModal}
         footer={null}
       >
