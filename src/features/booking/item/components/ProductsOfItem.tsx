@@ -34,34 +34,52 @@ const ProductsOfItem: React.FC<ProductsOfItemProps> = ({ itemToUpdate }) => {
                       className="h-36 w-full object-cover"
                     />
 
-                    <div className="p-1">
-                      <p className="font-semibold">{product.productName}</p>
-
-                      <p>
-                        Bán ra:
-                        <span className="font-semibold text-blue-800">
-                          {" "}
-                          {product.sellingPrice.sellingPriceValue.toLocaleString()}{" "}
-                        </span>
-                        VNĐ/kg (
-                        <span className="font-semibold text-blue-800">
-                          {product.sellingPrice.sellingPriceFluctuation.toLocaleString()}{" "}
-                        </span>
-                        VNĐ/con)
+                    <div className="h- p-1 pb-2">
+                      <p className="mb-3 font-semibold">
+                        {product.productName}
                       </p>
 
-                      <p>
-                        Mua vào:
-                        <span className="font-semibold text-green-700">
-                          {" "}
-                          {product.buyingPrice.buyingPriceValue.toLocaleString()}{" "}
-                        </span>
-                        VNĐ/kg (
-                        <span className="font-semibold text-green-700">
-                          {product.buyingPrice.buyingPriceFluctuation.toLocaleString()}{" "}
-                        </span>
-                        VNĐ/con)
-                      </p>
+                      <div className="flex justify-between text-xs">
+                        <p>
+                          Bán ra:
+                          <span className="font-semibold text-blue-800">
+                            {" "}
+                            {product.sellingPrice.sellingPriceValue.toLocaleString()}{" "}
+                          </span>
+                          VNĐ/kg
+                        </p>
+                        {product.sellingPrice.sellingPriceFluctuation > 0 && (
+                          <p>
+                            (
+                            <span className="font-semibold text-yellow-600">
+                              {"±" +
+                                product.sellingPrice.sellingPriceFluctuation.toLocaleString()}{" "}
+                            </span>
+                            VNĐ/con)
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="flex justify-between text-xs">
+                        <p>
+                          Mua vào:
+                          <span className="font-semibold text-green-700">
+                            {" "}
+                            {product.buyingPrice.buyingPriceValue.toLocaleString()}{" "}
+                          </span>
+                          VNĐ/kg
+                        </p>
+                        {product.buyingPrice.buyingPriceFluctuation > 0 && (
+                          <p>
+                            (
+                            <span className="font-semibold text-yellow-600">
+                              {"±" +
+                                product.buyingPrice.buyingPriceFluctuation.toLocaleString()}{" "}
+                            </span>
+                            VNĐ/con)
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </Col>

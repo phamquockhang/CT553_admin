@@ -24,6 +24,7 @@ export interface ItemFilterCriteria {
 export interface IProduct {
   productId: number;
   productName: string;
+  productUnit: string;
   description: string;
   isActivated: boolean;
   itemId: number;
@@ -60,7 +61,7 @@ export interface IProductImage {
 export interface IBuyingPrice {
   buyingPriceId: string;
   buyingPriceValue: number;
-  buyingPriceFluctuation: number;
+  buyingPriceFluctuation?: number;
   isCurrent?: boolean;
   createdAt?: string;
 }
@@ -68,7 +69,7 @@ export interface IBuyingPrice {
 export interface ISellingPrice {
   sellingPriceId: string;
   sellingPriceValue: number;
-  sellingPriceFluctuation: number;
+  sellingPriceFluctuation?: number;
   isCurrent?: boolean;
   createdAt?: string;
 }

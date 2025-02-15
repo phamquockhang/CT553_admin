@@ -4,6 +4,7 @@ import {
   Card,
   Col,
   Form,
+  FormInstance,
   Image,
   Input,
   InputNumber,
@@ -14,10 +15,12 @@ import {
 } from "antd";
 import { UploadFile } from "antd/lib";
 import { useState } from "react";
-import { FileType } from "../../../../interfaces";
+import { FileType, IItem } from "../../../../interfaces";
 import { getBase64 } from "../../../../utils";
+import { AiFillQuestionCircle } from "react-icons/ai";
 
 interface FormItemAddProductProps {
+  form: FormInstance<IItem>;
   viewOnly?: boolean;
 
   fileList: Map<number, UploadFile[]>;
@@ -35,6 +38,7 @@ interface FormItemAddProductProps {
 }
 
 const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
+  form,
   viewOnly,
   fileList,
   setFileList,
@@ -179,6 +183,85 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                       />
                     </Form.Item>
 
+                    <Row className="flex justify-between">
+                      <Col span={14}>
+                        {/* productUnit */}
+                        <Form.Item
+                          className="flex-1"
+                          name={[field.name, "productUnit"]}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Vui lòng nhập đơn vị sản phẩm",
+                            },
+                            {
+                              // vietnamese name has anccent characters
+                              pattern:
+                                /^[0-9a-zA-ZăâđêôơưàảãáạăằẳẵắặâầẩẫấậèẻẽéẹêềểễếệìỉĩíịòỏõóọôồổỗốộơờởỡớợùủũúụưừửữứựỳỷỹýỵĂÂĐÊÔƠƯÀẢÃÁẠĂẰẲẴẮẶÂẦẨẪẤẬÈẺẼÉẸÊỀỂỄẾỆÌỈĨÍỊÒỎÕÓỌÔỒỔỖỐỘƠỜỞỠỚOỢÙỦŨÚỤƯỪỬỮỨỰỲỶỸÝỴ\s]+$/,
+                              message:
+                                "Đơn vị sản phẩm không chứa ký tự đặc biệt",
+                            },
+                          ]}
+                        >
+                          <Input
+                            allowClear
+                            addonAfter={
+                              <Tooltip title="Đơn vị áp dụng khi tính giá bán cho sản phẩm này">
+                                <AiFillQuestionCircle />
+                              </Tooltip>
+                            }
+                            onChange={() => {
+                              form.setFieldsValue({
+                                products: fields.map((field) => ({
+                                  ...form.getFieldValue([
+                                    "products",
+                                    field.name,
+                                  ]),
+                                })),
+                              });
+                            }}
+                            readOnly={viewOnly}
+                            placeholder="Ví dụ: con, kg, thùng, ..."
+                          />
+                        </Form.Item>
+                      </Col>
+
+                      <Col span={9}>
+                        {/* productWeightRemain */}
+                        <Form.Item
+                          className="flex-1"
+                          name={[field.name, "productWeightRemain"]}
+                          rules={
+                            [
+                              // {
+                              //   required: true,
+                              //   message:
+                              //     "Vui lòng nhập tổng khối lượng sản phẩm còn lại trong kho",
+                              // },
+                            ]
+                          }
+                        >
+                          <InputNumber
+                            style={{ width: "100%" }}
+                            min={0}
+                            addonAfter={
+                              <Tooltip title="Tổng khối lượng sản phẩm còn lại trong kho">
+                                <AiFillQuestionCircle />
+                              </Tooltip>
+                            }
+                            formatter={(value) =>
+                              `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                            }
+                            // parser={(value) =>
+                            //   value?.replace(/\$\s?|(,*)/g, "") as unknown as number
+                            // }
+                            placeholder="Ví dụ: 250"
+                            readOnly={viewOnly}
+                          />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+
                     {/* description */}
                     <Form.Item
                       name={[field.name, "description"]}
@@ -194,14 +277,14 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                       <Input.TextArea
                         allowClear
                         readOnly={viewOnly}
-                        rows={6}
+                        rows={3}
                         placeholder="Mô tả sản phẩm, ví dụ: Tôm sú hàng 2 có kích thước 15-24 con/kg"
                       />
                     </Form.Item>
                   </Col>
 
                   <Col span={11}>
-                    {/* sellinPriceValue */}
+                    {/* sellingPriceValue */}
                     <Form.Item
                       name={[field.name, "sellingPrice", "sellingPriceValue"]}
                       rules={[
@@ -215,7 +298,33 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                         style={{ width: "100%" }}
                         min={0}
                         addonBefore="Bán ra"
-                        addonAfter="VNĐ/kg"
+                        // addonAfter="VNĐ/kg"
+                        addonAfter={
+                          form.getFieldValue([
+                            "products",
+                            field.name,
+                            "productUnit",
+                          ]) ? (
+                            `VNĐ/${form.getFieldValue([
+                              "products",
+                              field.name,
+                              "productUnit",
+                            ])}`
+                          ) : (
+                            <Tooltip
+                              title="Vui lòng nhập đơn vị sản phẩm trước"
+                              className="cursor-pointer"
+                            >
+                              <p className="text-red-500">VNĐ/null</p>
+                            </Tooltip>
+                          )
+                        }
+                        // addonAfter={`
+                        //   VNĐ/${form.getFieldValue([
+                        //     "products",
+                        //     field.name,
+                        //     "productUnit",
+                        //   ])}`}
                         formatter={(value) =>
                           `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                         }
@@ -227,24 +336,26 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                       />
                     </Form.Item>
 
-                    {/* sellinPriceFluctuation */}
+                    {/* sellingPriceFluctuation */}
                     <Form.Item
                       name={[
                         field.name,
                         "sellingPrice",
                         "sellingPriceFluctuation",
                       ]}
-                      rules={[
-                        {
-                          required: true,
-                          message: "Vui lòng nhập giá biến động bán ra",
-                        },
-                      ]}
+                      rules={
+                        [
+                          // {
+                          //   required: true,
+                          //   message: "Vui lòng nhập giá biến động bán ra",
+                          // },
+                        ]
+                      }
                     >
                       <InputNumber
                         style={{ width: "100%" }}
                         min={0}
-                        addonBefore="Biến động bán ra"
+                        addonBefore="Biến động giá bán ra (nếu cần)"
                         addonAfter="VNĐ/con"
                         formatter={(value) =>
                           `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -290,17 +401,19 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                         "buyingPrice",
                         "buyingPriceFluctuation",
                       ]}
-                      rules={[
-                        {
-                          required: true,
-                          message: "Vui lòng nhập giá biến động mua vào",
-                        },
-                      ]}
+                      rules={
+                        [
+                          // {
+                          //   required: true,
+                          //   message: "Vui lòng nhập giá biến động mua vào",
+                          // },
+                        ]
+                      }
                     >
                       <InputNumber
                         style={{ width: "100%" }}
                         min={0}
-                        addonBefore="Biến động mua vào"
+                        addonBefore="Biến động giá mua vào (nếu cần)"
                         addonAfter="VNĐ/con"
                         formatter={(value) =>
                           `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -327,6 +440,7 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                           if (
                             // (fileList.get(field.name) &&
                             //   fileList.get(field.name)?.length === 0) ||
+                            fileList.get(field.name)?.length === 0 ||
                             !fileList.get(field.name)
                           ) {
                             return Promise.reject(
@@ -342,6 +456,7 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                     }
                   >
                     <Upload
+                      accept="image/*"
                       maxCount={3}
                       disabled={viewOnly}
                       listType="picture-card"

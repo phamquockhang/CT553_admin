@@ -278,6 +278,7 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
         if (!product.productId) {
           const newProduct = {
             productName: product.productName,
+            productUnit: product.productUnit,
             description: product.description,
             isActivated: product.isActivated,
             itemId: itemToUpdate.itemId,
@@ -454,6 +455,7 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
         if (createdItem.success) {
           const newProductList = values.products.map((product) => ({
             productName: product.productName,
+            productUnit: product.productUnit,
             description: product.description,
             isActivated: product.isActivated,
             itemId: createdItem.payload?.itemId,
@@ -544,6 +546,7 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
       <FormItemAddItem viewOnly={viewOnly} />
 
       <FormItemAddProduct
+        form={form}
         viewOnly={viewOnly}
         fileList={fileList}
         setFileList={setFileList}
