@@ -231,15 +231,13 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                         <Form.Item
                           className="flex-1"
                           name={[field.name, "weight", "weightValue"]}
-                          rules={
-                            [
-                              // {
-                              //   required: true,
-                              //   message:
-                              //     "Vui lòng nhập tổng khối lượng sản phẩm còn lại trong kho",
-                              // },
-                            ]
-                          }
+                          rules={[
+                            {
+                              required: true,
+                              message:
+                                "Vui lòng nhập tổng khối lượng sản phẩm còn lại trong kho",
+                            },
+                          ]}
                         >
                           <InputNumber
                             style={{ width: "100%" }}
