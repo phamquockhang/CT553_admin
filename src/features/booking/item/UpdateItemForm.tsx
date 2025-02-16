@@ -1,24 +1,15 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button, Form, Space, UploadFile } from "antd";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import {
   ApiResponse,
-  IBuyingPrice,
   IItem,
   IProduct,
   IProductImage,
-  ISellingPrice,
-  IWeight,
 } from "../../../interfaces";
-import {
-  itemService,
-  productImageService,
-  productPriceService,
-  productService,
-  productWeightService,
-} from "../../../services";
+import { useItemService, useProductService } from "../hooks";
 import FormItemAddItem from "./components/FormItemAddItem";
 import FormItemAddProduct from "./components/FormItemAddProduct";
 import ProductsOfItem from "./components/ProductsOfItem";
@@ -28,16 +19,6 @@ interface UpdateItemFormProps {
   onCancel: () => void;
   viewOnly?: boolean;
 }
-
-interface UpdateItemArgs {
-  itemId: number;
-  updatedItem: IItem;
-}
-
-// interface UpdateProductArgs {
-//   productId: number;
-//   updatedProduct: IProduct;
-// }
 
 const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
   itemToUpdate,
@@ -55,6 +36,19 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
     Map<number, string[]>
   >(new Map());
   const queryClient = useQueryClient();
+  const { createItem, isCreatingItem, updateItem, isUpdatingItem } =
+    useItemService();
+  const {
+    createProduct,
+    createBuyingPrice,
+    createSellingPrice,
+    createWeight,
+    createProductImage,
+    updateProductImage,
+    isCreatingProduct,
+    isCreatingProductImage,
+    isUpdatingProductImage,
+  } = useProductService();
 
   async function urlToUploadFile(
     productImage: IProductImage,
@@ -116,189 +110,6 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
     }
   }, [itemToUpdate, form]);
 
-  const { mutate: createItem, isPending: isCreatingItem } = useMutation({
-    mutationFn: itemService.create,
-
-    onSuccess: (data) => {
-      if (data && data.success) {
-        // onCancel();
-        // form.resetFields();
-        // toast.success(data?.message || "Operation successful");
-      } else if (data && !data.success) {
-        toast.error(data?.message || "Operation failed");
-      }
-    },
-
-    onError: (error) => {
-      console.log(error);
-    },
-  });
-
-  const { mutate: updateItem, isPending: isUpdatingItem } = useMutation({
-    mutationFn: ({ itemId, updatedItem }: UpdateItemArgs) => {
-      return itemService.update(itemId, updatedItem);
-    },
-
-    onSuccess: (data) => {
-      if (data && data.success) {
-        // onCancel();
-        // form.resetFields();
-        // toast.success(data?.message || "Operation successful");
-      } else if (data && !data.success) {
-        // console.log("success", data.success);
-        toast.error(data?.message || "Operation failed");
-      }
-    },
-
-    onError: (error) => {
-      console.log(error);
-    },
-  });
-
-  const { mutate: createProduct, isPending: isCreatingProduct } = useMutation({
-    mutationFn: productService.create,
-
-    onSuccess: (data) => {
-      if (data && data.success) {
-        // onCancel();
-        // form.resetFields();
-        // toast.success(data?.message || "Operation successful");
-      } else if (data && !data.success) {
-        // toast.error(data?.message || "Operation failed");
-      }
-    },
-
-    onError: (error) => {
-      console.log(error);
-    },
-  });
-
-  const { mutate: createBuyingPrice } = useMutation({
-    mutationFn: ({
-      productId,
-      newBuyingPrice,
-    }: {
-      productId: number;
-      newBuyingPrice: Omit<IBuyingPrice, "buyingPriceId">;
-    }) => {
-      return productPriceService.createBuyingPrice(productId, newBuyingPrice);
-    },
-
-    onSuccess: (data) => {
-      if (data && data.success) {
-        // onCancel();
-        // form.resetFields();
-        // toast.success(data?.message || "Operation successful");
-      } else if (data && !data.success) {
-        toast.error(data?.message || "Operation failed");
-      }
-    },
-
-    onError: (error) => {
-      console.log(error);
-    },
-  });
-
-  const { mutate: createSellingPrice } = useMutation({
-    mutationFn: ({
-      productId,
-      newSellingPrice,
-    }: {
-      productId: number;
-      newSellingPrice: Omit<ISellingPrice, "sellingPriceId">;
-    }) => {
-      return productPriceService.createSellingPrice(productId, newSellingPrice);
-    },
-
-    onSuccess: (data) => {
-      if (data && data.success) {
-        // onCancel();
-        // form.resetFields();
-        // toast.success(data?.message || "Operation successful");
-      } else if (data && !data.success) {
-        toast.error(data?.message || "Operation failed");
-      }
-    },
-
-    onError: (error) => {
-      console.log(error);
-    },
-  });
-
-  const { mutate: createWeight } = useMutation({
-    mutationFn: ({
-      productId,
-      newWeight,
-    }: {
-      productId: number;
-      newWeight: Omit<IWeight, "weightId">;
-    }) => {
-      return productWeightService.createWeightOfProduct(productId, newWeight);
-    },
-
-    onSuccess: (data) => {
-      if (data && data.success) {
-        // onCancel();
-        // form.resetFields();
-        // toast.success(data?.message || "Operation successful");
-      } else if (data && !data.success) {
-        toast.error(data?.message || "Operation failed");
-      }
-    },
-
-    onError: (error) => {
-      console.log(error);
-    },
-  });
-
-  const { mutate: createProductImage, isPending: isCreatingProductImage } =
-    useMutation({
-      mutationFn: (formData: FormData) => {
-        return productImageService.create(formData);
-      },
-
-      onSuccess: (data) => {
-        if (data && data.success) {
-          // onCancel();
-          // form.resetFields();
-          // toast.success(data?.message || "Operation successful");
-        } else if (data && !data.success) {
-          toast.error(data?.message || "Operation failed");
-        }
-      },
-
-      onError: (error) => {
-        console.log(error);
-      },
-    });
-
-  const { mutate: updateProductImage, isPending: isUpdatingProductImage } =
-    useMutation({
-      mutationFn: ({
-        productId,
-        formData,
-      }: {
-        productId: number;
-        formData: FormData;
-      }) => {
-        return productImageService.update(productId, formData);
-      },
-
-      onSuccess: (data) => {
-        if (data && data.success) {
-          // onCancel();
-          // form.resetFields();
-          // toast.success(data?.message || "Operation successful");
-        } else if (data && !data.success) {
-          toast.error(data?.message || "Operation failed");
-        }
-      },
-
-      onError: (error) => {
-        console.log(error);
-      },
-    });
-
   async function handleFinish(values: IItem) {
     if (itemToUpdate) {
       for (const [index, product] of values.products.entries()) {
@@ -321,6 +132,7 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
                   values.products[index] = newProduct.payload;
                   values.products[index].buyingPrice = product.buyingPrice;
                   values.products[index].sellingPrice = product.sellingPrice;
+                  values.products[index].weight = product.weight;
                 }
               },
               onError: (error) => {
