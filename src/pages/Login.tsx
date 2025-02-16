@@ -21,7 +21,10 @@ const Login: React.FC = () => {
           </div>
 
           <div className="hidden w-1/2 lg:block">
-            <img src="/login_background.jpg" alt="Login background" />
+            <img
+              src="/src/assets/login_background.jpg"
+              alt="Login background"
+            />
           </div>
         </div>
       </div>
