@@ -3,18 +3,12 @@ import {
   CaretUpFilled,
   FilterFilled,
 } from "@ant-design/icons";
-import { Space, Table, TablePaginationConfig, TableProps } from "antd";
+import { Table, TablePaginationConfig, TableProps } from "antd";
 import { SorterResult } from "antd/es/table/interface";
 import { GetProp } from "antd/lib";
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import {
-  IPermission,
-  Method,
-  Module,
-  Page,
-  PERMISSIONS,
-} from "../../../interfaces";
+import { IPermission, Method, Module, Page } from "../../../interfaces";
 import {
   colorFilterIcon,
   colorMethod,
@@ -25,8 +19,6 @@ import {
   getDefaultSortOrder,
   getSortDirection,
 } from "../../../utils";
-import Access from "../Access";
-import UpdatePermission from "./UpdatePermission";
 
 interface TableParams {
   pagination: TablePaginationConfig;
@@ -223,23 +215,23 @@ const PermissionsTable: React.FC<PermissionTableProps> = ({
         </div>
       ),
     },
-    {
-      title: "Hành động",
-      key: "action",
-      width: "10%",
-      align: "center",
+    // {
+    //   title: "Hành động",
+    //   key: "action",
+    //   width: "10%",
+    //   align: "center",
 
-      render: (record: IPermission) => (
-        <Space>
-          <Access
-            permission={PERMISSIONS[Module.PERMISSIONS].UPDATE}
-            hideChildren
-          >
-            <UpdatePermission permission={record} />
-          </Access>
-        </Space>
-      ),
-    },
+    //   render: (record: IPermission) => (
+    //     <Space>
+    //       <Access
+    //         permission={PERMISSIONS[Module.PERMISSIONS].UPDATE}
+    //         hideChildren
+    //       >
+    //         <UpdatePermission permission={record} />
+    //       </Access>
+    //     </Space>
+    //   ),
+    // },
   ];
 
   return (

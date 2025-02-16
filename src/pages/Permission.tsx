@@ -1,18 +1,17 @@
+import { useQuery } from "@tanstack/react-query";
+import { Input } from "antd";
+import { SearchProps } from "antd/es/input";
 import { useSearchParams } from "react-router-dom";
+import Access from "../features/auth/Access";
+import PermissionsTable from "../features/auth/permissions/PermissionsTable";
 import {
   Module,
   PermissionFilterCriteria,
   PERMISSIONS,
   SortParams,
 } from "../interfaces";
-import { useQuery } from "@tanstack/react-query";
 import { permissionService } from "../services";
-import { SearchProps } from "antd/es/input";
 import { useDynamicTitle } from "../utils";
-import Access from "../features/auth/Access";
-import { Input } from "antd";
-import AddPermission from "../features/auth/permissions/AddPermission";
-import PermissionsTable from "../features/auth/permissions/PermissionsTable";
 
 const Permission: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -75,12 +74,12 @@ const Permission: React.FC = () => {
               />
             </div>
           </div>
-          <Access
+          {/* <Access
             permission={PERMISSIONS[Module.PERMISSIONS].CREATE}
             hideChildren
           >
             <AddPermission />
-          </Access>
+          </Access> */}
         </div>
         <PermissionsTable
           permissionPage={data?.payload}
