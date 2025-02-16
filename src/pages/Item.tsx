@@ -57,7 +57,7 @@ const Item: React.FC = () => {
   useDynamicTitle("Quản lý mặt hàng");
 
   return (
-    <Access permission={PERMISSIONS[Module.STAFF].GET_PAGINATION}>
+    <Access permission={PERMISSIONS[Module.ITEMS].GET_PAGINATION}>
       <div className="card">
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-xl font-semibold">Quản lý mặt hàng</h2>
@@ -73,7 +73,7 @@ const Item: React.FC = () => {
               />
             </div>
           </div>
-          <Access permission={PERMISSIONS[Module.STAFF].CREATE} hideChildren>
+          <Access permission={PERMISSIONS[Module.ITEMS].CREATE} hideChildren>
             <AddItem />
           </Access>
         </div>
