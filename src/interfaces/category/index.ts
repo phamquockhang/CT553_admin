@@ -31,6 +31,7 @@ export interface IProduct {
   productImages: IProductImage[];
   buyingPrice: IBuyingPrice;
   sellingPrice: ISellingPrice;
+  weight: IWeight;
   productImageFiles?: UploadFile[];
   createdAt: string;
   updatedAt?: string;
@@ -70,6 +71,13 @@ export interface ISellingPrice {
   sellingPriceId: string;
   sellingPriceValue: number;
   sellingPriceFluctuation?: number;
+  isCurrent?: boolean;
+  createdAt?: string;
+}
+
+export interface IWeight {
+  weightId: string;
+  weightValue: number;
   isCurrent?: boolean;
   createdAt?: string;
 }

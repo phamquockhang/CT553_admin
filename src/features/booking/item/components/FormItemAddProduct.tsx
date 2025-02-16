@@ -227,10 +227,10 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                       </Col>
 
                       <Col span={9}>
-                        {/* productWeightRemain */}
+                        {/* productWeight*/}
                         <Form.Item
                           className="flex-1"
-                          name={[field.name, "productWeightRemain"]}
+                          name={[field.name, "weight", "weightValue"]}
                           rules={
                             [
                               // {
@@ -245,7 +245,7 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                             style={{ width: "100%" }}
                             min={0}
                             addonAfter={
-                              <Tooltip title="Tổng khối lượng sản phẩm còn lại trong kho">
+                              <Tooltip title="Tổng khối lượng sản phẩm còn lại trong kho (theo kg)">
                                 <AiFillQuestionCircle />
                               </Tooltip>
                             }

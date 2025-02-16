@@ -48,16 +48,19 @@ const ProductsOfItem: React.FC<ProductsOfItemProps> = ({ itemToUpdate }) => {
                           </span>
                           VNĐ/kg
                         </p>
-                        {product.sellingPrice.sellingPriceFluctuation > 0 && (
-                          <p>
-                            (
-                            <span className="font-semibold text-yellow-600">
-                              {"±" +
-                                product.sellingPrice.sellingPriceFluctuation.toLocaleString()}{" "}
-                            </span>
-                            VNĐ/con)
-                          </p>
-                        )}
+
+                        {product.sellingPrice.sellingPriceFluctuation !==
+                          undefined &&
+                          product.sellingPrice.sellingPriceFluctuation > 0 && (
+                            <p>
+                              (
+                              <span className="font-semibold text-yellow-600">
+                                {"±" +
+                                  product.sellingPrice.sellingPriceFluctuation.toLocaleString()}{" "}
+                              </span>
+                              VNĐ/con)
+                            </p>
+                          )}
                       </div>
 
                       <div className="flex justify-between text-xs">
@@ -69,16 +72,18 @@ const ProductsOfItem: React.FC<ProductsOfItemProps> = ({ itemToUpdate }) => {
                           </span>
                           VNĐ/kg
                         </p>
-                        {product.buyingPrice.buyingPriceFluctuation > 0 && (
-                          <p>
-                            (
-                            <span className="font-semibold text-yellow-600">
-                              {"±" +
-                                product.buyingPrice.buyingPriceFluctuation.toLocaleString()}{" "}
-                            </span>
-                            VNĐ/con)
-                          </p>
-                        )}
+                        {product.buyingPrice.buyingPriceFluctuation !==
+                          undefined &&
+                          product.buyingPrice.buyingPriceFluctuation > 0 && (
+                            <p>
+                              (
+                              <span className="font-semibold text-yellow-600">
+                                {"±" +
+                                  product.buyingPrice.buyingPriceFluctuation.toLocaleString()}{" "}
+                              </span>
+                              VNĐ/con)
+                            </p>
+                          )}
                       </div>
                     </div>
                   </div>

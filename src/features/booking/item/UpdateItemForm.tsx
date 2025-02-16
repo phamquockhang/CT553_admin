@@ -10,12 +10,14 @@ import {
   IProduct,
   IProductImage,
   ISellingPrice,
+  IWeight,
 } from "../../../interfaces";
 import {
   itemService,
   productImageService,
   productPriceService,
   productService,
+  productWeightService,
 } from "../../../services";
 import FormItemAddItem from "./components/FormItemAddItem";
 import FormItemAddProduct from "./components/FormItemAddProduct";
@@ -223,6 +225,32 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
     },
   });
 
+  const { mutate: createWeight } = useMutation({
+    mutationFn: ({
+      productId,
+      newWeight,
+    }: {
+      productId: number;
+      newWeight: Omit<IWeight, "weightId">;
+    }) => {
+      return productWeightService.createWeightOfProduct(productId, newWeight);
+    },
+
+    onSuccess: (data) => {
+      if (data && data.success) {
+        // onCancel();
+        // form.resetFields();
+        // toast.success(data?.message || "Operation successful");
+      } else if (data && !data.success) {
+        toast.error(data?.message || "Operation failed");
+      }
+    },
+
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
   const { mutate: createProductImage, isPending: isCreatingProductImage } =
     useMutation({
       mutationFn: (formData: FormData) => {
@@ -302,8 +330,6 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
           });
 
           const productImages = fileList.get(index);
-          console.log("productImages", productImages);
-
           if (productImages) {
             const formData = new FormData();
             if (values.products[index].productId !== undefined) {
@@ -363,6 +389,9 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
             sellingPriceFluctuation:
               product.sellingPrice.sellingPriceFluctuation || 0,
           };
+          const newWeight = {
+            weightValue: product.weight.weightValue,
+          };
 
           await new Promise((resolve) => {
             createBuyingPrice({
@@ -372,6 +401,10 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
             createSellingPrice({
               productId: product.productId,
               newSellingPrice: newSellingPrice,
+            });
+            createWeight({
+              productId: product.productId,
+              newWeight: newWeight,
             });
 
             resolve(null);
@@ -484,6 +517,11 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
               createSellingPrice({
                 productId: createdProduct.payload.productId,
                 newSellingPrice: values.products[index].sellingPrice,
+              });
+
+              createWeight({
+                productId: createdProduct.payload.productId,
+                newWeight: values.products[index].weight,
               });
             }
 

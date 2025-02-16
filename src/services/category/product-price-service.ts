@@ -2,7 +2,7 @@ import { AxiosInstance } from "axios";
 import { ApiResponse, IBuyingPrice, ISellingPrice } from "../../interfaces";
 import { createApiClient } from "../api-client";
 
-interface IProductService {
+interface IProductPriceService {
   getAllBuyingPrice(productId: number): Promise<ApiResponse<IBuyingPrice[]>>;
   getAllSellingPrice(productId: number): Promise<ApiResponse<ISellingPrice[]>>;
   createBuyingPrice(
@@ -18,7 +18,7 @@ interface IProductService {
 const buyingPriceApiClient: AxiosInstance = createApiClient("buying_prices");
 const sellingPriceApiClient: AxiosInstance = createApiClient("selling_prices");
 
-class ProductPriceService implements IProductService {
+class ProductPriceService implements IProductPriceService {
   async getAllBuyingPrice(
     productId: number,
   ): Promise<ApiResponse<IBuyingPrice[]>> {
