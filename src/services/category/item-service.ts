@@ -17,6 +17,7 @@ interface IItemService {
     filter?: ItemFilterCriteria,
     sort?: SortParams,
   ): Promise<ApiResponse<Page<IItem>>>;
+  getAllItems(): Promise<ApiResponse<IItem[]>>;
   create(newItem: Omit<IBriefItem, "itemId">): Promise<ApiResponse<IItem>>;
   update(itemId: number, updatedItem: IBriefItem): Promise<ApiResponse<IItem>>;
   delete(itemId: number): Promise<ApiResponse<void>>;
@@ -39,6 +40,10 @@ class ItemService implements IItemService {
         direction: sort?.direction !== "" ? sort?.direction : undefined,
       },
     });
+  }
+
+  async getAllItems(): Promise<ApiResponse<IItem[]>> {
+    return await apiClient.get("/all");
   }
 
   async create(

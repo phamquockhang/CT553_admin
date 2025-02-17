@@ -1,6 +1,8 @@
 import { PlusOutlined } from "@ant-design/icons";
+import { useQuery } from "@tanstack/react-query";
 import { Button, Modal } from "antd";
 import { useState } from "react";
+import { itemService } from "../../../services";
 import UpdateProductForm from "./UpdateProductForm";
 
 const AddProduct: React.FC = () => {
@@ -13,6 +15,11 @@ const AddProduct: React.FC = () => {
   const handleCloseModal = () => {
     setIsOpenModal(false);
   };
+
+  const { data, isLoading, isFetching } = useQuery({
+    queryKey: ["items"],
+    queryFn: itemService.getAllItems,
+  });
 
   return (
     <>
@@ -29,7 +36,11 @@ const AddProduct: React.FC = () => {
         onCancel={handleCloseModal}
         footer={null}
       >
-        <UpdateProductForm onCancel={handleCloseModal} />
+        <UpdateProductForm
+          onCancel={handleCloseModal}
+          existingItems={data?.payload}
+          isLoadingItemsData={isLoading || isFetching}
+        />
       </Modal>
     </>
   );

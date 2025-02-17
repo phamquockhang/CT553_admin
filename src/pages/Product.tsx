@@ -12,6 +12,7 @@ import {
 import { useDynamicTitle } from "../utils";
 import { productService } from "../services";
 import AddProduct from "../features/booking/product/AddProduct";
+import ProductsTable from "../features/booking/product/ProductsTable";
 
 const Product: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -76,11 +77,11 @@ const Product: React.FC = () => {
             <AddProduct />
           </Access>
         </div>
-        {/* <ItemsTable
-          itemPage={data?.payload}
+        <ProductsTable
+          productPage={data?.payload}
           isLoading={isLoading}
           isFetching={isFetching}
-        /> */}
+        />
       </div>
     </Access>
   );
