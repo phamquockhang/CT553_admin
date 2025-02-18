@@ -115,6 +115,7 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
       for (const [index, product] of values.products.entries()) {
         // create new product and product image if this product is new
         if (!product.productId) {
+          toast.loading("Đang thêm sản phẩm mới: " + product.productName);
           const newProduct = {
             productName: product.productName,
             productUnit: product.productUnit,
@@ -165,6 +166,7 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
               });
             });
           }
+          toast.dismiss();
         }
       }
 
@@ -173,109 +175,151 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
         ...values,
         products: values.products,
       };
-      const updatedItem = await new Promise<ApiResponse<IItem>>(
-        (resolve, reject) => {
-          updateItem(
-            { itemId: itemToUpdate.itemId, updatedItem: modifiedItem },
-            {
-              onSuccess: (updatedItem) => {
-                resolve(updatedItem);
-              },
-              onError: (error) => {
-                reject(error);
-              },
-            },
+
+      if (
+        modifiedItem.itemName !== itemToUpdate.itemName ||
+        modifiedItem.isActivated !== itemToUpdate.isActivated ||
+        modifiedItem.products.length !== itemToUpdate.products.length ||
+        modifiedItem.products.some((product, index) => {
+          return (
+            product.productName !== itemToUpdate.products[index].productName ||
+            product.productUnit !== itemToUpdate.products[index].productUnit ||
+            product.description !== itemToUpdate.products[index].description ||
+            product.isActivated !== itemToUpdate.products[index].isActivated ||
+            product.buyingPrice.buyingPriceValue !==
+              itemToUpdate.products[index].buyingPrice.buyingPriceValue ||
+            product.buyingPrice.buyingPriceFluctuation !==
+              itemToUpdate.products[index].buyingPrice.buyingPriceFluctuation ||
+            product.sellingPrice.sellingPriceValue !==
+              itemToUpdate.products[index].sellingPrice.sellingPriceValue ||
+            product.sellingPrice.sellingPriceFluctuation !==
+              itemToUpdate.products[index].sellingPrice
+                .sellingPriceFluctuation ||
+            product.weight.weightValue !==
+              itemToUpdate.products[index].weight.weightValue ||
+            fileListToUpdate.get(index) ||
+            publicIdImageListToKeep.get(index)?.length !==
+              itemToUpdate.products[index].productImages.length
           );
-        },
-      );
-
-      if (updatedItem.success) {
-        for (const [index, product] of values.products.entries()) {
-          const newBuyingPrice = {
-            buyingPriceValue: product.buyingPrice.buyingPriceValue,
-            buyingPriceFluctuation:
-              product.buyingPrice.buyingPriceFluctuation || 0,
-          };
-          const newSellingPrice = {
-            sellingPriceValue: product.sellingPrice.sellingPriceValue,
-            sellingPriceFluctuation:
-              product.sellingPrice.sellingPriceFluctuation || 0,
-          };
-          const newWeight = {
-            weightValue: product.weight.weightValue,
-          };
-
-          await new Promise((resolve) => {
-            createBuyingPrice({
-              productId: product.productId,
-              newBuyingPrice: newBuyingPrice,
-            });
-            createSellingPrice({
-              productId: product.productId,
-              newSellingPrice: newSellingPrice,
-            });
-            createWeight({
-              productId: product.productId,
-              newWeight: newWeight,
-            });
-
-            resolve(null);
-          });
-
-          const productImagesToUpdate = fileListToUpdate.get(index);
-          const publicIdImagesToKeep = publicIdImageListToKeep.get(index);
-          if (productImagesToUpdate || publicIdImagesToKeep) {
-            const formData = new FormData();
-            if (product.productId) {
-              formData.append("productId", product.productId.toString());
-            }
-
-            if (productImagesToUpdate && productImagesToUpdate.length > 0) {
-              for (const image of productImagesToUpdate) {
-                formData.append(
-                  "productImageFiles",
-                  image.originFileObj as File,
-                );
-              }
-            } else {
-              formData.append("productImageFiles", new Blob());
-            }
-
-            if (publicIdImagesToKeep) {
-              for (const publicId of publicIdImagesToKeep) {
-                formData.append("publicIdOfImageFiles", publicId);
-              }
-            } else {
-              formData.append("publicIdOfImageFiles", "");
-            }
-
-            await new Promise((resolve, reject) => {
-              updateProductImage(
-                {
-                  productId: product.productId,
-                  formData,
+        })
+      ) {
+        const updatedItem = await new Promise<ApiResponse<IItem>>(
+          (resolve, reject) => {
+            updateItem(
+              { itemId: itemToUpdate.itemId, updatedItem: modifiedItem },
+              {
+                onSuccess: (updatedItem) => {
+                  resolve(updatedItem);
                 },
-                {
-                  onSuccess: (updatedProductImage) => {
-                    resolve(updatedProductImage);
-                  },
-                  onError: (error) => {
-                    reject(error);
-                  },
+                onError: (error) => {
+                  reject(error);
                 },
-              );
-            });
-          }
-        }
-
-        queryClient.invalidateQueries({
-          predicate: (query) => {
-            return query.queryKey.includes("items");
+              },
+            );
           },
-        });
-        onCancel();
-        // form.resetFields();
-        toast.success(updatedItem.message || "Operation successful");
+        );
+
+        if (updatedItem.success) {
+          for (const [index, product] of values.products.entries()) {
+            toast.loading("Đang cập nhật sản phẩm: " + product.productName);
+            const newBuyingPrice = {
+              buyingPriceValue: product.buyingPrice.buyingPriceValue,
+              buyingPriceFluctuation:
+                product.buyingPrice.buyingPriceFluctuation || 0,
+            };
+            const newSellingPrice = {
+              sellingPriceValue: product.sellingPrice.sellingPriceValue,
+              sellingPriceFluctuation:
+                product.sellingPrice.sellingPriceFluctuation || 0,
+            };
+            const newWeight = {
+              weightValue: product.weight.weightValue,
+            };
+
+            await Promise.all([
+              createBuyingPrice({
+                productId: product.productId,
+                newBuyingPrice: newBuyingPrice,
+              }),
+              createSellingPrice({
+                productId: product.productId,
+                newSellingPrice: newSellingPrice,
+              }),
+              createWeight({
+                productId: product.productId,
+                newWeight: newWeight,
+              }),
+            ]);
+
+            const productImagesToUpdate = fileListToUpdate.get(index);
+            const publicIdImagesToKeep = publicIdImageListToKeep.get(index);
+            if (
+              (productImagesToUpdate?.length ?? 0) > 0 ||
+              productImagesToUpdate ||
+              publicIdImagesToKeep?.length !==
+                itemToUpdate.products[index].productImages.length
+            ) {
+              console.log("productImagesToUpdate", productImagesToUpdate);
+              console.log("publicIdImagesToKeep", publicIdImagesToKeep);
+              const formData = new FormData();
+              if (product.productId) {
+                formData.append("productId", product.productId.toString());
+              }
+
+              if (productImagesToUpdate && productImagesToUpdate.length > 0) {
+                for (const image of productImagesToUpdate) {
+                  formData.append(
+                    "productImageFiles",
+                    image.originFileObj as File,
+                  );
+                }
+              } else {
+                formData.append("productImageFiles", new Blob());
+              }
+
+              if (publicIdImagesToKeep) {
+                for (const publicId of publicIdImagesToKeep) {
+                  formData.append("publicIdOfImageFiles", publicId);
+                }
+              } else {
+                formData.append("publicIdOfImageFiles", "");
+              }
+
+              await new Promise((resolve, reject) => {
+                updateProductImage(
+                  {
+                    productId: product.productId,
+                    formData,
+                  },
+                  {
+                    onSuccess: (updatedProductImage) => {
+                      resolve(updatedProductImage);
+                    },
+                    onError: (error) => {
+                      reject(error);
+                    },
+                  },
+                );
+              });
+            }
+            toast.dismiss();
+          }
+
+          queryClient.invalidateQueries({
+            predicate: (query) => {
+              return (
+                query.queryKey.includes("items") ||
+                query.queryKey.includes("item") ||
+                query.queryKey.includes("allItems")
+              );
+            },
+          });
+          onCancel();
+          // form.resetFields();
+          toast.success(updatedItem.message || "Operation successful");
+        }
+      } else {
+        toast.error("Không có thay đổi nào được thực hiện");
       }
     } else {
       const newItem = {
@@ -307,6 +351,7 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
           }));
 
           for (const [index, product] of newProductList.entries()) {
+            toast.loading("Đang thêm sản phẩm: " + product.productName);
             const createdProduct = await new Promise<ApiResponse<IProduct>>(
               (resolve, reject) => {
                 createProduct(product, {
@@ -364,11 +409,16 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
                 });
               });
             }
+            toast.dismiss();
           }
 
           queryClient.invalidateQueries({
             predicate: (query) => {
-              return query.queryKey.includes("items");
+              return (
+                query.queryKey.includes("items") ||
+                query.queryKey.includes("item") ||
+                query.queryKey.includes("allItems")
+              );
             },
           });
           onCancel();

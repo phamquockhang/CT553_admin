@@ -19,7 +19,10 @@ const DeleteItem: React.FC<DeleteItemProps> = ({ itemId, setIsDeleting }) => {
       setIsDeleting(false);
 
       queryClient.invalidateQueries({
-        predicate: (query) => query.queryKey.includes("items"),
+        predicate: (query) =>
+          query.queryKey.includes("items") ||
+          query.queryKey.includes("item") ||
+          query.queryKey.includes("allItems"),
       });
 
       toast.success(data.message || "Operation successful");

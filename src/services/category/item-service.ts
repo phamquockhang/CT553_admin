@@ -11,6 +11,7 @@ import {
 } from "../../interfaces";
 
 interface IItemService {
+  getItem(itemId: number): Promise<ApiResponse<IItem>>;
   getItems(
     pagination: PaginationParams,
     query: string,
@@ -25,6 +26,10 @@ interface IItemService {
 
 const apiClient: AxiosInstance = createApiClient("items");
 class ItemService implements IItemService {
+  async getItem(itemId: number): Promise<ApiResponse<IItem>> {
+    return await apiClient.get(`/${itemId}`);
+  }
+
   async getItems(
     pagination: PaginationParams,
     query: string,

@@ -1,15 +1,21 @@
 import { EditOutlined } from "@ant-design/icons";
+import { useQuery } from "@tanstack/react-query";
 import { Modal, Tooltip } from "antd";
 import { useState } from "react";
+import { itemService } from "../../../services";
 import UpdateItemForm from "./UpdateItemForm";
-import { IItem } from "../../../interfaces";
 
 interface UpdateItemProps {
-  item: IItem;
+  itemId: number;
 }
 
-const UpdateItem: React.FC<UpdateItemProps> = ({ item }) => {
+const UpdateItem: React.FC<UpdateItemProps> = ({ itemId }) => {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["item", itemId],
+    queryFn: () => itemService.getItem(itemId),
+  });
 
   const handleOpenModal = () => {
     setIsOpenModal(true);
@@ -28,6 +34,7 @@ const UpdateItem: React.FC<UpdateItemProps> = ({ item }) => {
         />
       </Tooltip>
       <Modal
+        loading={isLoading}
         centered
         open={isOpenModal}
         width="60%"
@@ -37,7 +44,10 @@ const UpdateItem: React.FC<UpdateItemProps> = ({ item }) => {
         onCancel={handleCloseModal}
         footer={null}
       >
-        <UpdateItemForm itemToUpdate={item} onCancel={handleCloseModal} />
+        <UpdateItemForm
+          itemToUpdate={data?.payload}
+          onCancel={handleCloseModal}
+        />
       </Modal>
     </>
   );

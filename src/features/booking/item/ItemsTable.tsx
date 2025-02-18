@@ -194,9 +194,9 @@ const ItemsTable: React.FC<ItemTableProps> = ({
 
       render: (record: IItem) => (
         <Space>
-          <ViewItem item={record} />
+          <ViewItem itemId={record.itemId} />
           <Access permission={PERMISSIONS[Module.ITEMS].UPDATE} hideChildren>
-            <UpdateItem item={record} />
+            <UpdateItem itemId={record.itemId} />
           </Access>
           <Access permission={PERMISSIONS[Module.ITEMS].DELETE} hideChildren>
             <DeleteItem itemId={record.itemId} setIsDeleting={setIsDeleting} />

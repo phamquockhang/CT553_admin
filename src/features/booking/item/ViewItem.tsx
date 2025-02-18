@@ -1,15 +1,21 @@
 import { EyeOutlined } from "@ant-design/icons";
+import { useQuery } from "@tanstack/react-query";
 import { Modal, Tooltip } from "antd";
 import { useState } from "react";
+import { itemService } from "../../../services";
 import UpdateItemForm from "./UpdateItemForm";
-import { IItem } from "../../../interfaces";
 
 interface ViewItemProps {
-  item: IItem;
+  itemId: number;
 }
 
-const ViewItem: React.FC<ViewItemProps> = ({ item }) => {
+const ViewItem: React.FC<ViewItemProps> = ({ itemId }) => {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["item", itemId],
+    queryFn: () => itemService.getItem(itemId),
+  });
 
   const handleOpenModal = () => {
     setIsOpenModal(true);
@@ -28,6 +34,7 @@ const ViewItem: React.FC<ViewItemProps> = ({ item }) => {
         />
       </Tooltip>
       <Modal
+        loading={isLoading}
         centered
         open={isOpenModal}
         width="60%"
@@ -37,7 +44,7 @@ const ViewItem: React.FC<ViewItemProps> = ({ item }) => {
         footer={null}
       >
         <UpdateItemForm
-          itemToUpdate={item}
+          itemToUpdate={data?.payload}
           onCancel={handleCloseModal}
           viewOnly
         />
