@@ -22,7 +22,9 @@ const DeleteItem: React.FC<DeleteItemProps> = ({ itemId, setIsDeleting }) => {
         predicate: (query) =>
           query.queryKey.includes("items") ||
           query.queryKey.includes("item") ||
-          query.queryKey.includes("allItems"),
+          query.queryKey.includes("allItems") ||
+          query.queryKey.includes("products") ||
+          query.queryKey.includes("product"),
       });
 
       toast.success(data.message || "Operation successful");

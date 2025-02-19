@@ -299,7 +299,9 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
               return (
                 query.queryKey.includes("items") ||
                 query.queryKey.includes("item") ||
-                query.queryKey.includes("allItems")
+                query.queryKey.includes("allItems") ||
+                query.queryKey.includes("products") ||
+                query.queryKey.includes("product")
               );
             },
           });
@@ -406,7 +408,9 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
               return (
                 query.queryKey.includes("items") ||
                 query.queryKey.includes("item") ||
-                query.queryKey.includes("allItems")
+                query.queryKey.includes("allItems") ||
+                query.queryKey.includes("products") ||
+                query.queryKey.includes("product")
               );
             },
           });
