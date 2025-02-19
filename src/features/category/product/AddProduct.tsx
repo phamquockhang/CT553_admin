@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button, Modal } from "antd";
 import { useState } from "react";
 import { itemService } from "../../../services";
-import UpdateProductForm from "./UpdateProductForm";
+import AddProductForm from "./components/AddProductForm";
 
 const AddProduct: React.FC = () => {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
@@ -36,7 +36,7 @@ const AddProduct: React.FC = () => {
         onCancel={handleCloseModal}
         footer={null}
       >
-        <UpdateProductForm
+        <AddProductForm
           onCancel={handleCloseModal}
           existingItems={data?.payload}
           isLoadingItemsData={isLoading || isFetching}

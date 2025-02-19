@@ -49,6 +49,7 @@ export interface IBriefProduct {
 
 export interface ProductFilterCriteria {
   isActivated?: string;
+  itemId?: string;
 }
 
 export interface IProductImage {

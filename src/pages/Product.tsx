@@ -30,6 +30,7 @@ const Product: React.FC = () => {
   };
   const filter: ProductFilterCriteria = {
     isActivated: searchParams.get("isActivated") || undefined,
+    itemId: searchParams.get("itemId") || undefined,
   };
 
   const { data, isLoading, isFetching } = useQuery({
