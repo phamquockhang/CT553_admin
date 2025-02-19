@@ -214,7 +214,12 @@ const UpdateProductForm: React.FC<UpdateProductFormProps> = ({
 
         queryClient.invalidateQueries({
           predicate: (query) => {
-            return query.queryKey.includes("items");
+            return (
+              query.queryKey.includes("items") ||
+              query.queryKey.includes("item") ||
+              query.queryKey.includes("allItems") ||
+              query.queryKey.includes("products")
+            );
           },
         });
         onCancel();
@@ -292,9 +297,15 @@ const UpdateProductForm: React.FC<UpdateProductFormProps> = ({
 
         queryClient.invalidateQueries({
           predicate: (query) => {
-            return query.queryKey.includes("products");
+            return (
+              query.queryKey.includes("items") ||
+              query.queryKey.includes("item") ||
+              query.queryKey.includes("allItems") ||
+              query.queryKey.includes("products")
+            );
           },
         });
+
         onCancel();
         form.resetFields();
         toast.success("Thêm sản phẩm thành công");

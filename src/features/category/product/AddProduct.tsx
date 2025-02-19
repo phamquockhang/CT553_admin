@@ -17,7 +17,7 @@ const AddProduct: React.FC = () => {
   };
 
   const { data, isLoading, isFetching } = useQuery({
-    queryKey: ["items"],
+    queryKey: ["allItems"],
     queryFn: itemService.getAllItems,
   });
 

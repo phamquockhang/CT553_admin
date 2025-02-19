@@ -3,16 +3,16 @@ import { Input } from "antd";
 import { SearchProps } from "antd/es/input";
 import { useSearchParams } from "react-router-dom";
 import Access from "../features/auth/Access";
+import AddProduct from "../features/category/product/AddProduct";
+import ProductsTable from "../features/category/product/ProductsTable";
 import {
   Module,
   PERMISSIONS,
   ProductFilterCriteria,
   SortParams,
 } from "../interfaces";
-import { useDynamicTitle } from "../utils";
 import { productService } from "../services";
-import AddProduct from "../features/booking/product/AddProduct";
-import ProductsTable from "../features/booking/product/ProductsTable";
+import { useDynamicTitle } from "../utils";
 
 const Product: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();

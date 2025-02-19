@@ -3,8 +3,8 @@ import { Input } from "antd";
 import { SearchProps } from "antd/es/input";
 import { useSearchParams } from "react-router-dom";
 import Access from "../features/auth/Access";
-import AddItem from "../features/booking/item/AddItem";
-import ItemsTable from "../features/booking/item/ItemsTable";
+import AddItem from "../features/category/item/AddItem";
+import ItemsTable from "../features/category/item/ItemsTable";
 import {
   ItemFilterCriteria,
   Module,
