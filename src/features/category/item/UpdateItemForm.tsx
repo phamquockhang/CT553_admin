@@ -115,7 +115,6 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
       for (const [index, product] of values.products.entries()) {
         // create new product and product image if this product is new
         if (!product.productId) {
-          toast.loading("Đang thêm sản phẩm mới: " + product.productName);
           const newProduct = {
             productName: product.productName,
             productUnit: product.productUnit,
@@ -127,46 +126,20 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
           await new Promise((resolve, reject) => {
             createProduct(newProduct, {
               onSuccess: (newProduct) => {
-                resolve(newProduct);
-
                 if (newProduct.payload) {
                   values.products[index] = newProduct.payload;
                   values.products[index].buyingPrice = product.buyingPrice;
                   values.products[index].sellingPrice = product.sellingPrice;
                   values.products[index].weight = product.weight;
                 }
+
+                resolve(newProduct);
               },
               onError: (error) => {
                 reject(error);
               },
             });
           });
-
-          const productImages = fileList.get(index);
-          if (productImages) {
-            const formData = new FormData();
-            if (values.products[index].productId !== undefined) {
-              formData.append(
-                "productId",
-                values.products[index].productId.toString(),
-              );
-            }
-            for (const image of productImages) {
-              formData.append("productImageFiles", image.originFileObj as File);
-            }
-
-            await new Promise((resolve, reject) => {
-              createProductImage(formData, {
-                onSuccess: () => {
-                  resolve(null);
-                },
-                onError: (error) => {
-                  reject(error);
-                },
-              });
-            });
-          }
-          toast.dismiss();
         }
       }
 
@@ -236,20 +209,36 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
               weightValue: product.weight.weightValue,
             };
 
-            await Promise.all([
+            await new Promise((resolve) => {
               createBuyingPrice({
                 productId: product.productId,
                 newBuyingPrice: newBuyingPrice,
-              }),
+              });
+              resolve(null);
+            });
+            await new Promise((resolve) => {
               createSellingPrice({
                 productId: product.productId,
                 newSellingPrice: newSellingPrice,
-              }),
-              createWeight({
-                productId: product.productId,
-                newWeight: newWeight,
-              }),
-            ]);
+              });
+              resolve(null);
+            });
+            await new Promise((resolve, reject) => {
+              createWeight(
+                {
+                  productId: product.productId,
+                  newWeight: newWeight,
+                },
+                {
+                  onSuccess: (createdWeight) => {
+                    resolve(createdWeight);
+                  },
+                  onError: (error) => {
+                    reject(error);
+                  },
+                },
+              );
+            });
 
             const productImagesToUpdate = fileListToUpdate.get(index);
             const publicIdImagesToKeep = publicIdImageListToKeep.get(index);

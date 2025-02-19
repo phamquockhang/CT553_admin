@@ -38,6 +38,34 @@ export function colorSortDownIcon(sortOrder: SortOrder | undefined) {
   return sortOrder === "descend" ? "#60C158" : "#fff";
 }
 
+export function getActiveColor(active: boolean) {
+  return active ? blue[7] : red[3];
+}
+
+export function getUniqueColorByString(str: string) {
+  const colors = [
+    "blue",
+    "green",
+    "orange",
+    "red",
+    "yellow",
+    "pink",
+    "purple",
+    "cyan",
+    "magenta",
+    "geekblue",
+    "volcano",
+    "gold",
+    "lime",
+  ];
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash % colors.length);
+  return colors[index];
+}
+
 export function groupBy<T, K>(
   list: T[],
   keyGetter: (item: T) => K,

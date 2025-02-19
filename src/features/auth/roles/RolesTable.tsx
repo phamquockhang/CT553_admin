@@ -16,6 +16,7 @@ import {
   colorSortDownIcon,
   colorSortUpIcon,
   formatTimestamp,
+  getActiveColor,
   getDefaultFilterValue,
   getDefaultSortOrder,
   getSortDirection,
@@ -136,7 +137,7 @@ const RolesTable: React.FC<RolesTableProps> = ({ rolePage, isLoading }) => {
       width: "8%",
       align: "center",
       render: (isActivated: boolean) => (
-        <Tag color={isActivated ? "green" : "red"}>
+        <Tag color={getActiveColor(isActivated)}>
           {isActivated ? "ACTIVE" : "INACTIVE"}
         </Tag>
       ),
