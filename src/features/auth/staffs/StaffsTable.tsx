@@ -20,6 +20,7 @@ import {
   colorSortDownIcon,
   colorSortUpIcon,
   formatTimestamp,
+  getActiveColor,
   getDefaultFilterValue,
   getDefaultSortOrder,
   getSortDirection,
@@ -158,7 +159,7 @@ const StaffsTable: React.FC<StaffTableProps> = ({ staffPage, isLoading }) => {
       width: "8%",
       align: "center",
       render: (isActivated: boolean) => (
-        <Tag color={isActivated ? "green" : "red"}>
+        <Tag color={getActiveColor(isActivated)}>
           {isActivated ? "ACTIVE" : "INACTIVE"}
         </Tag>
       ),

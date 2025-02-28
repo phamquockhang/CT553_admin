@@ -1,4 +1,4 @@
-import useDynamicTitle from "../hooks/useDynamicTitle";
+import { useDynamicTitle } from "../utils";
 
 const Dashboard: React.FC = () => {
   useDynamicTitle("Trang chủ K-Seafood");

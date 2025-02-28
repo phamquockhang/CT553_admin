@@ -3,10 +3,17 @@ import { Button, Dropdown, Layout, Menu, theme, Tooltip } from "antd";
 import { MenuProps } from "antd/lib";
 import { useEffect, useState } from "react";
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
-import { FaKey, FaUserCircle, FaUserCog, FaUsers } from "react-icons/fa";
+import { BiSolidCategory } from "react-icons/bi";
+import {
+  FaKey,
+  FaSitemap,
+  FaUserCircle,
+  FaUserCog,
+  FaUsers,
+} from "react-icons/fa";
 import { IoIosNotifications } from "react-icons/io";
 import { IoShieldCheckmark } from "react-icons/io5";
-import { MdDashboard } from "react-icons/md";
+import { MdCategory, MdDashboard } from "react-icons/md";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import Loading from "../common/components/Loading";
 import { useLoggedInUser } from "../features/auth/hooks/useLoggedInUser";
@@ -83,8 +90,25 @@ const AdminLayout: React.FC = () => {
             PERMISSIONS[Module.PERMISSIONS].GET_PAGINATION.apiPath &&
           item.method === PERMISSIONS[Module.PERMISSIONS].GET_PAGINATION.method,
       );
+      const viewItems = permissions.find(
+        (item) =>
+          item.apiPath === PERMISSIONS[Module.ITEMS].GET_PAGINATION.apiPath &&
+          item.method === PERMISSIONS[Module.ITEMS].GET_PAGINATION.method,
+      );
+      const viewProducts = permissions.find(
+        (item) =>
+          item.apiPath ===
+            PERMISSIONS[Module.PRODUCTS].GET_PAGINATION.apiPath &&
+          item.method === PERMISSIONS[Module.PRODUCTS].GET_PAGINATION.method,
+      );
+
       const hasAuthChildren: boolean = Boolean(
-        viewStaffs || viewRoles || viewPermissions || viewCustomers,
+        viewStaffs ||
+          viewRoles ||
+          viewPermissions ||
+          viewCustomers ||
+          viewItems ||
+          viewProducts,
       );
 
       const menuItems = [
@@ -137,6 +161,31 @@ const AdminLayout: React.FC = () => {
                           label: <NavLink to="/permissions">Quyền hạn</NavLink>,
                           key: "permissions",
                           icon: <FaKey />,
+                        },
+                      ]
+                    : []),
+                ],
+              },
+              {
+                label: "Danh mục",
+                key: "categories",
+                icon: <BiSolidCategory />,
+                children: [
+                  ...(viewItems
+                    ? [
+                        {
+                          label: <NavLink to="/items">Mặt hàng</NavLink>,
+                          key: "items",
+                          icon: <FaSitemap />,
+                        },
+                      ]
+                    : []),
+                  ...(viewProducts
+                    ? [
+                        {
+                          label: <NavLink to="/products">Sản phẩm</NavLink>,
+                          key: "products",
+                          icon: <MdCategory />,
                         },
                       ]
                     : []),
@@ -210,7 +259,7 @@ const AdminLayout: React.FC = () => {
         theme="light"
       >
         <div className="demo-logo-vertical flex flex-col items-center pb-6">
-          <img src="logo_512.png" alt="Logo" className="w-36 p-3" />
+          <img src="/src/assets/logo_512.png" alt="Logo" className="w-36 p-3" />
           {!collapsed && <h1 className="font-bold">{user?.firstName}</h1>}
         </div>
         <Menu

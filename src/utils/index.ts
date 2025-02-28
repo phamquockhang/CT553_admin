@@ -2,7 +2,8 @@ import { blue, green, grey, orange, red } from "@ant-design/colors";
 import { SortOrder } from "antd/es/table/interface";
 import dayjs from "dayjs";
 import { useEffect } from "react";
-import { IDistrict, IProvince, IWard } from "../interfaces/address";
+import { IDistrict, IProvince, IWard } from "../interfaces";
+import { FileType } from "../interfaces";
 
 export function useDynamicTitle(title: string) {
   useEffect(() => {
@@ -35,6 +36,34 @@ export function colorSortUpIcon(sortOrder: SortOrder | undefined) {
 
 export function colorSortDownIcon(sortOrder: SortOrder | undefined) {
   return sortOrder === "descend" ? "#60C158" : "#fff";
+}
+
+export function getActiveColor(active: boolean) {
+  return active ? blue[7] : red[3];
+}
+
+export function getUniqueColorByString(str: string) {
+  const colors = [
+    "blue",
+    "green",
+    "orange",
+    "red",
+    "yellow",
+    "pink",
+    "purple",
+    "cyan",
+    "magenta",
+    "geekblue",
+    "volcano",
+    "gold",
+    "lime",
+  ];
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash % colors.length);
+  return colors[index];
 }
 
 export function groupBy<T, K>(
@@ -91,14 +120,14 @@ export function formatTimestamp(timestamp: string) {
   return dayjs(timestamp).format("DD-MM-YYYY HH:mm:ss");
 }
 
-// export async function getBase64(file: FileType): Promise<string> {
-//   return new Promise((resolve, reject) => {
-//     const reader = new FileReader();
-//     reader.readAsDataURL(file);
-//     reader.onload = () => resolve(reader.result as string);
-//     reader.onerror = (error) => reject(error);
-//   });
-// }
+export async function getBase64(file: FileType): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+  });
+}
 
 export function getFormattedDuration(durationInMinutes: number): string {
   const hours = Math.floor(durationInMinutes / 60);

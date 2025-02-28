@@ -3,17 +3,18 @@ import { Input } from "antd";
 import { SearchProps } from "antd/es/input";
 import { useSearchParams } from "react-router-dom";
 import Access from "../features/auth/Access";
-import PermissionsTable from "../features/auth/permissions/PermissionsTable";
+import AddProduct from "../features/category/product/AddProduct";
+import ProductsTable from "../features/category/product/ProductsTable";
 import {
   Module,
-  PermissionFilterCriteria,
   PERMISSIONS,
+  ProductFilterCriteria,
   SortParams,
 } from "../interfaces";
-import { permissionService } from "../services";
+import { productService } from "../services";
 import { useDynamicTitle } from "../utils";
 
-const Permission: React.FC = () => {
+const Product: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const pagination = {
@@ -27,13 +28,13 @@ const Permission: React.FC = () => {
     sortBy: searchParams.get("sortBy") || "",
     direction: searchParams.get("direction") || "",
   };
-  const filter: PermissionFilterCriteria = {
-    method: searchParams.get("method") || "",
-    module: searchParams.get("module") || "",
+  const filter: ProductFilterCriteria = {
+    isActivated: searchParams.get("isActivated") || undefined,
+    itemId: searchParams.get("itemId") || undefined,
   };
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["permissions", pagination, query, sort, filter].filter((key) => {
+  const { data, isLoading, isFetching } = useQuery({
+    queryKey: ["products", pagination, query, sort, filter].filter((key) => {
       if (typeof key === "string") {
         return key !== "";
       } else if (key instanceof Object) {
@@ -42,8 +43,7 @@ const Permission: React.FC = () => {
         );
       }
     }),
-    queryFn: () =>
-      permissionService.getPermissions(pagination, query, filter, sort),
+    queryFn: () => productService.getProducts(pagination, query, filter, sort),
   });
 
   const handleSearch: SearchProps["onSearch"] = (value) => {
@@ -55,18 +55,18 @@ const Permission: React.FC = () => {
     setSearchParams(searchParams);
   };
 
-  useDynamicTitle("Quản lý quyền hạn");
+  useDynamicTitle("Quản lý sản phẩm");
 
   return (
-    <Access permission={PERMISSIONS[Module.PERMISSIONS].GET_PAGINATION}>
+    <Access permission={PERMISSIONS[Module.PRODUCTS].GET_PAGINATION}>
       <div className="card">
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Quản lý quyền hạn</h2>
+          <h2 className="text-xl font-semibold">Quản lý sản phẩm</h2>
 
           <div className="w-[60%]">
             <div className="flex gap-3">
               <Input.Search
-                placeholder="Nhập tên hoặc url của Quyền hạn để tìm kiếm..."
+                placeholder="Nhập tên sản phẩm để tìm kiếm..."
                 defaultValue={query}
                 enterButton
                 allowClear
@@ -74,20 +74,18 @@ const Permission: React.FC = () => {
               />
             </div>
           </div>
-          {/* <Access
-            permission={PERMISSIONS[Module.PERMISSIONS].CREATE}
-            hideChildren
-          >
-            <AddPermission />
-          </Access> */}
+          <Access permission={PERMISSIONS[Module.PRODUCTS].CREATE} hideChildren>
+            <AddProduct />
+          </Access>
         </div>
-        <PermissionsTable
-          permissionPage={data?.payload}
+        <ProductsTable
+          productPage={data?.payload}
           isLoading={isLoading}
+          isFetching={isFetching}
         />
       </div>
     </Access>
   );
 };
 
-export default Permission;
+export default Product;

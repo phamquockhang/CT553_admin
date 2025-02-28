@@ -8,11 +8,7 @@ import { SorterResult } from "antd/es/table/interface";
 import { GetProp } from "antd/lib";
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-
-import DeleteCustomer from "./DeleteCustomer";
-import UpdateCustomer from "./UpdateCustomer";
-import ViewCustomer from "./ViewCustomer";
-import { ICustomer, Module, Page, PERMISSIONS } from "../../../interfaces";
+import { IItem, Module, Page, PERMISSIONS } from "../../../interfaces";
 import {
   colorFilterIcon,
   colorSortDownIcon,
@@ -23,22 +19,27 @@ import {
   getDefaultSortOrder,
   getSortDirection,
 } from "../../../utils";
-import Access from "../Access";
+import Access from "../../auth/Access";
+import UpdateItem from "./UpdateItem";
+import ViewItem from "./ViewItem";
+import DeleteItem from "./DeleteItem";
 
 interface TableParams {
   pagination: TablePaginationConfig;
   filters?: Parameters<GetProp<TableProps, "onChange">>[1];
-  sorter?: SorterResult<ICustomer> | SorterResult<ICustomer>[];
+  sorter?: SorterResult<IItem> | SorterResult<IItem>[];
 }
 
-interface CustomerTableProps {
-  customerPage?: Page<ICustomer>;
+interface ItemTableProps {
+  itemPage?: Page<IItem>;
   isLoading: boolean;
+  isFetching: boolean;
 }
 
-const CustomersTable: React.FC<CustomerTableProps> = ({
-  customerPage,
+const ItemsTable: React.FC<ItemTableProps> = ({
+  itemPage,
   isLoading,
+  isFetching,
 }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [tableParams, setTableParams] = useState<TableParams>(() => ({
@@ -46,24 +47,26 @@ const CustomersTable: React.FC<CustomerTableProps> = ({
       current: Number(searchParams.get("page")) || 1,
       pageSize: Number(searchParams.get("pageSize")) || 10,
       showSizeChanger: true,
-      showTotal: (total) => `Tổng ${total} khách hàng`,
+      showTotal: (total) => `Tổng ${total} mặt hàng`,
     },
   }));
 
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+
   useEffect(() => {
-    if (customerPage) {
+    if (itemPage) {
       setTableParams((prev) => ({
         ...prev,
         pagination: {
           ...prev.pagination,
-          total: customerPage.meta?.total || 0,
-          showTotal: (total) => `Tổng ${total} khách hàng`,
+          total: itemPage.meta?.total || 0,
+          showTotal: (total) => `Tổng ${total} mặt hàng`,
         },
       }));
     }
-  }, [customerPage]);
+  }, [itemPage]);
 
-  const handleTableChange: TableProps<ICustomer>["onChange"] = (
+  const handleTableChange: TableProps<IItem>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -113,7 +116,7 @@ const CustomersTable: React.FC<CustomerTableProps> = ({
     setSearchParams(searchParams);
   };
 
-  const columns: TableProps<ICustomer>["columns"] = [
+  const columns: TableProps<IItem>["columns"] = [
     {
       title: "STT",
       width: "2%",
@@ -125,28 +128,16 @@ const CustomersTable: React.FC<CustomerTableProps> = ({
         1,
     },
     {
-      title: "Họ",
-      key: "lastName",
-      dataIndex: "lastName",
+      title: "Tên mặt hàng",
+      key: "itemName",
+      dataIndex: "itemName",
       width: "10%",
-    },
-    {
-      title: "Tên",
-      key: "firstName",
-      dataIndex: "firstName",
-      width: "10%",
-    },
-    {
-      key: "email",
-      title: "Email",
-      dataIndex: "email",
-      width: "15%",
     },
     {
       key: "isActivated",
       title: "Trạng thái",
       dataIndex: "isActivated",
-      width: "8%",
+      width: "5%",
       align: "center",
       render: (isActivated: boolean) => (
         <Tag color={getActiveColor(isActivated)}>
@@ -199,42 +190,53 @@ const CustomersTable: React.FC<CustomerTableProps> = ({
     {
       title: "Hành động",
       key: "action",
-      width: "10%",
+      width: "5%",
       align: "center",
 
-      render: (record: ICustomer) => (
+      render: (record: IItem) => (
         <Space>
-          <ViewCustomer user={record} />
-          <Access permission={PERMISSIONS[Module.CUSTOMER].UPDATE} hideChildren>
-            <UpdateCustomer user={record} />
+          <ViewItem itemId={record.itemId} />
+          <Access permission={PERMISSIONS[Module.ITEMS].UPDATE} hideChildren>
+            <UpdateItem itemId={record.itemId} />
           </Access>
-          <Access permission={PERMISSIONS[Module.CUSTOMER].DELETE} hideChildren>
-            <DeleteCustomer userId={record.customerId} />
+          <Access permission={PERMISSIONS[Module.ITEMS].DELETE} hideChildren>
+            <DeleteItem itemId={record.itemId} setIsDeleting={setIsDeleting} />
           </Access>
         </Space>
       ),
     },
   ];
 
+  // if (!isLoading) {
+  //   console.log(itemPage?.data);
+  // }
+
   return (
     <Table
       bordered={false}
       columns={columns}
-      rowKey={(record: ICustomer) => record.customerId}
+      rowKey={(record: IItem) => record.itemId}
       pagination={tableParams.pagination}
-      dataSource={customerPage?.data}
+      dataSource={itemPage?.data}
       rowClassName={(_, index) =>
         index % 2 === 0 ? "table-row-light" : "table-row-gray"
       }
       rowHoverable={false}
-      loading={{
-        spinning: isLoading,
-        tip: "Đang tải dữ liệu...",
-      }}
+      loading={
+        isLoading
+          ? {
+              spinning: true,
+              tip: "Đang tải dữ liệu...",
+            }
+          : (isFetching || isDeleting) && {
+              spinning: true,
+              tip: "Đang cập nhật dữ liệu...",
+            }
+      }
       onChange={handleTableChange}
       size="middle"
     />
   );
 };
 
-export default CustomersTable;
+export default ItemsTable;

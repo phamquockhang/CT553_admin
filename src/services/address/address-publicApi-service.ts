@@ -1,5 +1,4 @@
-import { ApiResponse } from "../../interfaces";
-import { IDistrict, IProvince, IWard } from "../../interfaces/address/index";
+import { ApiResponse, IDistrict, IProvince, IWard } from "../../interfaces";
 
 const addressHost =
   "https://online-gateway.ghn.vn/shiip/public-api/master-data";

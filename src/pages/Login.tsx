@@ -1,5 +1,5 @@
 import LoginForm from "../features/auth/LoginForm";
-import useDynamicTitle from "../hooks/useDynamicTitle";
+import { useDynamicTitle } from "../utils";
 
 const Login: React.FC = () => {
   useDynamicTitle("Đăng nhập");
@@ -21,7 +21,10 @@ const Login: React.FC = () => {
           </div>
 
           <div className="hidden w-1/2 lg:block">
-            <img src="/login_background.jpg" alt="Login background" />
+            <img
+              src="/src/assets/login_background.jpg"
+              alt="Login background"
+            />
           </div>
         </div>
       </div>
