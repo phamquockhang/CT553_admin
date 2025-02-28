@@ -15,14 +15,14 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import Loading from "../../../common/components/Loading";
 import { ICustomer } from "../../../interfaces";
+import { IAddress } from "../../../interfaces/address";
 import {
   addressPublicApiService,
   addressService,
   customerService,
   scoreService,
 } from "../../../services";
-import { formatAddressName } from "../../../utils";
-import { IAddress } from "../../../interfaces/address";
+import AddressItem from "./components/AddressItem";
 
 interface UpdateCustomerFormProps {
   userToUpdate?: ICustomer;
@@ -135,12 +135,6 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
     return current && dayjs(current).isAfter(dayjs().endOf("day"));
   };
 
-  // const { data: customerIdByEmail } = useQuery({
-  //   queryKey: ["customerId", form.getFieldValue("email")],
-  //   queryFn: ({ queryKey }) =>
-  //     customerService.getCustomerIdByEmail(queryKey[1]),
-  // });
-
   function handleFinish(values: ICustomer) {
     if (userToUpdate) {
       const updatedUser = {
@@ -188,20 +182,6 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
     },
   });
 
-  const { data: addressData, isLoading: isLoadingAddress } = useQuery({
-    queryKey: ["addresses", userToUpdate?.customerId],
-    queryFn: async () => {
-      if (userToUpdate) {
-        const res = await addressService.getDefaultAddressByCustomerId(
-          userToUpdate?.customerId || "",
-        );
-        if (res && res.success) {
-          return res;
-        }
-      }
-    },
-  });
-
   const { data: provinceData, isLoading: isLoadingProvince } = useQuery({
     queryKey: ["province"],
     queryFn: async () => {
@@ -216,16 +196,12 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
   }));
 
   const { data: districtData, isLoading: isLoadingDistrict } = useQuery({
-    queryKey: [
-      "district",
-      userToUpdate ? addressData?.payload?.provinceId : provinceId,
-    ],
+    queryKey: ["district", provinceId],
     queryFn: async () => {
-      const response = await addressPublicApiService.getDistricts(
-        userToUpdate ? addressData?.payload?.provinceId : provinceId,
-      );
+      const response = await addressPublicApiService.getDistricts(provinceId);
       return response.data;
     },
+    enabled: Boolean(provinceId),
   });
 
   const districtOptions = districtData?.map((district) => ({
@@ -234,16 +210,12 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
   }));
 
   const { data: wardData, isLoading: isLoadingWard } = useQuery({
-    queryKey: [
-      "ward",
-      userToUpdate ? addressData?.payload?.districtId : districtId,
-    ],
+    queryKey: ["ward", districtId],
     queryFn: async () => {
-      const response = await addressPublicApiService.getWards(
-        userToUpdate ? addressData?.payload?.districtId : districtId,
-      );
+      const response = await addressPublicApiService.getWards(districtId);
       return response.data;
     },
+    enabled: Boolean(districtId),
   });
 
   const wardOptions = wardData?.map((ward) => ({
@@ -251,19 +223,13 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
     label: ward.WardName,
   }));
 
-  const formattedAddress = formatAddressName(
-    addressData?.payload?.provinceId,
-    addressData?.payload?.districtId,
-    addressData?.payload?.wardCode,
-    addressData?.payload?.description,
-    provinceData,
-    districtData,
-    wardData,
-  );
-
-  if (isLoadingScore || isLoadingAddress) {
+  if (isLoadingScore) {
     return <Loading />;
   }
+
+  const sortedAddress = userToUpdate?.addresses?.sort((a, b) => {
+    return (a.createdAt ?? 0) > (b.createdAt ?? 0) ? -1 : 1;
+  });
 
   return (
     <Form
@@ -437,14 +403,17 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
       {userToUpdate ? (
         <div className="flex gap-8">
           <Form.Item className="flex-1" label="Địa chỉ">
-            <Input
-              readOnly={userToUpdate != undefined || viewOnly}
-              value={
-                addressData?.payload?.description
-                  ? formattedAddress
-                  : "Chưa cập nhật địa chỉ"
-              }
-            />
+            {sortedAddress && sortedAddress.length > 0 ? (
+              <>
+                {sortedAddress.map((address) => (
+                  <AddressItem key={address.addressId} address={address} />
+                ))}
+              </>
+            ) : (
+              <>
+                <Input readOnly={true} value={"Chưa cập nhật địa chỉ"} />
+              </>
+            )}
           </Form.Item>
         </div>
       ) : (
