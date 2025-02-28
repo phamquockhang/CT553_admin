@@ -1,3 +1,4 @@
+import { IAddress } from "../address";
 import { Dayjs } from "dayjs";
 
 export interface IStaff {
@@ -30,6 +31,8 @@ export interface ICustomer {
   isActivated: boolean;
   dob: string | Dayjs;
   role: IRole;
+  addresses: IAddress[];
+  score: IScore;
   createdAt: string;
   updatedAt?: string;
 
