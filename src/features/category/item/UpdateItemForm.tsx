@@ -266,7 +266,7 @@ const UpdateItemForm: React.FC<UpdateItemFormProps> = ({
                 formData.append("productImageFiles", new Blob());
               }
 
-              if (publicIdImagesToKeep) {
+              if (publicIdImagesToKeep && publicIdImagesToKeep.length > 0) {
                 for (const publicId of publicIdImagesToKeep) {
                   formData.append("publicIdOfImageFiles", publicId);
                 }
