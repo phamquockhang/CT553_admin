@@ -13,14 +13,12 @@ import {
 import dayjs, { Dayjs } from "dayjs";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import Loading from "../../../common/components/Loading";
 import { ICustomer } from "../../../interfaces";
 import { IAddress } from "../../../interfaces/address";
 import {
   addressPublicApiService,
   addressService,
   customerService,
-  scoreService,
 } from "../../../services";
 import AddressItem from "./components/AddressItem";
 
@@ -168,20 +166,6 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
     }
   }
 
-  const { data: scoreData, isLoading: isLoadingScore } = useQuery({
-    queryKey: ["scores", userToUpdate?.customerId],
-    queryFn: async () => {
-      if (userToUpdate) {
-        const res = await scoreService.getCurrentScoreByCustomerId(
-          userToUpdate?.customerId || "",
-        );
-        if (res && res.success) {
-          return res;
-        }
-      }
-    },
-  });
-
   const { data: provinceData, isLoading: isLoadingProvince } = useQuery({
     queryKey: ["province"],
     queryFn: async () => {
@@ -222,10 +206,6 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
     value: ward.WardCode,
     label: ward.WardName,
   }));
-
-  if (isLoadingScore) {
-    return <Loading />;
-  }
 
   const sortedAddress = userToUpdate?.addresses?.sort((a, b) => {
     return (a.createdAt ?? 0) > (b.createdAt ?? 0) ? -1 : 1;
@@ -329,17 +309,18 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
       </div>
       <div className="flex gap-8">
         {userToUpdate && (
-          <Form.Item className="flex-1" label=" ">
-            <p className="flex-1">
-              Điểm tích lũy:{" "}
-              <span className={`font-semibold text-[#003F8F]`}>
-                {isLoadingScore
-                  ? "0"
-                  : scoreData?.success
-                    ? scoreData.payload?.newValue
-                    : "0"}
-              </span>
-            </p>
+          <Form.Item className="flex-1" label="Điểm tích lũy:">
+            <Input
+              className="font-semibold text-[#003F8F]"
+              readOnly={true}
+              // bordered={false}
+              variant="borderless"
+              value={
+                userToUpdate.score
+                  ? userToUpdate.score.newValue.toLocaleString()
+                  : "0"
+              }
+            />
           </Form.Item>
         )}
 

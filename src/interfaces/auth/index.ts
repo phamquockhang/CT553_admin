@@ -32,6 +32,7 @@ export interface ICustomer {
   dob: string | Dayjs;
   role: IRole;
   addresses: IAddress[];
+  score: IScore;
   createdAt: string;
   updatedAt?: string;
 
