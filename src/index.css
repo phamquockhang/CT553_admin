@@ -33,4 +33,8 @@
   .ant-timeline-item.timeline-item-content {
     @apply pb-[4rem];
   }
+
+  .right-input .ant-input-number-input {
+    text-align: right !important;
+  }
 }

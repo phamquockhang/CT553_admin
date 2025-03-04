@@ -240,6 +240,7 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                           ]}
                         >
                           <InputNumber
+                            className="right-input"
                             style={{ width: "100%" }}
                             min={0}
                             addonAfter={
@@ -293,6 +294,7 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                       ]}
                     >
                       <InputNumber
+                        className="right-input"
                         style={{ width: "100%" }}
                         min={0}
                         addonBefore="Bán ra"
@@ -351,6 +353,7 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                       }
                     >
                       <InputNumber
+                        className="right-input"
                         style={{ width: "100%" }}
                         min={0}
                         addonBefore="Biến động giá bán ra (nếu cần)"
@@ -377,6 +380,7 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                       ]}
                     >
                       <InputNumber
+                        className="right-input"
                         style={{ width: "100%" }}
                         min={0}
                         addonBefore="Mua vào"
@@ -409,6 +413,7 @@ const FormItemAddProduct: React.FC<FormItemAddProductProps> = ({
                       }
                     >
                       <InputNumber
+                        className="right-input"
                         style={{ width: "100%" }}
                         min={0}
                         addonBefore="Biến động giá mua vào (nếu cần)"

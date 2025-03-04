@@ -157,6 +157,7 @@ const UpdateProductDetailsForm: React.FC<UpdateProductDetailsFormProps> = ({
                 ]}
               >
                 <InputNumber
+                  className="right-input"
                   style={{ width: "100%" }}
                   min={0}
                   addonAfter={
@@ -205,6 +206,7 @@ const UpdateProductDetailsForm: React.FC<UpdateProductDetailsFormProps> = ({
             ]}
           >
             <InputNumber
+              className="right-input"
               style={{ width: "100%" }}
               min={0}
               addonBefore="Bán ra"
@@ -240,6 +242,7 @@ const UpdateProductDetailsForm: React.FC<UpdateProductDetailsFormProps> = ({
             }
           >
             <InputNumber
+              className="right-input"
               style={{ width: "100%" }}
               min={0}
               addonBefore="Biến động giá bán ra (nếu cần)"
@@ -265,6 +268,7 @@ const UpdateProductDetailsForm: React.FC<UpdateProductDetailsFormProps> = ({
             ]}
           >
             <InputNumber
+              className="right-input"
               style={{ width: "100%" }}
               min={0}
               addonBefore="Mua vào"
@@ -292,6 +296,7 @@ const UpdateProductDetailsForm: React.FC<UpdateProductDetailsFormProps> = ({
             }
           >
             <InputNumber
+              className="right-input"
               style={{ width: "100%" }}
               min={0}
               addonBefore="Biến động giá mua vào (nếu cần)"
