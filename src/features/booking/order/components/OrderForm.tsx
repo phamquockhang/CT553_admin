@@ -1,12 +1,13 @@
-import { Button, Form, Input, Select, Space, Tooltip } from "antd";
-import { IOrder, IOrderStatus, OrderStatus } from "../../../../interfaces";
-import { translateOrderStatus } from "../../../../utils";
-import OrderDetails from "./OrderDetails";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { orderService } from "../../../../services";
+import { Button, Form, Input, Select, Space, Tooltip } from "antd";
 import toast from "react-hot-toast";
-import { useValidOrderStatuses } from "../hooks/useValidOrderStatuses";
 import { IoIosAlert } from "react-icons/io";
+import { IOrder, IOrderStatus, OrderStatus } from "../../../../interfaces";
+import { orderService } from "../../../../services";
+import { translateOrderStatus } from "../../../../utils";
+import { useValidOrderStatuses } from "../hooks/useValidOrderStatuses";
+import OrderDetails from "./OrderDetails";
+import OrderStatusHistory from "./OrderStatusHistory";
 
 interface OrderFormProps {
   orderToUpdate?: IOrder;
@@ -87,14 +88,18 @@ const OrderForm: React.FC<OrderFormProps> = ({
           className="flex-1"
           //   label="Trạng thái đơn hàng"
           label={
-            <>
-              Trạng thái đơn hàng
-              <span className="ml-2 text-red-500">
-                <Tooltip title="Trạng thái đơn hàng chỉ có thể cập nhật theo các trạng thái được đưa ra dựa vào trạng thái hiện tại và không thể  hoàn tác!!!">
-                  <IoIosAlert />
-                </Tooltip>
-              </span>
-            </>
+            <div className="flex items-center gap-6">
+              <div className="flex items-center">
+                Trạng thái đơn hàng
+                <span className="ml-2 text-red-500">
+                  <Tooltip title="Trạng thái đơn hàng chỉ có thể cập nhật theo các trạng thái được đưa ra dựa vào trạng thái hiện tại và không thể  hoàn tác!!!">
+                    <IoIosAlert />
+                  </Tooltip>
+                </span>
+              </div>
+
+              <OrderStatusHistory history={orderToUpdate?.orderStatuses} />
+            </div>
           }
           name="orderStatus"
         >

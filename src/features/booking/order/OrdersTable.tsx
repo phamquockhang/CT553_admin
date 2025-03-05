@@ -33,6 +33,7 @@ import {
 import ViewOrder from "./ViewOrder";
 import Access from "../../auth/Access";
 import UpdateOrder from "./UpdateOrder";
+import OrderStatusHistory from "./components/OrderStatusHistory";
 
 interface TableParams {
   pagination: TablePaginationConfig;
@@ -251,6 +252,7 @@ const OrdersTable: React.FC<OrderTableProps> = ({
           <Access permission={PERMISSIONS[Module.ORDERS].UPDATE} hideChildren>
             <UpdateOrder order={record} />
           </Access>
+          <OrderStatusHistory orderId={record.orderId} />
         </Space>
       ),
     },
