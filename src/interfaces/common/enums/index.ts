@@ -13,10 +13,26 @@ export enum Module {
   PERMISSIONS = "PERMISSION",
   ITEMS = "ITEM",
   PRODUCTS = "PRODUCT",
+  ORDERS = "ORDER",
 }
 
 export enum RoleName {
   MANAGER = "MANAGER",
   STAFF = "STAFF",
   CUSTOMER = "CUSTOMER",
+}
+
+export enum OrderStatus {
+  PENDING = "PENDING",
+  CONFIRMED = "CONFIRMED",
+  PREPARING = "PREPARING",
+  DELIVERING = "DELIVERING",
+  DELIVERED = "DELIVERED",
+  COMPLETED = "COMPLETED",
+  CANCELLED = "CANCELLED",
+}
+
+export enum PaidStatus {
+  PAID = "PAID",
+  UNPAID = "UNPAID",
 }

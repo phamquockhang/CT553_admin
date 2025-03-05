@@ -19,6 +19,8 @@ import Loading from "../common/components/Loading";
 import { useLoggedInUser } from "../features/auth/hooks/useLoggedInUser";
 import { Module, PERMISSIONS } from "../interfaces";
 import { authService } from "../services";
+import { FaBoxesStacked } from "react-icons/fa6";
+import { BsFillBoxSeamFill } from "react-icons/bs";
 
 const { Header, Sider } = Layout;
 
@@ -90,6 +92,12 @@ const AdminLayout: React.FC = () => {
             PERMISSIONS[Module.PERMISSIONS].GET_PAGINATION.apiPath &&
           item.method === PERMISSIONS[Module.PERMISSIONS].GET_PAGINATION.method,
       );
+      //////////////
+      const hasAuthChildren: boolean = Boolean(
+        viewStaffs || viewRoles || viewPermissions || viewCustomers,
+      );
+
+      //////////////////////////////////////////
       const viewItems = permissions.find(
         (item) =>
           item.apiPath === PERMISSIONS[Module.ITEMS].GET_PAGINATION.apiPath &&
@@ -101,15 +109,17 @@ const AdminLayout: React.FC = () => {
             PERMISSIONS[Module.PRODUCTS].GET_PAGINATION.apiPath &&
           item.method === PERMISSIONS[Module.PRODUCTS].GET_PAGINATION.method,
       );
+      //////////////
+      const hasCategoryChildren: boolean = Boolean(viewItems || viewProducts);
 
-      const hasAuthChildren: boolean = Boolean(
-        viewStaffs ||
-          viewRoles ||
-          viewPermissions ||
-          viewCustomers ||
-          viewItems ||
-          viewProducts,
+      //////////////////////////////////////////
+      const viewOrders = permissions.find(
+        (item) =>
+          item.apiPath === PERMISSIONS[Module.ORDERS].GET_PAGINATION.apiPath &&
+          item.method === PERMISSIONS[Module.ORDERS].GET_PAGINATION.method,
       );
+      //////////////
+      const hasOrderChildren: boolean = Boolean(viewOrders);
 
       const menuItems = [
         {
@@ -166,6 +176,10 @@ const AdminLayout: React.FC = () => {
                     : []),
                 ],
               },
+            ]
+          : []),
+        ...(hasCategoryChildren
+          ? [
               {
                 label: "Danh mục",
                 key: "categories",
@@ -186,6 +200,26 @@ const AdminLayout: React.FC = () => {
                           label: <NavLink to="/products">Sản phẩm</NavLink>,
                           key: "products",
                           icon: <MdCategory />,
+                        },
+                      ]
+                    : []),
+                ],
+              },
+            ]
+          : []),
+        ...(hasOrderChildren
+          ? [
+              {
+                label: "Đặt hàng",
+                key: "orders",
+                icon: <FaBoxesStacked />,
+                children: [
+                  ...(viewOrders
+                    ? [
+                        {
+                          label: <NavLink to="/orders">Đơn hàng</NavLink>,
+                          key: "orders",
+                          icon: <BsFillBoxSeamFill />,
                         },
                       ]
                     : []),
