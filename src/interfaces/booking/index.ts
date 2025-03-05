@@ -30,4 +30,5 @@ export interface IOrderDetail {
 
 export interface OrderFilterCriteria {
   orderStatus?: string;
+  paymentStatus?: string;
 }

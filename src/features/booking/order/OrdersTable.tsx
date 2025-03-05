@@ -69,7 +69,7 @@ const OrdersTable: React.FC<OrderTableProps> = ({
         pagination: {
           ...prev.pagination,
           total: orderPage.meta?.total || 0,
-          showTotal: (total) => `Tổng ${total} mặt hàng`,
+          showTotal: (total) => `Tổng ${total} đơn hàng`,
         },
       }));
     }

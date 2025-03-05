@@ -27,6 +27,7 @@ const Order: React.FC = () => {
   };
   const filter: OrderFilterCriteria = {
     orderStatus: searchParams.get("orderStatus") || undefined,
+    paymentStatus: searchParams.get("paymentStatus") || undefined,
   };
 
   const { data, isLoading, isFetching } = useQuery({
