@@ -1,9 +1,23 @@
-import { blue, green, grey, orange, red } from "@ant-design/colors";
+import {
+  blue,
+  green,
+  grey,
+  greyDark,
+  orange,
+  purple,
+  red,
+  yellow,
+} from "@ant-design/colors";
 import { SortOrder } from "antd/es/table/interface";
 import dayjs from "dayjs";
 import { useEffect } from "react";
-import { IDistrict, IProvince, IWard } from "../interfaces";
-import { FileType } from "../interfaces";
+import {
+  FileType,
+  IDistrict,
+  IProvince,
+  IWard,
+  OrderStatus,
+} from "../interfaces";
 
 export function useDynamicTitle(title: string) {
   useEffect(() => {
@@ -64,6 +78,37 @@ export function getUniqueColorByString(str: string) {
   }
   const index = Math.abs(hash % colors.length);
   return colors[index];
+}
+
+export function getColorForTag(str: string) {
+  if (str === OrderStatus.PENDING) return yellow[7];
+  else if (str === OrderStatus.CONFIRMED) return purple[6];
+  else if (str === OrderStatus.PREPARING) return orange[6];
+  else if (str === OrderStatus.DELIVERING) return greyDark[6];
+  else if (str === OrderStatus.DELIVERED) return green[6];
+  else if (str === OrderStatus.COMPLETED) return blue[6];
+  else if (str === OrderStatus.CANCELLED) return red[5];
+}
+
+export function translateOrderStatus(status: string) {
+  switch (status) {
+    case OrderStatus.PENDING:
+      return "Đang chờ xác nhận";
+    case OrderStatus.CONFIRMED:
+      return "Đã xác nhận";
+    case OrderStatus.PREPARING:
+      return "Đang chuẩn bị";
+    case OrderStatus.DELIVERING:
+      return "Đang giao hàng";
+    case OrderStatus.DELIVERED:
+      return "Đã giao hàng";
+    case OrderStatus.COMPLETED:
+      return "Hoàn thành";
+    case OrderStatus.CANCELLED:
+      return "Đã hủy";
+    default:
+      return status;
+  }
 }
 
 export function groupBy<T, K>(
