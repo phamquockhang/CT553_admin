@@ -54,7 +54,7 @@ class SellingOrderService implements ISellingOrderService {
   }
 
   async create(
-    newSellingOrder: Omit<ISellingOrder, "orderId">,
+    newSellingOrder: Omit<ISellingOrder, "sellingOrderId">,
   ): Promise<ApiResponse<void>> {
     return await apiClient.post("", newSellingOrder);
   }

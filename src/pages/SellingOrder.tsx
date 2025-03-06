@@ -12,6 +12,7 @@ import {
 import { sellingOrderService } from "../services";
 import { useDynamicTitle } from "../utils";
 import SellingOrdersTable from "../features/booking/selling-order/SellingOrdersTable";
+import AddSellingOrder from "../features/booking/selling-order/AddSellingOrder";
 
 const SellingOrder: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -75,7 +76,7 @@ const SellingOrder: React.FC = () => {
             </div>
           </div>
           <Access permission={PERMISSIONS[Module.ORDERS].CREATE} hideChildren>
-            {/* <AddOrder /> */}
+            <AddSellingOrder />
           </Access>
         </div>
         <SellingOrdersTable
