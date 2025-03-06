@@ -8,7 +8,7 @@ import {
   OrderStatus,
 } from "../../../../interfaces";
 import { sellingOrderService } from "../../../../services";
-import { translateSellingOrderStatus } from "../../../../utils";
+import { translateOrderStatus } from "../../../../utils";
 import { useValidSellingOrderStatuses } from "../hooks/useValidSellingOrderStatuses";
 import SellingOrderDetails from "./SellingOrderDetails";
 import SellingOrderStatusHistory from "./SellingOrderStatusHistory";
@@ -73,7 +73,7 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
   const initialValues = {
     ...sellingOrderToUpdate,
     orderStatus: sellingOrderToUpdate
-      ? translateSellingOrderStatus(sellingOrderToUpdate.orderStatus)
+      ? translateOrderStatus(sellingOrderToUpdate.orderStatus)
       : undefined,
   };
 

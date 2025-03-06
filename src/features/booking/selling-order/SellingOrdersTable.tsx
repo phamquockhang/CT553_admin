@@ -24,11 +24,11 @@ import {
   colorSortUpIcon,
   formatTimestamp,
   getActiveColor,
-  getColorForTag,
+  getColorOrderStatus,
   getDefaultFilterValue,
   getDefaultSortOrder,
   getSortDirection,
-  translateSellingOrderStatus,
+  translateOrderStatus,
 } from "../../../utils";
 import ViewSellingOrder from "./ViewSellingOrder";
 import Access from "../../auth/Access";
@@ -137,7 +137,7 @@ const SellingOrdersTable: React.FC<SellingOrderTableProps> = ({
         1,
     },
     {
-      title: "Mã đơn hàng",
+      title: "Mã hóa đơn",
       key: "sellingOrderId",
       dataIndex: "sellingOrderId",
       align: "left",
@@ -201,8 +201,8 @@ const SellingOrdersTable: React.FC<SellingOrderTableProps> = ({
       align: "center",
       render: (text, record) => {
         const orderStatus = record.orderStatus;
-        const color = getColorForTag(orderStatus);
-        const translatedStatus = translateSellingOrderStatus(orderStatus);
+        const color = getColorOrderStatus(orderStatus);
+        const translatedStatus = translateOrderStatus(orderStatus);
         return (
           <Tag className="m-0 px-1" color={color}>
             {translatedStatus}

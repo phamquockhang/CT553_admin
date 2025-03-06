@@ -80,17 +80,28 @@ export function getUniqueColorByString(str: string) {
   return colors[index];
 }
 
-export function getColorForTag(str: string) {
-  if (str === OrderStatus.PENDING) return yellow[7];
-  else if (str === OrderStatus.CONFIRMED) return purple[6];
-  else if (str === OrderStatus.PREPARING) return orange[6];
-  else if (str === OrderStatus.DELIVERING) return greyDark[6];
-  else if (str === OrderStatus.DELIVERED) return green[6];
-  else if (str === OrderStatus.COMPLETED) return blue[6];
-  else if (str === OrderStatus.CANCELLED) return red[5];
+export function getColorOrderStatus(status: string) {
+  switch (status) {
+    case OrderStatus.PENDING:
+      return yellow[7];
+    case OrderStatus.CONFIRMED:
+      return purple[6];
+    case OrderStatus.PREPARING:
+      return orange[6];
+    case OrderStatus.DELIVERING:
+      return greyDark[6];
+    case OrderStatus.DELIVERED:
+      return green[6];
+    case OrderStatus.COMPLETED:
+      return blue[7];
+    case OrderStatus.CANCELLED:
+      return red[5];
+    default:
+      return grey[10];
+  }
 }
 
-export function translateSellingOrderStatus(status: string) {
+export function translateOrderStatus(status: string) {
   switch (status) {
     case OrderStatus.PENDING:
       return "Đang chờ xác nhận";

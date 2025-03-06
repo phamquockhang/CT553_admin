@@ -9,7 +9,7 @@ import { MdPending } from "react-icons/md";
 import { TbPackageExport } from "react-icons/tb";
 import { IOrderStatus, OrderStatus } from "../../../../interfaces";
 import { sellingOrderService } from "../../../../services";
-import { getColorForTag, translateSellingOrderStatus } from "../../../../utils";
+import { getColorOrderStatus, translateOrderStatus } from "../../../../utils";
 
 interface SellingOrderStatusHistoryProps {
   history?: IOrderStatus[];
@@ -63,7 +63,7 @@ const SellingOrderStatusHistory: React.FC<SellingOrderStatusHistoryProps> = ({
                 key={orderStatusId}
                 title={
                   <span className="font-medium text-gray-800">
-                    {translateSellingOrderStatus(status)}
+                    {translateOrderStatus(status)}
                   </span>
                 }
                 description={
@@ -74,19 +74,19 @@ const SellingOrderStatusHistory: React.FC<SellingOrderStatusHistoryProps> = ({
                 icon={
                   status === OrderStatus.PENDING ? (
                     // <MdPending className="text-green-500" />
-                    <MdPending color={getColorForTag(status)} />
+                    <MdPending color={getColorOrderStatus(status)} />
                   ) : status === OrderStatus.CONFIRMED ? (
-                    <TbPackageExport color={getColorForTag(status)} />
+                    <TbPackageExport color={getColorOrderStatus(status)} />
                   ) : status === OrderStatus.PREPARING ? (
-                    <FaHourglassStart color={getColorForTag(status)} />
+                    <FaHourglassStart color={getColorOrderStatus(status)} />
                   ) : status === OrderStatus.DELIVERING ? (
-                    <FaShippingFast color={getColorForTag(status)} />
+                    <FaShippingFast color={getColorOrderStatus(status)} />
                   ) : status === OrderStatus.DELIVERED ? (
-                    <FcShipped color={getColorForTag(status)} />
+                    <FcShipped color={getColorOrderStatus(status)} />
                   ) : status === OrderStatus.COMPLETED ? (
-                    <FaCircleCheck color={getColorForTag(status)} />
+                    <FaCircleCheck color={getColorOrderStatus(status)} />
                   ) : (
-                    <FcCancel color={getColorForTag(status)} />
+                    <FcCancel color={getColorOrderStatus(status)} />
                   )
                 }
               />

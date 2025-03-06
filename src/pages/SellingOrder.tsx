@@ -55,18 +55,18 @@ const SellingOrder: React.FC = () => {
     setSearchParams(searchParams);
   };
 
-  useDynamicTitle("Quản lý đơn hàng");
+  useDynamicTitle("Quản lý đơn bán");
 
   return (
     <Access permission={PERMISSIONS[Module.ORDERS].GET_PAGINATION}>
       <div className="card">
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Quản lý đơn hàng</h2>
+          <h2 className="text-xl font-semibold">Quản lý đơn bán</h2>
 
           <div className="w-[60%]">
             <div className="flex gap-3">
               <Input.Search
-                placeholder="Nhập mã đơn hàng để tìm kiếm..."
+                placeholder="Nhập mã hóa đơn bán hàng để tìm kiếm..."
                 defaultValue={query}
                 enterButton
                 allowClear
