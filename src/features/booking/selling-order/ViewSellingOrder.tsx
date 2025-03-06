@@ -1,16 +1,15 @@
 import { EyeOutlined } from "@ant-design/icons";
+import { useQuery } from "@tanstack/react-query";
 import { Modal, Tooltip } from "antd";
 import { useState } from "react";
-import { IOrder } from "../../../interfaces";
-import { useQuery } from "@tanstack/react-query";
-import { orderService } from "../../../services";
-import OrderForm from "./components/OrderForm";
+import { sellingOrderService } from "../../../services";
+import SellingOrderForm from "./components/SellingOrderForm";
 
 interface ViewOrderProps {
-  order: IOrder;
+  sellingOrderId: string;
 }
 
-const ViewOrder: React.FC<ViewOrderProps> = ({ order }) => {
+const ViewSellingOrder: React.FC<ViewOrderProps> = ({ sellingOrderId }) => {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 
   const handleOpenModal = () => {
@@ -22,8 +21,8 @@ const ViewOrder: React.FC<ViewOrderProps> = ({ order }) => {
   };
 
   const { data: orderData, isLoading: isOrderLoading } = useQuery({
-    queryKey: ["order", order.orderId],
-    queryFn: () => orderService.getOrder(order.orderId),
+    queryKey: ["selling_order", sellingOrderId],
+    queryFn: () => sellingOrderService.getSellingOrder(sellingOrderId),
     select: (data) => data.payload,
   });
 
@@ -45,8 +44,8 @@ const ViewOrder: React.FC<ViewOrderProps> = ({ order }) => {
         onCancel={handleCloseModal}
         footer={null}
       >
-        <OrderForm
-          orderToUpdate={orderData}
+        <SellingOrderForm
+          sellingOrderToUpdate={orderData}
           onCancel={handleCloseModal}
           viewMode
         />
@@ -55,4 +54,4 @@ const ViewOrder: React.FC<ViewOrderProps> = ({ order }) => {
   );
 };
 
-export default ViewOrder;
+export default ViewSellingOrder;

@@ -210,15 +210,17 @@ const AdminLayout: React.FC = () => {
         ...(hasOrderChildren
           ? [
               {
-                label: "Đặt hàng",
+                label: "Đơn hàng",
                 key: "orders",
                 icon: <FaBoxesStacked />,
                 children: [
                   ...(viewOrders
                     ? [
                         {
-                          label: <NavLink to="/orders">Đơn hàng</NavLink>,
-                          key: "orders",
+                          label: (
+                            <NavLink to="/selling-orders">Đơn bán</NavLink>
+                          ),
+                          key: "selling-orders",
                           icon: <BsFillBoxSeamFill />,
                         },
                       ]
@@ -307,7 +309,7 @@ const AdminLayout: React.FC = () => {
         />
       </Sider>
       <Layout
-        className="transition-all duration-200"
+        className="bg-slate-200/65 transition-all duration-200"
         style={{ marginInlineStart: collapsed ? 80 : 230 }}
       >
         <Header

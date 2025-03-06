@@ -5,39 +5,43 @@ import {
   Page,
   PaginationParams,
   SortParams,
-  IOrder,
-  OrderFilterCriteria,
+  ISellingOrder,
+  SellingOrderFilterCriteria,
   IOrderStatus,
 } from "../../interfaces";
 
-interface IOrderService {
-  getOrder(orderId: string): Promise<ApiResponse<IOrder>>;
-  getOrders(
+interface ISellingOrderService {
+  getSellingOrder(orderId: string): Promise<ApiResponse<ISellingOrder>>;
+  getSellingOrders(
     pagination: PaginationParams,
     query: string,
-    filter?: OrderFilterCriteria,
+    filter?: SellingOrderFilterCriteria,
     sort?: SortParams,
-  ): Promise<ApiResponse<Page<IOrder>>>;
-  create(newOrder: Omit<IOrder, "orderId">): Promise<ApiResponse<void>>;
+  ): Promise<ApiResponse<Page<ISellingOrder>>>;
+  create(
+    newSellingOrder: Omit<ISellingOrder, "sellingOrderId">,
+  ): Promise<ApiResponse<void>>;
   updateOrderStatus(
-    orderId: string,
+    sellingOrderId: string,
     updatedOrderStatus: IOrderStatus,
   ): Promise<ApiResponse<void>>;
 }
 
-const apiClient: AxiosInstance = createApiClient("orders");
+const apiClient: AxiosInstance = createApiClient("selling_orders");
 
-class OrderService implements IOrderService {
-  async getOrder(orderId: string): Promise<ApiResponse<IOrder>> {
-    return await apiClient.get(`/${orderId}`);
+class SellingOrderService implements ISellingOrderService {
+  async getSellingOrder(
+    sellingOrderId: string,
+  ): Promise<ApiResponse<ISellingOrder>> {
+    return await apiClient.get(`/${sellingOrderId}`);
   }
 
-  async getOrders(
+  async getSellingOrders(
     pagination: PaginationParams,
     query: string,
-    filter?: OrderFilterCriteria,
+    filter?: SellingOrderFilterCriteria,
     sort?: SortParams,
-  ): Promise<ApiResponse<Page<IOrder>>> {
+  ): Promise<ApiResponse<Page<ISellingOrder>>> {
     return await apiClient.get("", {
       params: {
         ...pagination,
@@ -49,16 +53,18 @@ class OrderService implements IOrderService {
     });
   }
 
-  async create(newOrder: Omit<IOrder, "orderId">): Promise<ApiResponse<void>> {
-    return await apiClient.post("", newOrder);
+  async create(
+    newSellingOrder: Omit<ISellingOrder, "orderId">,
+  ): Promise<ApiResponse<void>> {
+    return await apiClient.post("", newSellingOrder);
   }
 
   async updateOrderStatus(
-    orderId: string,
+    sellingOrderId: string,
     updatedOrderStatus: IOrderStatus,
   ): Promise<ApiResponse<void>> {
-    return await apiClient.put(`/${orderId}`, updatedOrderStatus);
+    return await apiClient.put(`/${sellingOrderId}`, updatedOrderStatus);
   }
 }
 
-export const orderService = new OrderService();
+export const sellingOrderService = new SellingOrderService();

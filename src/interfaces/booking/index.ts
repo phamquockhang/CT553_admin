@@ -1,16 +1,18 @@
-export interface IOrder {
-  orderId: string;
-  customerId: string;
-  name: string;
-  phone: string;
-  email: string;
-  address: string;
-  note: string;
+export interface ISellingOrder {
+  sellingOrderId: string;
+  customerId?: string;
+  customerName?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  note?: string;
   totalAmount: number;
+  usedScore: number;
+  earnedScore: number;
   paymentStatus: string;
   orderStatus: string;
   orderStatuses: IOrderStatus[];
-  orderDetails: IOrderDetail[];
+  sellingOrderDetails: ISellingOrderDetail[];
   createdAt?: string;
   updatedAt?: string;
 }
@@ -21,14 +23,17 @@ export interface IOrderStatus {
   createdAt?: string;
 }
 
-export interface IOrderDetail {
-  orderDetailId: number;
+export interface ISellingOrderDetail {
+  sellingOrderDetailId: number;
   productId: number;
+  productName: string;
+  unit: string;
   quantity: number;
-  price: number;
+  unitPrice: number;
+  totalAmount: number;
 }
 
-export interface OrderFilterCriteria {
+export interface SellingOrderFilterCriteria {
   orderStatus?: string;
   paymentStatus?: string;
 }

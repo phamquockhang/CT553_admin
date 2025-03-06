@@ -5,15 +5,15 @@ import { useSearchParams } from "react-router-dom";
 import Access from "../features/auth/Access";
 import {
   Module,
-  OrderFilterCriteria,
+  SellingOrderFilterCriteria,
   PERMISSIONS,
   SortParams,
 } from "../interfaces";
-import { orderService } from "../services";
+import { sellingOrderService } from "../services";
 import { useDynamicTitle } from "../utils";
-import OrdersTable from "../features/booking/order/OrdersTable";
+import SellingOrdersTable from "../features/booking/selling-order/SellingOrdersTable";
 
-const Order: React.FC = () => {
+const SellingOrder: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const pagination = {
@@ -25,22 +25,25 @@ const Order: React.FC = () => {
     sortBy: searchParams.get("sortBy") || "",
     direction: searchParams.get("direction") || "",
   };
-  const filter: OrderFilterCriteria = {
+  const filter: SellingOrderFilterCriteria = {
     orderStatus: searchParams.get("orderStatus") || undefined,
     paymentStatus: searchParams.get("paymentStatus") || undefined,
   };
 
   const { data, isLoading, isFetching } = useQuery({
-    queryKey: ["orders", pagination, query, sort, filter].filter((key) => {
-      if (typeof key === "string") {
-        return key !== "";
-      } else if (key instanceof Object) {
-        return Object.values(key).some(
-          (value) => value !== undefined && value !== "",
-        );
-      }
-    }),
-    queryFn: () => orderService.getOrders(pagination, query, filter, sort),
+    queryKey: ["selling_orders", pagination, query, sort, filter].filter(
+      (key) => {
+        if (typeof key === "string") {
+          return key !== "";
+        } else if (key instanceof Object) {
+          return Object.values(key).some(
+            (value) => value !== undefined && value !== "",
+          );
+        }
+      },
+    ),
+    queryFn: () =>
+      sellingOrderService.getSellingOrders(pagination, query, filter, sort),
   });
 
   const handleSearch: SearchProps["onSearch"] = (value) => {
@@ -75,8 +78,8 @@ const Order: React.FC = () => {
             {/* <AddOrder /> */}
           </Access>
         </div>
-        <OrdersTable
-          orderPage={data?.payload}
+        <SellingOrdersTable
+          sellingOrderPage={data?.payload}
           isLoading={isLoading}
           isFetching={isFetching}
         />
@@ -85,4 +88,4 @@ const Order: React.FC = () => {
   );
 };
 
-export default Order;
+export default SellingOrder;

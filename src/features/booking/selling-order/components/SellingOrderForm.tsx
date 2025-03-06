@@ -2,29 +2,33 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button, Form, Input, Select, Space, Tooltip } from "antd";
 import toast from "react-hot-toast";
 import { IoIosAlert } from "react-icons/io";
-import { IOrder, IOrderStatus, OrderStatus } from "../../../../interfaces";
-import { orderService } from "../../../../services";
-import { translateOrderStatus } from "../../../../utils";
-import { useValidOrderStatuses } from "../hooks/useValidOrderStatuses";
-import OrderDetails from "./OrderDetails";
-import OrderStatusHistory from "./OrderStatusHistory";
+import {
+  ISellingOrder,
+  IOrderStatus,
+  OrderStatus,
+} from "../../../../interfaces";
+import { sellingOrderService } from "../../../../services";
+import { translateSellingOrderStatus } from "../../../../utils";
+import { useValidSellingOrderStatuses } from "../hooks/useValidSellingOrderStatuses";
+import SellingOrderDetails from "./SellingOrderDetails";
+import SellingOrderStatusHistory from "./SellingOrderStatusHistory";
 
-interface OrderFormProps {
-  orderToUpdate?: IOrder;
+interface SellingOrderFormProps {
+  sellingOrderToUpdate?: ISellingOrder;
   onCancel: () => void;
   viewMode?: boolean;
 }
 
-const OrderForm: React.FC<OrderFormProps> = ({
-  orderToUpdate,
+const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
+  sellingOrderToUpdate,
   onCancel,
   viewMode = false,
 }) => {
   const [form] = Form.useForm();
   const queryClient = useQueryClient();
 
-  const currentStatus = orderToUpdate?.orderStatus as OrderStatus;
-  const optionsOrderStatus = useValidOrderStatuses(currentStatus);
+  const currentStatus = sellingOrderToUpdate?.orderStatus as OrderStatus;
+  const optionsOrderStatus = useValidSellingOrderStatuses(currentStatus);
 
   const { mutate: updateOrderStatus } = useMutation({
     mutationFn: ({
@@ -34,13 +38,14 @@ const OrderForm: React.FC<OrderFormProps> = ({
       orderId: string;
       orderStatus: IOrderStatus;
     }) => {
-      return orderService.updateOrderStatus(orderId, orderStatus);
+      return sellingOrderService.updateOrderStatus(orderId, orderStatus);
     },
 
     onSuccess: (data) => {
       queryClient.invalidateQueries({
         predicate: (query) =>
-          query.queryKey.includes("orders") || query.queryKey.includes("order"),
+          query.queryKey.includes("selling_orders") ||
+          query.queryKey.includes("selling_order"),
       });
       onCancel();
       toast.success(data.message || "Operation successful");
@@ -51,14 +56,14 @@ const OrderForm: React.FC<OrderFormProps> = ({
     },
   });
 
-  const handleSubmit = (values: IOrder) => {
+  const handleSubmit = (values: ISellingOrder) => {
     if (values.orderStatus === currentStatus) {
       toast.error("Trạng thái chưa có thay đổi");
       return;
     }
 
     updateOrderStatus({
-      orderId: values.orderId,
+      orderId: values.sellingOrderId,
       orderStatus: {
         status: values.orderStatus,
       },
@@ -66,9 +71,9 @@ const OrderForm: React.FC<OrderFormProps> = ({
   };
 
   const initialValues = {
-    ...orderToUpdate,
-    orderStatus: orderToUpdate
-      ? translateOrderStatus(orderToUpdate.orderStatus)
+    ...sellingOrderToUpdate,
+    orderStatus: sellingOrderToUpdate
+      ? translateSellingOrderStatus(sellingOrderToUpdate.orderStatus)
       : undefined,
   };
 
@@ -80,7 +85,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
       onFinish={handleSubmit}
     >
       <div className="flex gap-8">
-        <Form.Item className="flex-1" label="Mã đơn hàng" name="orderId">
+        <Form.Item className="flex-1" label="Mã đơn hàng" name="sellingOrderId">
           <Input readOnly={true} />
         </Form.Item>
 
@@ -98,7 +103,9 @@ const OrderForm: React.FC<OrderFormProps> = ({
                 </span>
               </div>
 
-              <OrderStatusHistory history={orderToUpdate?.orderStatuses} />
+              <SellingOrderStatusHistory
+                history={sellingOrderToUpdate?.orderStatuses}
+              />
             </div>
           }
           name="orderStatus"
@@ -114,7 +121,11 @@ const OrderForm: React.FC<OrderFormProps> = ({
       </div>
 
       <div className="flex gap-8">
-        <Form.Item className="flex-1" label="Tên khách hàng" name="name">
+        <Form.Item
+          className="flex-1"
+          label="Tên khách hàng"
+          name="customerName"
+        >
           <Input readOnly={true} />
         </Form.Item>
 
@@ -139,9 +150,9 @@ const OrderForm: React.FC<OrderFormProps> = ({
         </Form.Item>
       </div>
 
-      <OrderDetails
-        orderDetails={orderToUpdate?.orderDetails || []}
-        totalAmount={orderToUpdate?.totalAmount}
+      <SellingOrderDetails
+        sellingOrderDetails={sellingOrderToUpdate?.sellingOrderDetails || []}
+        totalAmount={sellingOrderToUpdate?.totalAmount}
       />
 
       {!viewMode && (
@@ -161,7 +172,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
               //     isCreatingOrder || isUpdatingOrder
               //   }
             >
-              {orderToUpdate ? "Cập nhật" : "Thêm mới"}
+              {sellingOrderToUpdate ? "Cập nhật" : "Thêm mới"}
             </Button>
           </Space>
         </Form.Item>
@@ -170,4 +181,4 @@ const OrderForm: React.FC<OrderFormProps> = ({
   );
 };
 
-export default OrderForm;
+export default SellingOrderForm;

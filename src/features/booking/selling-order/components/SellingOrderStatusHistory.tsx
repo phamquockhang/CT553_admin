@@ -8,25 +8,26 @@ import { FcCancel, FcShipped } from "react-icons/fc";
 import { MdPending } from "react-icons/md";
 import { TbPackageExport } from "react-icons/tb";
 import { IOrderStatus, OrderStatus } from "../../../../interfaces";
-import { orderService } from "../../../../services";
-import { getColorForTag, translateOrderStatus } from "../../../../utils";
+import { sellingOrderService } from "../../../../services";
+import { getColorForTag, translateSellingOrderStatus } from "../../../../utils";
 
-interface OrderStatusHistoryProps {
+interface SellingOrderStatusHistoryProps {
   history?: IOrderStatus[];
-  orderId?: string;
+  sellingOrderId?: string;
 }
 
-const OrderStatusHistory: React.FC<OrderStatusHistoryProps> = ({
+const SellingOrderStatusHistory: React.FC<SellingOrderStatusHistoryProps> = ({
   history,
-  orderId,
+  sellingOrderId,
 }) => {
   const [isOpenModal, setIsOpenModal] = useState(false);
 
-  const { data: orderData, isLoading: isOrderLoading } = useQuery({
-    queryKey: ["order", orderId],
-    queryFn: () => orderService.getOrder(orderId ? orderId : ""),
+  const { data: orderData } = useQuery({
+    queryKey: ["order", sellingOrderId],
+    queryFn: () =>
+      sellingOrderService.getSellingOrder(sellingOrderId ? sellingOrderId : ""),
     select: (data) => data.payload,
-    enabled: !!orderId, // Fetch data only when orderId is available
+    enabled: !!sellingOrderId, // Fetch data only when orderId is available
   });
 
   const orderStatusHistory = history || orderData?.orderStatuses;
@@ -62,7 +63,7 @@ const OrderStatusHistory: React.FC<OrderStatusHistoryProps> = ({
                 key={orderStatusId}
                 title={
                   <span className="font-medium text-gray-800">
-                    {translateOrderStatus(status)}
+                    {translateSellingOrderStatus(status)}
                   </span>
                 }
                 description={
@@ -97,4 +98,4 @@ const OrderStatusHistory: React.FC<OrderStatusHistoryProps> = ({
   );
 };
 
-export default OrderStatusHistory;
+export default SellingOrderStatusHistory;

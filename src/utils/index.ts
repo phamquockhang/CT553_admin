@@ -90,7 +90,7 @@ export function getColorForTag(str: string) {
   else if (str === OrderStatus.CANCELLED) return red[5];
 }
 
-export function translateOrderStatus(status: string) {
+export function translateSellingOrderStatus(status: string) {
   switch (status) {
     case OrderStatus.PENDING:
       return "Đang chờ xác nhận";

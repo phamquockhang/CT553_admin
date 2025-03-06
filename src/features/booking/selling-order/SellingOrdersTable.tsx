@@ -11,7 +11,7 @@ import { FaCheck } from "react-icons/fa";
 import { RiCloseFill } from "react-icons/ri";
 import { useSearchParams } from "react-router-dom";
 import {
-  IOrder,
+  ISellingOrder,
   Module,
   OrderStatus,
   Page,
@@ -28,27 +28,27 @@ import {
   getDefaultFilterValue,
   getDefaultSortOrder,
   getSortDirection,
-  translateOrderStatus,
+  translateSellingOrderStatus,
 } from "../../../utils";
-import ViewOrder from "./ViewOrder";
+import ViewSellingOrder from "./ViewSellingOrder";
 import Access from "../../auth/Access";
-import UpdateOrder from "./UpdateOrder";
-import OrderStatusHistory from "./components/OrderStatusHistory";
+import UpdateSellingOrder from "./UpdateSellingOrder";
+import SellingOrderStatusHistory from "./components/SellingOrderStatusHistory";
 
 interface TableParams {
   pagination: TablePaginationConfig;
   filters?: Parameters<GetProp<TableProps, "onChange">>[1];
-  sorter?: SorterResult<IOrder> | SorterResult<IOrder>[];
+  sorter?: SorterResult<ISellingOrder> | SorterResult<ISellingOrder>[];
 }
 
-interface OrderTableProps {
-  orderPage?: Page<IOrder>;
+interface SellingOrderTableProps {
+  sellingOrderPage?: Page<ISellingOrder>;
   isLoading: boolean;
   isFetching: boolean;
 }
 
-const OrdersTable: React.FC<OrderTableProps> = ({
-  orderPage,
+const SellingOrdersTable: React.FC<SellingOrderTableProps> = ({
+  sellingOrderPage: orderPage,
   isLoading,
   isFetching,
 }) => {
@@ -75,7 +75,7 @@ const OrdersTable: React.FC<OrderTableProps> = ({
     }
   }, [orderPage]);
 
-  const handleTableChange: TableProps<IOrder>["onChange"] = (
+  const handleTableChange: TableProps<ISellingOrder>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -125,7 +125,7 @@ const OrdersTable: React.FC<OrderTableProps> = ({
     setSearchParams(searchParams);
   };
 
-  const columns: TableProps<IOrder>["columns"] = [
+  const columns: TableProps<ISellingOrder>["columns"] = [
     {
       title: "STT",
       width: "2%",
@@ -138,9 +138,9 @@ const OrdersTable: React.FC<OrderTableProps> = ({
     },
     {
       title: "Mã đơn hàng",
-      key: "orderId",
-      dataIndex: "orderId",
-      align: "center",
+      key: "sellingOrderId",
+      dataIndex: "sellingOrderId",
+      align: "left",
       width: "7%",
     },
     {
@@ -148,7 +148,7 @@ const OrdersTable: React.FC<OrderTableProps> = ({
       key: "totalAmount",
       dataIndex: "totalAmount",
       width: "7%",
-      align: "center",
+      align: "right",
       render: (text, record) => {
         const totalAmount = record.totalAmount.toLocaleString();
         return <p>{totalAmount}</p>;
@@ -202,7 +202,7 @@ const OrdersTable: React.FC<OrderTableProps> = ({
       render: (text, record) => {
         const orderStatus = record.orderStatus;
         const color = getColorForTag(orderStatus);
-        const translatedStatus = translateOrderStatus(orderStatus);
+        const translatedStatus = translateSellingOrderStatus(orderStatus);
         return (
           <Tag className="m-0 px-1" color={color}>
             {translatedStatus}
@@ -246,13 +246,13 @@ const OrdersTable: React.FC<OrderTableProps> = ({
       width: "7%",
       align: "center",
 
-      render: (record: IOrder) => (
+      render: (record: ISellingOrder) => (
         <Space>
-          <ViewOrder order={record} />
+          <ViewSellingOrder sellingOrderId={record.sellingOrderId} />
           <Access permission={PERMISSIONS[Module.ORDERS].UPDATE} hideChildren>
-            <UpdateOrder order={record} />
+            <UpdateSellingOrder sellingOrderId={record.sellingOrderId} />
           </Access>
-          <OrderStatusHistory orderId={record.orderId} />
+          <SellingOrderStatusHistory sellingOrderId={record.sellingOrderId} />
         </Space>
       ),
     },
@@ -262,7 +262,7 @@ const OrdersTable: React.FC<OrderTableProps> = ({
     <Table
       bordered={false}
       columns={columns}
-      rowKey={(record: IOrder) => record.orderId}
+      rowKey={(record: ISellingOrder) => record.sellingOrderId}
       pagination={tableParams.pagination}
       dataSource={orderPage?.data}
       rowClassName={(_, index) =>
@@ -286,4 +286,4 @@ const OrdersTable: React.FC<OrderTableProps> = ({
   );
 };
 
-export default OrdersTable;
+export default SellingOrdersTable;

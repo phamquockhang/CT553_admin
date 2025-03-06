@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { OrderStatus } from "../../../../interfaces";
-import { translateOrderStatus } from "../../../../utils";
+import { translateSellingOrderStatus } from "../../../../utils";
 
 const validTransitions: Record<OrderStatus, OrderStatus[]> = {
   [OrderStatus.PENDING]: [OrderStatus.CONFIRMED, OrderStatus.CANCELLED],
@@ -16,14 +16,14 @@ const validTransitions: Record<OrderStatus, OrderStatus[]> = {
   [OrderStatus.CANCELLED]: [],
 };
 
-export const useValidOrderStatuses = (currentStatus?: OrderStatus) => {
+export const useValidSellingOrderStatuses = (currentStatus?: OrderStatus) => {
   return useMemo(() => {
     const availableStatuses = currentStatus
       ? validTransitions[currentStatus]
       : Object.values(OrderStatus);
     return availableStatuses.map((status) => ({
       value: status,
-      label: translateOrderStatus(status),
+      label: translateSellingOrderStatus(status),
     }));
   }, [currentStatus]);
 };

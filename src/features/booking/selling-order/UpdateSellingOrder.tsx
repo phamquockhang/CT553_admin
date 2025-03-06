@@ -2,15 +2,16 @@ import { EditOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { Modal, Tooltip } from "antd";
 import { useState } from "react";
-import { IOrder } from "../../../interfaces";
-import { orderService } from "../../../services";
-import OrderForm from "./components/OrderForm";
+import { sellingOrderService } from "../../../services";
+import SellingOrderForm from "./components/SellingOrderForm";
 
-interface UpdateOrderProps {
-  order: IOrder;
+interface UpdateSellingOrderProps {
+  sellingOrderId: string;
 }
 
-const UpdateOrder: React.FC<UpdateOrderProps> = ({ order }) => {
+const UpdateSellingOrder: React.FC<UpdateSellingOrderProps> = ({
+  sellingOrderId,
+}) => {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 
   const handleOpenModal = () => {
@@ -22,8 +23,8 @@ const UpdateOrder: React.FC<UpdateOrderProps> = ({ order }) => {
   };
 
   const { data: orderData, isLoading: isOrderLoading } = useQuery({
-    queryKey: ["order", order.orderId],
-    queryFn: () => orderService.getOrder(order.orderId),
+    queryKey: ["selling_order", sellingOrderId],
+    queryFn: () => sellingOrderService.getSellingOrder(sellingOrderId),
     select: (data) => data.payload,
   });
 
@@ -45,10 +46,13 @@ const UpdateOrder: React.FC<UpdateOrderProps> = ({ order }) => {
         onCancel={handleCloseModal}
         footer={null}
       >
-        <OrderForm orderToUpdate={orderData} onCancel={handleCloseModal} />
+        <SellingOrderForm
+          sellingOrderToUpdate={orderData}
+          onCancel={handleCloseModal}
+        />
       </Modal>
     </>
   );
 };
 
-export default UpdateOrder;
+export default UpdateSellingOrder;
