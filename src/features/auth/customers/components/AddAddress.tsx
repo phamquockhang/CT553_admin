@@ -17,7 +17,9 @@ interface AddAddressProps {
   description: string | undefined;
   setDescription: React.Dispatch<React.SetStateAction<string | undefined>>;
 
-  setFormattedAddress: React.Dispatch<React.SetStateAction<string | undefined>>;
+  setFormattedAddress:
+    | React.Dispatch<React.SetStateAction<string | undefined>>
+    | undefined;
 }
 
 const AddAddress: React.FC<AddAddressProps> = ({
@@ -83,7 +85,7 @@ const AddAddress: React.FC<AddAddressProps> = ({
 
   useEffect(() => {
     if (provinceId && districtId && wardCode && description) {
-      setFormattedAddress(
+      setFormattedAddress?.(
         formatAddressName(
           provinceId,
           districtId,
@@ -95,7 +97,7 @@ const AddAddress: React.FC<AddAddressProps> = ({
         ),
       );
     } else {
-      setFormattedAddress(undefined);
+      setFormattedAddress?.(undefined);
     }
   }, [
     provinceId,
