@@ -24,8 +24,8 @@ import {
 import { sellingOrderService } from "../../../../services";
 import { translateOrderStatus } from "../../../../utils";
 import AddCustomer from "../../../auth/customers/AddCustomer";
+import AddAddress from "../../../auth/customers/components/AddAddress";
 import { useValidSellingOrderStatuses } from "../hooks/useValidSellingOrderStatuses";
-import AddAddress from "./AddAddress";
 import AddProductToOrderForm from "./AddProductToOrderForm";
 import FindCustomer from "./FindCustomer";
 import SellingOrderDetails from "./SellingOrderDetails";
@@ -48,6 +48,11 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
   const [choosenCustomer, setChoosenCustomer] = useState<
     ICustomer | undefined
   >();
+
+  const [provinceId, setProvinceId] = useState<number>();
+  const [districtId, setDistrictId] = useState<number>();
+  const [wardCode, setWardCode] = useState<string>();
+  const [description, setDescription] = useState<string>();
 
   const address = choosenCustomer?.addresses.find(
     (address) => address.isDefault,
@@ -153,8 +158,12 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
         wardCode: address?.wardCode || undefined,
         description: address?.description || undefined,
       });
+      setProvinceId(address?.provinceId);
+      setDistrictId(address?.districtId);
+      setWardCode(address?.wardCode);
+      setDescription(address?.description);
     }
-  });
+  }, [choosenCustomer, form, address]);
 
   const initialValues = {
     ...sellingOrderToUpdate,
@@ -250,7 +259,18 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
                 </Form.Item>
               </div>
 
-              <AddAddress form={form} />
+              <h1 className="mb-1 text-lg font-semibold">Địa chỉ giao hàng</h1>
+              <AddAddress
+                form={form}
+                provinceId={provinceId}
+                setProvinceId={setProvinceId}
+                districtId={districtId}
+                setDistrictId={setDistrictId}
+                wardCode={wardCode}
+                setWardCode={setWardCode}
+                description={description}
+                setDescription={setDescription}
+              />
 
               <div className="flex gap-8">
                 <Form.Item className="flex-1" label="Ghi chú" name="note">

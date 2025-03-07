@@ -1,18 +1,35 @@
 import { useQuery } from "@tanstack/react-query";
 import { Form, Input, Select } from "antd";
-import { useState } from "react";
-import { addressPublicApiService } from "../../../../services";
 import { FormInstance } from "antd/lib";
+import { addressPublicApiService } from "../../../../services";
 
 interface AddAddressProps {
   form: FormInstance<any>;
+  provinceId: number | undefined;
+  setProvinceId: React.Dispatch<React.SetStateAction<number | undefined>>;
+  districtId: number | undefined;
+  setDistrictId: React.Dispatch<React.SetStateAction<number | undefined>>;
+  wardCode: string | undefined;
+  setWardCode: React.Dispatch<React.SetStateAction<string | undefined>>;
+  description: string | undefined;
+  setDescription: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
-const AddAddress: React.FC<AddAddressProps> = ({ form }) => {
-  const [provinceId, setProvinceId] = useState<number>();
-  const [districtId, setDistrictId] = useState<number>();
-  const [wardCode, setWardCode] = useState<string>();
-  const [description, setDescription] = useState<string>();
+const AddAddress: React.FC<AddAddressProps> = ({
+  form,
+  provinceId,
+  setProvinceId,
+  districtId,
+  setDistrictId,
+  wardCode,
+  setWardCode,
+  description,
+  setDescription,
+}) => {
+  //   const [provinceId, setProvinceId] = useState<number>();
+  //   const [districtId, setDistrictId] = useState<number>();
+  //   const [wardCode, setWardCode] = useState<string>();
+  //   const [description, setDescription] = useState<string>();
 
   const { data: provinceData, isLoading: isLoadingProvince } = useQuery({
     queryKey: ["province"],
@@ -20,6 +37,8 @@ const AddAddress: React.FC<AddAddressProps> = ({ form }) => {
       const response = await addressPublicApiService.getProvinces();
       return response.data;
     },
+    select: (data) =>
+      data?.sort((a, b) => a.ProvinceName.localeCompare(b.ProvinceName)),
   });
 
   const provinceOptions = provinceData?.map((province) => ({
@@ -33,6 +52,8 @@ const AddAddress: React.FC<AddAddressProps> = ({ form }) => {
       const response = await addressPublicApiService.getDistricts(provinceId);
       return response.data;
     },
+    select: (data) =>
+      data?.sort((a, b) => a.DistrictName.localeCompare(b.DistrictName)),
     enabled: Boolean(provinceId),
   });
 
@@ -47,6 +68,8 @@ const AddAddress: React.FC<AddAddressProps> = ({ form }) => {
       const response = await addressPublicApiService.getWards(districtId);
       return response.data;
     },
+    select: (data) =>
+      data?.sort((a, b) => a.WardName.localeCompare(b.WardName)),
     enabled: Boolean(districtId),
   });
 
@@ -54,8 +77,6 @@ const AddAddress: React.FC<AddAddressProps> = ({ form }) => {
     value: ward.WardCode,
     label: ward.WardName,
   }));
-
-  console.log(provinceId, districtId, wardCode, description);
 
   return (
     <>
@@ -95,9 +116,11 @@ const AddAddress: React.FC<AddAddressProps> = ({ form }) => {
                 setProvinceId(value);
                 setDistrictId(undefined);
                 setWardCode(undefined);
+                setDescription("");
                 form.setFieldsValue({
                   districtId: undefined,
                   wardCode: undefined,
+                  description: "",
                 });
               }
             }}
@@ -105,9 +128,12 @@ const AddAddress: React.FC<AddAddressProps> = ({ form }) => {
               setProvinceId(undefined);
               setDistrictId(undefined);
               setWardCode(undefined);
+              setDescription("");
               form.setFieldsValue({
+                provinceId: undefined,
                 districtId: undefined,
                 wardCode: undefined,
+                description: "",
               });
             }}
           />
@@ -147,16 +173,21 @@ const AddAddress: React.FC<AddAddressProps> = ({ form }) => {
               if (value !== districtId) {
                 setDistrictId(value);
                 setWardCode(undefined);
+                setDescription("");
                 form.setFieldsValue({
                   wardCode: undefined,
+                  description: "",
                 });
               }
             }}
             onClear={() => {
               setDistrictId(undefined);
               setWardCode(undefined);
+              setDescription("");
               form.setFieldsValue({
+                districtId: undefined,
                 wardCode: undefined,
+                description: "",
               });
             }}
           />
@@ -196,6 +227,18 @@ const AddAddress: React.FC<AddAddressProps> = ({ form }) => {
             }
             onSelect={(value: string) => {
               setWardCode(value);
+              setDescription("");
+              form.setFieldsValue({
+                description: "",
+              });
+            }}
+            onClear={() => {
+              setWardCode(undefined);
+              setDescription("");
+              form.setFieldsValue({
+                wardCode: undefined,
+                description: "",
+              });
             }}
           />
         </Form.Item>
