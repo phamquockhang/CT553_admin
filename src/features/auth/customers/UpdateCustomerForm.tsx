@@ -363,6 +363,7 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
           setWardCode={setWardCode}
           description={description}
           setDescription={setDescription}
+          setFormattedAddress={() => {}}
         />
       )}
       {!viewOnly && (
