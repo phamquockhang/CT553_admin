@@ -10,19 +10,34 @@ import {
 import { customerService } from "../../../../services";
 
 interface FindCustomerProps {
+  viewMode?: boolean;
   setChoosenCustomer: React.Dispatch<
     React.SetStateAction<ICustomer | undefined>
   >;
 }
 
-const FindCustomer: React.FC<FindCustomerProps> = ({ setChoosenCustomer }) => {
+const FindCustomer: React.FC<FindCustomerProps> = ({
+  viewMode,
+  setChoosenCustomer,
+}) => {
   const [options, setOptions] = useState<AutoCompleteProps["options"]>([]);
+  const [query, setQuery] = useState<string | undefined>("");
+  const [debouncedQuery, setDebouncedQuery] = useState<string | undefined>("");
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedQuery(query);
+    }, 1000);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [query]);
 
   const pagination = {
     page: 1,
     pageSize: 5,
   };
-  const [query, setQuery] = useState<string | undefined>("");
   const sort: SortParams = {
     sortBy: "firstName",
     direction: "asc",
@@ -31,32 +46,61 @@ const FindCustomer: React.FC<FindCustomerProps> = ({ setChoosenCustomer }) => {
     isActivated: "true",
   };
   const { data, isLoading } = useQuery({
-    queryKey: ["customers", pagination, query, filter, sort].filter((key) => {
-      if (typeof key === "string") {
-        return key !== "";
-      } else if (key instanceof Object) {
-        return Object.values(key).some(
-          (value) => value !== undefined && value !== "",
-        );
-      }
-    }),
+    queryKey: ["customers", pagination, debouncedQuery, filter, sort].filter(
+      (key) => {
+        if (typeof key === "string") {
+          return key !== "";
+        } else if (key instanceof Object) {
+          return Object.values(key).some(
+            (value) => value !== undefined && value !== "",
+          );
+        }
+      },
+    ),
     queryFn: () =>
-      customerService.getCustomers(pagination, query || "", filter, sort),
+      customerService.getCustomers(
+        pagination,
+        debouncedQuery || "",
+        filter,
+        sort,
+      ),
+    enabled: !!debouncedQuery && !debouncedQuery.includes("-"),
     select: (data) => data.payload?.data,
   });
 
   useEffect(() => {
-    if (data) {
+    if (isLoading) {
+      setOptions([
+        {
+          value: undefined,
+          label: <p className="text-center">{`Đang tìm kiếm...`}</p>,
+        },
+      ]);
+    } else if (data && data.length > 0) {
       setOptions(
         data.map((customer) => ({
           value: customer.customerId,
-          label: `${customer.firstName} ${customer.lastName} - ${customer.email}`,
+          label: `${customer.lastName} ${customer.firstName} - ${customer.email}`,
         })),
       );
+    } else if (!debouncedQuery || (debouncedQuery && debouncedQuery === "")) {
+      setOptions([
+        {
+          value: undefined,
+          label: (
+            <p className="">{`Nhập tên hoặc email của Khách hàng để tìm kiếm...`}</p>
+          ),
+        },
+      ]);
     } else {
-      setOptions([]);
+      setOptions([
+        {
+          value: undefined,
+          label: <p className="text-center">{`--<Không có>--`}</p>,
+        },
+      ]);
     }
-  }, [data]);
+  }, [data, isLoading, debouncedQuery]);
 
   const onSelect = (value: string) => {
     const choosenCustomer = data?.find(
@@ -89,6 +133,7 @@ const FindCustomer: React.FC<FindCustomerProps> = ({ setChoosenCustomer }) => {
           onSelect={onSelect}
           onSearch={handleSearch}
           value={query || undefined}
+          disabled={viewMode}
         >
           <Input.Search
             loading={isLoading}

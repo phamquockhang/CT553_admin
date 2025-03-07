@@ -29,7 +29,6 @@ const AddSellingOrder: React.FC = () => {
         onCancel={handleCloseModal}
         footer={null}
       >
-        {/* <UpdateItemForm onCancel={handleCloseModal} /> */}
         <SellingOrderForm onCancel={handleCloseModal} />
       </Modal>
     </>

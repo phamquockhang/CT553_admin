@@ -20,6 +20,7 @@ import {
   IOrderStatus,
   ISellingOrder,
   OrderStatus,
+  PaidStatus,
 } from "../../../../interfaces";
 import { sellingOrderService } from "../../../../services";
 import { translateOrderStatus } from "../../../../utils";
@@ -54,6 +55,8 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
   const [wardCode, setWardCode] = useState<string>();
   const [description, setDescription] = useState<string>();
 
+  const [formattedAddress, setFormattedAddress] = useState<string>();
+
   const address = choosenCustomer?.addresses.find(
     (address) => address.isDefault,
   );
@@ -72,7 +75,7 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
           query.queryKey.includes("selling_orders") ||
           query.queryKey.includes("selling_order"),
       });
-      onCancel();
+      // onCancel();
 
       if (data.success) toast.success(data.message || "Operation successful");
       else if (!data.success) toast.error(data.message || "Operation failed");
@@ -130,16 +133,24 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
       const newValues = {
         ...values,
         orderStatus: OrderStatus.COMPLETED,
+        paymentStatus: PaidStatus.PAID,
+
         customerName: hasCreateCustomer ? values.customerName : "Khách lẻ",
         phone: hasCreateCustomer ? values.phone : undefined,
         email: hasCreateCustomer ? values.email : undefined,
-        address: hasCreateCustomer ? values.address : "Không có",
+        address: hasCreateCustomer ? formattedAddress : "Không có",
         note: hasCreateCustomer ? values.note : undefined,
+
+        description: undefined,
+        provinceId: undefined,
+        districtId: undefined,
+        wardCode: undefined,
       };
 
+      console.log("hasCreateCustomer", hasCreateCustomer);
       console.log("Creating with values", newValues);
 
-      // createSellingOrder(newValues);
+      createSellingOrder(newValues);
     }
   };
 
@@ -150,7 +161,7 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
   useEffect(() => {
     if (choosenCustomer) {
       form.setFieldsValue({
-        customerName: `${choosenCustomer.firstName} ${choosenCustomer.lastName}`,
+        customerName: `${choosenCustomer.lastName} ${choosenCustomer.firstName}`,
         // phone: choosenCustomer.phone,
         email: choosenCustomer.email,
         provinceId: address?.provinceId || undefined,
@@ -181,18 +192,23 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
           checkedChildren="Có"
           unCheckedChildren="Không"
           defaultChecked={false}
+          value={hasCreateCustomer}
           // disabled={viewOnly}
           // checked={isModuleChecked(module)}
           // onClick={(_, event) => event.stopPropagation()}
           onChange={(checked) => handleCheck(checked)}
         />
       ),
+
       children: (
         <>
           <Col key={`1`} span={24}>
             <Card size="small">
               <div className="mb-4 flex justify-between gap-8">
-                <FindCustomer setChoosenCustomer={setChoosenCustomer} />
+                <FindCustomer
+                  viewMode={!hasCreateCustomer}
+                  setChoosenCustomer={setChoosenCustomer}
+                />
 
                 <AddCustomer />
               </div>
@@ -209,7 +225,8 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
                   ]}
                 >
                   <Input
-                    readOnly={!hasCreateCustomer}
+                    disabled={!hasCreateCustomer}
+                    // readOnly={!hasCreateCustomer}
                     placeholder="Nhập tên khách hàng"
                   />
                 </Form.Item>
@@ -230,7 +247,8 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
                   ]}
                 >
                   <Input
-                    readOnly={!hasCreateCustomer}
+                    disabled={!hasCreateCustomer}
+                    // readOnly={!hasCreateCustomer}
                     placeholder="Nhập số điện thoại"
                   />
                 </Form.Item>
@@ -253,7 +271,8 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
                   ]}
                 >
                   <Input
-                    readOnly={!hasCreateCustomer}
+                    disabled={!hasCreateCustomer}
+                    // readOnly={!hasCreateCustomer}
                     placeholder="Nhập email"
                   />
                 </Form.Item>
@@ -261,6 +280,7 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
 
               <h1 className="mb-1 text-lg font-semibold">Địa chỉ giao hàng</h1>
               <AddAddress
+                viewMode={!hasCreateCustomer}
                 form={form}
                 provinceId={provinceId}
                 setProvinceId={setProvinceId}
@@ -270,13 +290,15 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
                 setWardCode={setWardCode}
                 description={description}
                 setDescription={setDescription}
+                setFormattedAddress={setFormattedAddress}
               />
 
               <div className="flex gap-8">
                 <Form.Item className="flex-1" label="Ghi chú" name="note">
                   <Input.TextArea
+                    disabled={!hasCreateCustomer}
+                    // readOnly={!hasCreateCustomer}
                     rows={1}
-                    readOnly={!hasCreateCustomer}
                     placeholder="Nhập ghi chú"
                   />
                 </Form.Item>
@@ -288,7 +310,7 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
     },
   ];
 
-  console.log("choosenCustomer", choosenCustomer);
+  // console.log("choosenCustomer", choosenCustomer);
 
   return (
     <Form

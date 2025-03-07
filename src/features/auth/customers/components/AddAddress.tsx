@@ -2,8 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { Form, Input, Select } from "antd";
 import { FormInstance } from "antd/lib";
 import { addressPublicApiService } from "../../../../services";
+import { formatAddressName } from "../../../../utils";
+import { useEffect } from "react";
 
 interface AddAddressProps {
+  viewMode?: boolean;
   form: FormInstance<any>;
   provinceId: number | undefined;
   setProvinceId: React.Dispatch<React.SetStateAction<number | undefined>>;
@@ -13,9 +16,12 @@ interface AddAddressProps {
   setWardCode: React.Dispatch<React.SetStateAction<string | undefined>>;
   description: string | undefined;
   setDescription: React.Dispatch<React.SetStateAction<string | undefined>>;
+
+  setFormattedAddress: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
 const AddAddress: React.FC<AddAddressProps> = ({
+  viewMode,
   form,
   provinceId,
   setProvinceId,
@@ -25,12 +31,9 @@ const AddAddress: React.FC<AddAddressProps> = ({
   setWardCode,
   description,
   setDescription,
-}) => {
-  //   const [provinceId, setProvinceId] = useState<number>();
-  //   const [districtId, setDistrictId] = useState<number>();
-  //   const [wardCode, setWardCode] = useState<string>();
-  //   const [description, setDescription] = useState<string>();
 
+  setFormattedAddress,
+}) => {
   const { data: provinceData, isLoading: isLoadingProvince } = useQuery({
     queryKey: ["province"],
     queryFn: async () => {
@@ -78,6 +81,33 @@ const AddAddress: React.FC<AddAddressProps> = ({
     label: ward.WardName,
   }));
 
+  useEffect(() => {
+    if (provinceId && districtId && wardCode && description) {
+      setFormattedAddress(
+        formatAddressName(
+          provinceId,
+          districtId,
+          wardCode,
+          description,
+          provinceData,
+          districtData,
+          wardData,
+        ),
+      );
+    } else {
+      setFormattedAddress(undefined);
+    }
+  }, [
+    provinceId,
+    districtId,
+    wardCode,
+    description,
+    provinceData,
+    districtData,
+    wardData,
+    setFormattedAddress,
+  ]);
+
   return (
     <>
       <div className="flex gap-8">
@@ -93,6 +123,7 @@ const AddAddress: React.FC<AddAddressProps> = ({
           ]}
         >
           <Select
+            disabled={viewMode}
             loading={isLoadingProvince}
             allowClear
             showSearch
@@ -151,6 +182,7 @@ const AddAddress: React.FC<AddAddressProps> = ({
           ]}
         >
           <Select
+            disabled={viewMode}
             loading={isLoadingDistrict}
             allowClear
             showSearch
@@ -207,6 +239,7 @@ const AddAddress: React.FC<AddAddressProps> = ({
           ]}
         >
           <Select
+            disabled={viewMode}
             loading={isLoadingWard}
             allowClear
             showSearch
@@ -255,6 +288,7 @@ const AddAddress: React.FC<AddAddressProps> = ({
           ]}
         >
           <Input
+            disabled={viewMode}
             allowClear
             placeholder="Địa chỉ chi tiết"
             onChange={(e) => setDescription(e.target.value)}
