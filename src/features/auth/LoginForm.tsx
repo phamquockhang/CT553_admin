@@ -18,7 +18,7 @@ const LoginForm: React.FC = () => {
     }
   }, [accessToken, navigate]);
 
-  const { mutate: login } = useMutation({
+  const { mutate: login, isPending } = useMutation({
     mutationFn: authService.login,
     onSuccess: (data: ApiResponse<IAuthResponse>) => {
       if (data.payload) {
@@ -97,7 +97,7 @@ const LoginForm: React.FC = () => {
         </Form.Item> */}
 
         <Form.Item>
-          <Button type="primary" htmlType="submit" block>
+          <Button loading={isPending} type="primary" htmlType="submit" block>
             Đăng nhập
           </Button>
         </Form.Item>
