@@ -189,6 +189,7 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
   const optionsOrderStatus = useValidSellingOrderStatuses(currentStatus);
 
   console.log("selectedProductsDetails", selectedProductsDetails);
+  console.log("sellingOrderToUpdate", sellingOrderToUpdate);
 
   return (
     <Form
@@ -332,12 +333,7 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
             </Form.Item>
           </div>
 
-          <SellingOrderDetails
-            sellingOrderDetails={
-              sellingOrderToUpdate?.sellingOrderDetails || []
-            }
-            totalAmount={sellingOrderToUpdate?.totalAmount}
-          />
+          <SellingOrderDetails sellingOrder={sellingOrderToUpdate} />
         </>
       )}
 

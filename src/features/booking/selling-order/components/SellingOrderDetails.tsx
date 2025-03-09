@@ -1,15 +1,35 @@
-import { Table, TableProps } from "antd";
-import { ISellingOrderDetail } from "../../../../interfaces";
+import { Table, TableProps, Typography } from "antd";
+import {
+  ISellingOrder,
+  ISellingOrderDetail,
+  PaidStatus,
+} from "../../../../interfaces";
+const { Text } = Typography;
 
 interface SellingOrderDetailsProps {
-  sellingOrderDetails: ISellingOrderDetail[];
-  totalAmount?: number;
+  // sellingOrderDetails: ISellingOrderDetail[];
+  // totalAmount?: number;
+  sellingOrder: ISellingOrder;
 }
 
 const SellingOrderDetails: React.FC<SellingOrderDetailsProps> = ({
-  sellingOrderDetails,
-  totalAmount,
+  // sellingOrderDetails,
+  // totalAmount,
+  sellingOrder,
 }) => {
+  const {
+    usedScore,
+    earnedScore,
+    paymentStatus,
+    sellingOrderDetails,
+    totalAmount,
+  } = sellingOrder;
+
+  const totalPrice = sellingOrderDetails.reduce(
+    (total, product) => total + product.totalPrice,
+    0,
+  );
+
   const columns: TableProps<ISellingOrderDetail>["columns"] = [
     {
       title: "Mã sản phẩm",
@@ -28,7 +48,7 @@ const SellingOrderDetails: React.FC<SellingOrderDetailsProps> = ({
       dataIndex: "quantity",
       key: "quantity",
       align: "center",
-      render: (value, record) => {
+      render: (_, record) => {
         return (
           <span>
             {record.quantity} {record.unit}
@@ -62,10 +82,42 @@ const SellingOrderDetails: React.FC<SellingOrderDetailsProps> = ({
         rowKey="sellingOrderDetailId"
         pagination={false}
       />
-      <div className="my-4 flex justify-end">
-        <h3 className="text-lg font-semibold">
-          Tổng tiền: {totalAmount?.toLocaleString()} VND
-        </h3>
+
+      <div className="border-t pt-4">
+        <div className="flex justify-between">
+          <Text>Tổng tiền hàng:</Text>
+          <Text>{totalPrice.toLocaleString()} VND</Text>
+        </div>
+
+        {usedScore > 0 && (
+          <div className="flex justify-between">
+            <Text>Giảm giá từ điểm:</Text>
+            <Text className="text-red-500">
+              -{usedScore.toLocaleString()} VND
+            </Text>
+          </div>
+        )}
+
+        <div className="flex justify-between text-lg font-semibold">
+          <Text>Thành tiền:</Text>
+          <Text className="">{totalAmount.toLocaleString()} VND</Text>
+        </div>
+
+        <div className="flex justify-between text-lg font-semibold">
+          <Text>Đã thanh toán:</Text>
+          <Text>
+            {paymentStatus === PaidStatus.PAID
+              ? totalAmount.toLocaleString() + " VND"
+              : 0 + " VND"}
+          </Text>
+        </div>
+
+        {earnedScore && earnedScore > 0 && (
+          <div className="flex justify-between text-lg font-semibold">
+            <Text>Điểm tích lũy cộng thêm:</Text>
+            <Text>{earnedScore.toLocaleString()} điểm </Text>
+          </div>
+        )}
       </div>
     </div>
   );
