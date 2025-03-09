@@ -17,6 +17,11 @@ export interface ISellingOrder {
   updatedAt?: string;
 }
 
+export interface IBriefSellingOrderStatus {
+  orderStatus: string;
+  paymentStatus: string;
+}
+
 export interface IOrderStatus {
   orderStatusId?: string;
   status: string;

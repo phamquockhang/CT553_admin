@@ -17,6 +17,7 @@ import {
   IProvince,
   IWard,
   OrderStatus,
+  PaidStatus,
 } from "../interfaces";
 
 export function useDynamicTitle(title: string) {
@@ -117,6 +118,49 @@ export function translateOrderStatus(status: string) {
       return "Hoàn thành";
     case OrderStatus.CANCELLED:
       return "Đã hủy";
+    default:
+      return status;
+  }
+}
+
+export function revertOrderStatus(status: string) {
+  switch (status) {
+    case "Đang chờ xác nhận":
+      return OrderStatus.PENDING;
+    case "Đã xác nhận":
+      return OrderStatus.CONFIRMED;
+    case "Đang chuẩn bị":
+      return OrderStatus.PREPARING;
+    case "Đang giao hàng":
+      return OrderStatus.DELIVERING;
+    case "Đã giao hàng":
+      return OrderStatus.DELIVERED;
+    case "Hoàn thành":
+      return OrderStatus.COMPLETED;
+    case "Đã hủy":
+      return OrderStatus.CANCELLED;
+    default:
+      return status;
+  }
+}
+
+export function translatePaymentStatus(status: string) {
+  switch (status) {
+    case PaidStatus.UNPAID:
+      return "Chưa thanh toán";
+    case PaidStatus.PAID:
+      return "Đã thanh toán";
+    default:
+      return status;
+  }
+}
+
+export function revertPaymentStatus(status: string) {
+  switch (status) {
+    case "Chưa thanh toán":
+      return PaidStatus.UNPAID;
+    case "Đã thanh toán":
+      return PaidStatus.PAID;
     default:
       return status;
   }

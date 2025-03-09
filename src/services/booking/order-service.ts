@@ -1,14 +1,14 @@
 import { AxiosInstance } from "axios";
-import { createApiClient } from "../api-client";
 import {
   ApiResponse,
+  IBriefSellingOrderStatus,
+  ISellingOrder,
   Page,
   PaginationParams,
-  SortParams,
-  ISellingOrder,
   SellingOrderFilterCriteria,
-  IOrderStatus,
+  SortParams,
 } from "../../interfaces";
+import { createApiClient } from "../api-client";
 
 interface ISellingOrderService {
   getSellingOrder(orderId: string): Promise<ApiResponse<ISellingOrder>>;
@@ -23,7 +23,7 @@ interface ISellingOrderService {
   ): Promise<ApiResponse<void>>;
   updateOrderStatus(
     sellingOrderId: string,
-    updatedOrderStatus: IOrderStatus,
+    updatedOrderStatus: IBriefSellingOrderStatus,
   ): Promise<ApiResponse<void>>;
 }
 
@@ -61,7 +61,7 @@ class SellingOrderService implements ISellingOrderService {
 
   async updateOrderStatus(
     sellingOrderId: string,
-    updatedOrderStatus: IOrderStatus,
+    updatedOrderStatus: IBriefSellingOrderStatus,
   ): Promise<ApiResponse<void>> {
     return await apiClient.put(`/${sellingOrderId}`, updatedOrderStatus);
   }

@@ -86,7 +86,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   const isPartialPointsUsage = maxUsablePoints < maxPointsAvailable;
 
   return (
-    <div className="rounded-md bg-white p-4 shadow-sm">
+    <div className="rounded-md border border-gray-200 p-4">
       <Title level={4} className="mb-4">
         Thanh toán
       </Title>
@@ -144,7 +144,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       </div>
 
       <div className="border-t pt-4">
-        <Form.Item className="mb-1" name="totalAmount">
+        <Form.Item className="mb-0" name="totalAmount">
           <div className="flex justify-between">
             <Text>Tổng tiền hàng:</Text>
             <Text>{totalAmount.toLocaleString()} VND</Text>
@@ -152,7 +152,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
         </Form.Item>
 
         {usePoints && (
-          <Form.Item className="mb-1" name="discountAmount">
+          <Form.Item className="mb-0" name="discountAmount">
             <div className="flex justify-between">
               <Text>Giảm giá từ điểm:</Text>
               <Text className="text-red-500">
@@ -162,14 +162,10 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           </Form.Item>
         )}
 
-        <Form.Item className="mt-2" name="finalAmount">
+        <Form.Item className="m-0 font-semibold" name="finalAmount">
           <div className="flex justify-between">
-            <Title level={5} className="m-0">
-              Thành tiền:
-            </Title>
-            <Title level={5} className="m-0 text-red-600">
-              {finalAmount.toLocaleString()} VND
-            </Title>
+            <Text>Thành tiền:</Text>
+            <Text>{finalAmount.toLocaleString()} VND</Text>
           </div>
         </Form.Item>
       </div>

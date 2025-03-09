@@ -4,21 +4,27 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { IoIosAlert } from "react-icons/io";
 import {
+  IBriefSellingOrderStatus,
   ICustomer,
-  IOrderStatus,
   ISellingOrder,
   ISellingOrderDetail,
   OrderStatus,
   PaidStatus,
 } from "../../../../interfaces";
 import { sellingOrderService } from "../../../../services";
-import { translateOrderStatus } from "../../../../utils";
+import {
+  revertOrderStatus,
+  revertPaymentStatus,
+  translateOrderStatus,
+  translatePaymentStatus,
+} from "../../../../utils";
 import { useValidSellingOrderStatuses } from "../hooks/useValidSellingOrderStatuses";
 import AddCustomerToOrderForm from "./AddCustomerToOrderForm";
 import AddProductToOrderForm from "./AddProductToOrderForm";
 import PaymentForm from "./PaymentForm";
 import SellingOrderDetails from "./SellingOrderDetails";
 import SellingOrderStatusHistory from "./SellingOrderStatusHistory";
+import { useValidPaymentStatuses } from "../hooks/useValidPaymentStatuses";
 
 interface SellingOrderFormProps {
   sellingOrderToUpdate?: ISellingOrder;
@@ -78,20 +84,24 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
   const { mutate: updateOrderStatus, isPending: isUpdatingOrder } = useMutation(
     {
       mutationFn: ({
-        orderId,
-        orderStatus,
+        sellingOrderId,
+        sellingOrderStatus,
       }: {
-        orderId: string;
-        orderStatus: IOrderStatus;
+        sellingOrderId: string;
+        sellingOrderStatus: IBriefSellingOrderStatus;
       }) => {
-        return sellingOrderService.updateOrderStatus(orderId, orderStatus);
+        return sellingOrderService.updateOrderStatus(
+          sellingOrderId,
+          sellingOrderStatus,
+        );
       },
 
       onSuccess: (data) => {
         queryClient.invalidateQueries({
           predicate: (query) =>
             query.queryKey.includes("selling_orders") ||
-            query.queryKey.includes("selling_order"),
+            query.queryKey.includes("selling_order") ||
+            query.queryKey.includes("customers"),
         });
         onCancel();
 
@@ -107,18 +117,24 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
 
   const handleSubmit = (values: ISellingOrder) => {
     if (sellingOrderToUpdate) {
-      if (values.orderStatus === translateOrderStatus(currentStatus)) {
+      if (
+        values.orderStatus === translateOrderStatus(currentOrderStatus) &&
+        values.paymentStatus === translatePaymentStatus(currentPaymentStatus)
+      ) {
         toast.error("Trạng thái chưa có thay đổi");
         return;
       }
 
-      console.log("Updating with values", values);
+      const newSellingOrderStatus = {
+        orderStatus: revertOrderStatus(values.orderStatus as string),
+        paymentStatus: revertPaymentStatus(values.paymentStatus as string),
+      };
+
+      console.log("Updating with values", newSellingOrderStatus);
 
       updateOrderStatus({
-        orderId: values.sellingOrderId,
-        orderStatus: {
-          status: values.orderStatus,
-        },
+        sellingOrderId: values.sellingOrderId,
+        sellingOrderStatus: newSellingOrderStatus,
       });
     } else {
       if (!selectedProductsDetails || selectedProductsDetails.length === 0) {
@@ -127,7 +143,7 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
         const newValues = {
           ...values,
           orderStatus: values.orderStatus as OrderStatus,
-          paymentStatus: PaidStatus.PAID,
+          paymentStatus: values.paymentStatus as PaidStatus,
 
           customerId: isSaveCustomer ? choosenCustomer?.customerId : undefined,
           customerName: isSaveCustomer ? values.customerName : "Khách lẻ",
@@ -152,7 +168,6 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
           wardCode: undefined,
         };
 
-        console.log("isSaveCustomer", isSaveCustomer);
         console.log("Creating with values", newValues);
 
         createSellingOrder(newValues);
@@ -183,13 +198,20 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
     orderStatus: sellingOrderToUpdate
       ? translateOrderStatus(sellingOrderToUpdate.orderStatus)
       : OrderStatus.COMPLETED,
+    paymentStatus: sellingOrderToUpdate
+      ? translatePaymentStatus(sellingOrderToUpdate.paymentStatus)
+      : PaidStatus.PAID,
   };
 
-  const currentStatus = sellingOrderToUpdate?.orderStatus as OrderStatus;
-  const optionsOrderStatus = useValidSellingOrderStatuses(currentStatus);
+  const currentOrderStatus = sellingOrderToUpdate?.orderStatus as OrderStatus;
+  const optionsOrderStatus = useValidSellingOrderStatuses(currentOrderStatus);
 
-  console.log("selectedProductsDetails", selectedProductsDetails);
-  console.log("sellingOrderToUpdate", sellingOrderToUpdate);
+  const currentPaymentStatus =
+    sellingOrderToUpdate?.paymentStatus as PaidStatus;
+  const optionsPaymentStatus = useValidPaymentStatuses(currentPaymentStatus);
+
+  // console.log("selectedProductsDetails", selectedProductsDetails);
+  // console.log("sellingOrderToUpdate", sellingOrderToUpdate);
 
   return (
     <Form
@@ -200,19 +222,36 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
     >
       {!sellingOrderToUpdate && (
         <div className="mb-6 flex flex-col gap-4">
-          <Form.Item
-            className="flex-1"
-            label="Trạng thái đơn hàng"
-            name="orderStatus"
-          >
-            <Select disabled={viewMode}>
-              {optionsOrderStatus.map(({ value, label }) => (
-                <Select.Option key={value} value={value}>
-                  {label}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
+          <div className="flex gap-8">
+            <Form.Item
+              className="flex-1"
+              label="Trạng thái đơn hàng"
+              name="orderStatus"
+            >
+              <Select disabled={viewMode}>
+                {optionsOrderStatus.map(({ value, label }) => (
+                  <Select.Option key={value} value={value}>
+                    {label}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              className="flex-1"
+              //   label="Trạng thái đơn hàng"
+              label="Trạng thái thanh toán"
+              name="paymentStatus"
+            >
+              <Select disabled={viewMode}>
+                {optionsPaymentStatus.map(({ value, label }) => (
+                  <Select.Option key={value} value={value}>
+                    {label}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </div>
 
           <AddCustomerToOrderForm
             form={form}
@@ -255,7 +294,9 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
                 readOnly={viewMode || sellingOrderToUpdate ? true : false}
               />
             </Form.Item>
+          </div>
 
+          <div className="flex gap-8">
             <Form.Item
               className="flex-1"
               //   label="Trạng thái đơn hàng"
@@ -283,6 +324,21 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
             >
               <Select disabled={viewMode}>
                 {optionsOrderStatus.map(({ value, label }) => (
+                  <Select.Option key={value} value={value}>
+                    {label}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              className="flex-1"
+              //   label="Trạng thái đơn hàng"
+              label="Trạng thái thanh toán"
+              name="paymentStatus"
+            >
+              <Select disabled={viewMode}>
+                {optionsPaymentStatus.map(({ value, label }) => (
                   <Select.Option key={value} value={value}>
                     {label}
                   </Select.Option>
