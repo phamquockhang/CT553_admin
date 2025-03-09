@@ -23,7 +23,7 @@ const SellingOrderStatusHistory: React.FC<SellingOrderStatusHistoryProps> = ({
   const [isOpenModal, setIsOpenModal] = useState(false);
 
   const { data: orderData } = useQuery({
-    queryKey: ["order", sellingOrderId],
+    queryKey: ["selling_order", sellingOrderId],
     queryFn: () =>
       sellingOrderService.getSellingOrder(sellingOrderId ? sellingOrderId : ""),
     select: (data) => data.payload,
