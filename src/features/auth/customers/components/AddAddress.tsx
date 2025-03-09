@@ -7,7 +7,7 @@ import { useEffect } from "react";
 
 interface AddAddressProps {
   viewMode?: boolean;
-  form: FormInstance<any>;
+  form: FormInstance;
   provinceId: number | undefined;
   setProvinceId: React.Dispatch<React.SetStateAction<number | undefined>>;
   districtId: number | undefined;

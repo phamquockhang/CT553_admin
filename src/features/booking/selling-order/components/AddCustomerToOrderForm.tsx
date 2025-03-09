@@ -6,9 +6,9 @@ import AddAddress from "../../../auth/customers/components/AddAddress";
 import FindCustomer from "./FindCustomer";
 
 interface AddCustomerToOrderFormProps {
-  form: FormInstance<any>;
-  hasCreateCustomer: boolean;
-  setHasCreateCustomer: React.Dispatch<React.SetStateAction<boolean>>;
+  form: FormInstance;
+  isSaveCustomer: boolean;
+  setIsSaveCustomer: React.Dispatch<React.SetStateAction<boolean>>;
 
   setChoosenCustomer: React.Dispatch<
     React.SetStateAction<ICustomer | undefined>
@@ -27,11 +27,11 @@ interface AddCustomerToOrderFormProps {
 
 const AddCustomerToOrderForm: React.FC<AddCustomerToOrderFormProps> = ({
   form,
-  hasCreateCustomer,
-  setChoosenCustomer,
+  isSaveCustomer,
+  setIsSaveCustomer,
 
   setFormattedAddress,
-  setHasCreateCustomer,
+  setChoosenCustomer,
 
   provinceId,
   setProvinceId,
@@ -43,7 +43,7 @@ const AddCustomerToOrderForm: React.FC<AddCustomerToOrderFormProps> = ({
   setDescription,
 }) => {
   const handleCheck = (checked: boolean) => {
-    setHasCreateCustomer(checked);
+    setIsSaveCustomer(checked);
   };
 
   const items: CollapseProps["items"] = [
@@ -55,7 +55,7 @@ const AddCustomerToOrderForm: React.FC<AddCustomerToOrderFormProps> = ({
           checkedChildren="Có"
           unCheckedChildren="Không"
           defaultChecked={false}
-          value={hasCreateCustomer}
+          value={isSaveCustomer}
           // disabled={viewOnly}
           // checked={isModuleChecked(module)}
           // onClick={(_, event) => event.stopPropagation()}
@@ -69,7 +69,7 @@ const AddCustomerToOrderForm: React.FC<AddCustomerToOrderFormProps> = ({
             <Card size="small">
               <div className="mb-4 flex justify-between gap-8">
                 <FindCustomer
-                  viewMode={!hasCreateCustomer}
+                  viewMode={!isSaveCustomer}
                   setChoosenCustomer={setChoosenCustomer}
                 />
 
@@ -82,13 +82,13 @@ const AddCustomerToOrderForm: React.FC<AddCustomerToOrderFormProps> = ({
                   name="customerName"
                   rules={[
                     {
-                      required: hasCreateCustomer,
+                      required: isSaveCustomer,
                       message: "Vui lòng nhập tên khách hàng",
                     },
                   ]}
                 >
                   <Input
-                    disabled={!hasCreateCustomer}
+                    disabled={!isSaveCustomer}
                     // readOnly={!hasCreateCustomer}
                     placeholder="Nhập tên khách hàng"
                   />
@@ -100,7 +100,7 @@ const AddCustomerToOrderForm: React.FC<AddCustomerToOrderFormProps> = ({
                   name="phone"
                   rules={[
                     {
-                      required: hasCreateCustomer,
+                      required: isSaveCustomer,
                       message: "Vui lòng nhập số điện thoại",
                     },
                     {
@@ -110,7 +110,7 @@ const AddCustomerToOrderForm: React.FC<AddCustomerToOrderFormProps> = ({
                   ]}
                 >
                   <Input
-                    disabled={!hasCreateCustomer}
+                    disabled={!isSaveCustomer}
                     // readOnly={!hasCreateCustomer}
                     placeholder="Nhập số điện thoại"
                   />
@@ -124,7 +124,7 @@ const AddCustomerToOrderForm: React.FC<AddCustomerToOrderFormProps> = ({
                   name="email"
                   rules={[
                     {
-                      required: hasCreateCustomer,
+                      required: isSaveCustomer,
                       message: "Vui lòng nhập email",
                     },
                     {
@@ -134,7 +134,7 @@ const AddCustomerToOrderForm: React.FC<AddCustomerToOrderFormProps> = ({
                   ]}
                 >
                   <Input
-                    disabled={!hasCreateCustomer}
+                    disabled={!isSaveCustomer}
                     // readOnly={!hasCreateCustomer}
                     placeholder="Nhập email"
                   />
@@ -143,7 +143,7 @@ const AddCustomerToOrderForm: React.FC<AddCustomerToOrderFormProps> = ({
 
               <h1 className="mb-1 text-lg font-semibold">Địa chỉ giao hàng</h1>
               <AddAddress
-                viewMode={!hasCreateCustomer}
+                viewMode={!isSaveCustomer}
                 form={form}
                 provinceId={provinceId}
                 setProvinceId={setProvinceId}
@@ -159,7 +159,7 @@ const AddCustomerToOrderForm: React.FC<AddCustomerToOrderFormProps> = ({
               <div className="flex gap-8">
                 <Form.Item className="flex-1" label="Ghi chú" name="note">
                   <Input.TextArea
-                    disabled={!hasCreateCustomer}
+                    disabled={!isSaveCustomer}
                     // readOnly={!hasCreateCustomer}
                     rows={1}
                     placeholder="Nhập ghi chú"
