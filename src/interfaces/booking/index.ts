@@ -24,16 +24,18 @@ export interface IOrderStatus {
 }
 
 export interface ISellingOrderDetail {
-  sellingOrderDetailId: number;
+  sellingOrderDetailId?: number;
   productId: number;
   productName: string;
   unit: string;
   quantity: number;
   unitPrice: number;
-  totalAmount: number;
+  totalPrice: number;
 }
 
 export interface SellingOrderFilterCriteria {
   orderStatus?: string;
   paymentStatus?: string;
 }
+
+export const POINT_VALUE = 1;
