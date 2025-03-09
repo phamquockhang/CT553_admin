@@ -126,14 +126,14 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
       } else {
         const newValues = {
           ...values,
-          orderStatus: OrderStatus.COMPLETED,
+          orderStatus: values.orderStatus as OrderStatus,
           paymentStatus: PaidStatus.PAID,
 
           customerId: isSaveCustomer ? choosenCustomer?.customerId : undefined,
           customerName: isSaveCustomer ? values.customerName : "Khách lẻ",
           phone: isSaveCustomer ? values.phone : undefined,
           email: isSaveCustomer ? values.email : undefined,
-          address: isSaveCustomer ? formattedAddress : "Không có",
+          address: isSaveCustomer ? formattedAddress : undefined,
           note: isSaveCustomer ? values.note : undefined,
 
           sellingOrderDetails: selectedProductsDetails.map((product) => ({
@@ -185,8 +185,6 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
       : OrderStatus.COMPLETED,
   };
 
-  // console.log("choosenCustomer", choosenCustomer);
-
   const currentStatus = sellingOrderToUpdate?.orderStatus as OrderStatus;
   const optionsOrderStatus = useValidSellingOrderStatuses(currentStatus);
 
@@ -201,6 +199,20 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
     >
       {!sellingOrderToUpdate && (
         <div className="mb-6 flex flex-col gap-4">
+          <Form.Item
+            className="flex-1"
+            label="Trạng thái đơn hàng"
+            name="orderStatus"
+          >
+            <Select disabled={viewMode}>
+              {optionsOrderStatus.map(({ value, label }) => (
+                <Select.Option key={value} value={value}>
+                  {label}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+
           <AddCustomerToOrderForm
             form={form}
             isSaveCustomer={isSaveCustomer}
@@ -333,7 +345,7 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
         <Form.Item className="text-right" wrapperCol={{ span: 24 }}>
           <Space>
             <Button
-              //   disabled={isCreatingOrder || isUpdatingOrder}
+              disabled={isCreatingOrder || isUpdatingOrder}
               onClick={onCancel}
             >
               Hủy
