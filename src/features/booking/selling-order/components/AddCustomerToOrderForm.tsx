@@ -123,10 +123,10 @@ const AddCustomerToOrderForm: React.FC<AddCustomerToOrderFormProps> = ({
                   label="Email"
                   name="email"
                   rules={[
-                    {
-                      required: isSaveCustomer,
-                      message: "Vui lòng nhập email",
-                    },
+                    // {
+                    //   required: isSaveCustomer,
+                    //   message: "Vui lòng nhập email",
+                    // },
                     {
                       type: "email",
                       message: "Email không hợp lệ",
