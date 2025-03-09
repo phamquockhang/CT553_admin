@@ -7,6 +7,7 @@ import {
   ICustomer,
   IOrderStatus,
   ISellingOrder,
+  ISellingOrderDetail,
   OrderStatus,
   PaidStatus,
 } from "../../../../interfaces";
@@ -15,6 +16,7 @@ import { translateOrderStatus } from "../../../../utils";
 import { useValidSellingOrderStatuses } from "../hooks/useValidSellingOrderStatuses";
 import AddCustomerToOrderForm from "./AddCustomerToOrderForm";
 import AddProductToOrderForm from "./AddProductToOrderForm";
+import PaymentForm from "./PaymentForm";
 import SellingOrderDetails from "./SellingOrderDetails";
 import SellingOrderStatusHistory from "./SellingOrderStatusHistory";
 
@@ -31,10 +33,13 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
 }) => {
   const [form] = Form.useForm();
   const queryClient = useQueryClient();
-  const [hasCreateCustomer, setHasCreateCustomer] = useState<boolean>(false);
+  const [isSaveCustomer, setIsSaveCustomer] = useState<boolean>(false);
   const [choosenCustomer, setChoosenCustomer] = useState<
     ICustomer | undefined
   >();
+  const [selectedProductsDetails, setSelectedProductsDetails] = useState<
+    ISellingOrderDetail[]
+  >([]);
 
   const [provinceId, setProvinceId] = useState<number>();
   const [districtId, setDistrictId] = useState<number>();
@@ -46,55 +51,59 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
     (address) => address.isDefault,
   );
 
-  const { mutate: createSellingOrder } = useMutation({
-    mutationFn: (newSellingOrder: Omit<ISellingOrder, "sellingOrderId">) => {
-      return sellingOrderService.create(newSellingOrder);
+  const { mutate: createSellingOrder, isPending: isCreatingOrder } =
+    useMutation({
+      mutationFn: (newSellingOrder: Omit<ISellingOrder, "sellingOrderId">) => {
+        return sellingOrderService.create(newSellingOrder);
+      },
+
+      onSuccess: (data) => {
+        queryClient.invalidateQueries({
+          predicate: (query) =>
+            query.queryKey.includes("selling_orders") ||
+            query.queryKey.includes("selling_order") ||
+            query.queryKey.includes("customers"),
+        });
+        onCancel();
+
+        if (data.success) toast.success(data.message || "Operation successful");
+        else if (!data.success) toast.error(data.message || "Operation failed");
+      },
+
+      onError: (error) => {
+        toast.error(error.message || "Operation failed");
+      },
+    });
+
+  const { mutate: updateOrderStatus, isPending: isUpdatingOrder } = useMutation(
+    {
+      mutationFn: ({
+        orderId,
+        orderStatus,
+      }: {
+        orderId: string;
+        orderStatus: IOrderStatus;
+      }) => {
+        return sellingOrderService.updateOrderStatus(orderId, orderStatus);
+      },
+
+      onSuccess: (data) => {
+        queryClient.invalidateQueries({
+          predicate: (query) =>
+            query.queryKey.includes("selling_orders") ||
+            query.queryKey.includes("selling_order"),
+        });
+        onCancel();
+
+        if (data.success) toast.success(data.message || "Operation successful");
+        else if (!data.success) toast.error(data.message || "Operation failed");
+      },
+
+      onError: (error) => {
+        toast.error(error.message || "Operation failed");
+      },
     },
-
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({
-        predicate: (query) =>
-          query.queryKey.includes("selling_orders") ||
-          query.queryKey.includes("selling_order"),
-      });
-      // onCancel();
-
-      if (data.success) toast.success(data.message || "Operation successful");
-      else if (!data.success) toast.error(data.message || "Operation failed");
-    },
-
-    onError: (error) => {
-      toast.error(error.message || "Operation failed");
-    },
-  });
-
-  const { mutate: updateOrderStatus } = useMutation({
-    mutationFn: ({
-      orderId,
-      orderStatus,
-    }: {
-      orderId: string;
-      orderStatus: IOrderStatus;
-    }) => {
-      return sellingOrderService.updateOrderStatus(orderId, orderStatus);
-    },
-
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({
-        predicate: (query) =>
-          query.queryKey.includes("selling_orders") ||
-          query.queryKey.includes("selling_order"),
-      });
-      onCancel();
-
-      if (data.success) toast.success(data.message || "Operation successful");
-      else if (!data.success) toast.error(data.message || "Operation failed");
-    },
-
-    onError: (error) => {
-      toast.error(error.message || "Operation failed");
-    },
-  });
+  );
 
   const handleSubmit = (values: ISellingOrder) => {
     if (sellingOrderToUpdate) {
@@ -112,27 +121,42 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
         },
       });
     } else {
-      const newValues = {
-        ...values,
-        orderStatus: OrderStatus.COMPLETED,
-        paymentStatus: PaidStatus.PAID,
+      if (!selectedProductsDetails || selectedProductsDetails.length === 0) {
+        toast.error("Vui lòng chọn sản phẩm");
+      } else {
+        const newValues = {
+          ...values,
+          orderStatus: OrderStatus.COMPLETED,
+          paymentStatus: PaidStatus.PAID,
 
-        customerName: hasCreateCustomer ? values.customerName : "Khách lẻ",
-        phone: hasCreateCustomer ? values.phone : undefined,
-        email: hasCreateCustomer ? values.email : undefined,
-        address: hasCreateCustomer ? formattedAddress : "Không có",
-        note: hasCreateCustomer ? values.note : undefined,
+          customerId: isSaveCustomer ? choosenCustomer?.customerId : undefined,
+          customerName: isSaveCustomer ? values.customerName : "Khách lẻ",
+          phone: isSaveCustomer ? values.phone : undefined,
+          email: isSaveCustomer ? values.email : undefined,
+          address: isSaveCustomer ? formattedAddress : "Không có",
+          note: isSaveCustomer ? values.note : undefined,
 
-        description: undefined,
-        provinceId: undefined,
-        districtId: undefined,
-        wardCode: undefined,
-      };
+          sellingOrderDetails: selectedProductsDetails.map((product) => ({
+            sellingOrderDetailId: undefined,
+            productId: product.productId,
+            productName: product.productName,
+            unit: product.unit,
+            quantity: product.quantity,
+            unitPrice: product.unitPrice,
+            totalPrice: product.totalPrice,
+          })),
 
-      console.log("hasCreateCustomer", hasCreateCustomer);
-      console.log("Creating with values", newValues);
+          description: undefined,
+          provinceId: undefined,
+          districtId: undefined,
+          wardCode: undefined,
+        };
 
-      createSellingOrder(newValues);
+        console.log("isSaveCustomer", isSaveCustomer);
+        console.log("Creating with values", newValues);
+
+        createSellingOrder(newValues);
+      }
     }
   };
 
@@ -166,6 +190,8 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
   const currentStatus = sellingOrderToUpdate?.orderStatus as OrderStatus;
   const optionsOrderStatus = useValidSellingOrderStatuses(currentStatus);
 
+  console.log("selectedProductsDetails", selectedProductsDetails);
+
   return (
     <Form
       form={form}
@@ -177,8 +203,8 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
         <div className="mb-6 flex flex-col gap-4">
           <AddCustomerToOrderForm
             form={form}
-            hasCreateCustomer={hasCreateCustomer}
-            setHasCreateCustomer={setHasCreateCustomer}
+            isSaveCustomer={isSaveCustomer}
+            setIsSaveCustomer={setIsSaveCustomer}
             setChoosenCustomer={setChoosenCustomer}
             setFormattedAddress={setFormattedAddress}
             provinceId={provinceId}
@@ -191,7 +217,16 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
             setDescription={setDescription}
           />
 
-          <AddProductToOrderForm />
+          <AddProductToOrderForm
+            selectedProductsDetails={selectedProductsDetails}
+            setSelectedProductsDetails={setSelectedProductsDetails}
+          />
+
+          <PaymentForm
+            form={form}
+            selectedProductsDetails={selectedProductsDetails}
+            choosenCustomer={isSaveCustomer ? choosenCustomer : undefined}
+          />
         </div>
       )}
 
@@ -307,9 +342,7 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
             <Button
               type="primary"
               htmlType="submit"
-              //   loading={
-              //     isCreatingOrder || isUpdatingOrder
-              //   }
+              loading={isCreatingOrder || isUpdatingOrder}
             >
               {sellingOrderToUpdate ? "Cập nhật" : "Thêm mới"}
             </Button>

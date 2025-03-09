@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Input } from "antd";
 import { useState } from "react";
 import {
-  IProduct,
+  ISellingOrderDetail,
   ProductFilterCriteria,
   SortParams,
 } from "../../../../interfaces";
@@ -11,8 +11,10 @@ import { productService } from "../../../../services";
 import FoundedProductsTable from "./FoundedProductsTable";
 
 interface FindProductProps {
-  selectedProducts: IProduct[];
-  setSelectedProducts: React.Dispatch<React.SetStateAction<IProduct[]>>;
+  selectedProductsDetails: ISellingOrderDetail[];
+  setSelectedProductsDetails: React.Dispatch<
+    React.SetStateAction<ISellingOrderDetail[]>
+  >;
 }
 
 export interface IPagination {
@@ -21,8 +23,8 @@ export interface IPagination {
 }
 
 const FindProduct: React.FC<FindProductProps> = ({
-  selectedProducts,
-  setSelectedProducts,
+  selectedProductsDetails,
+  setSelectedProductsDetails,
 }) => {
   const [pagination, setPagination] = useState<IPagination>({
     page: 1,
@@ -70,8 +72,8 @@ const FindProduct: React.FC<FindProductProps> = ({
         productPage={data?.payload}
         isLoading={isLoading}
         isFetching={isFetching}
-        selectedProducts={selectedProducts}
-        setSelectedProducts={setSelectedProducts}
+        selectedProductsDetails={selectedProductsDetails}
+        setSelectedProductsDetails={setSelectedProductsDetails}
       />
     </>
   );

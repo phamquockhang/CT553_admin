@@ -11,7 +11,12 @@ import { SorterResult } from "antd/es/table/interface";
 import { GetProp } from "antd/lib";
 import React, { useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa";
-import { IProduct, Page, SortParams } from "../../../../interfaces";
+import {
+  IProduct,
+  ISellingOrderDetail,
+  Page,
+  SortParams,
+} from "../../../../interfaces";
 import {
   colorSortDownIcon,
   colorSortUpIcon,
@@ -33,8 +38,10 @@ interface FoundedProductsTableProps {
   productPage?: Page<IProduct>;
   isLoading: boolean;
   isFetching: boolean;
-  selectedProducts: IProduct[];
-  setSelectedProducts: React.Dispatch<React.SetStateAction<IProduct[]>>;
+  selectedProductsDetails: ISellingOrderDetail[];
+  setSelectedProductsDetails: React.Dispatch<
+    React.SetStateAction<ISellingOrderDetail[]>
+  >;
 }
 
 const FoundedProductsTable: React.FC<FoundedProductsTableProps> = ({
@@ -43,8 +50,8 @@ const FoundedProductsTable: React.FC<FoundedProductsTableProps> = ({
   productPage,
   isLoading,
   isFetching,
-  selectedProducts,
-  setSelectedProducts,
+  selectedProductsDetails,
+  setSelectedProductsDetails,
 }) => {
   const [tableParams, setTableParams] = useState<TableParams>(() => ({
     paginationTable: {
@@ -105,7 +112,18 @@ const FoundedProductsTable: React.FC<FoundedProductsTableProps> = ({
   };
 
   const addToInvoice = (product: IProduct) => {
-    setSelectedProducts((prev) => [...prev, product]);
+    // setSelectedProducts((prev) => [...prev, product]);
+    const productDetail: ISellingOrderDetail = {
+      sellingOrderDetailId: product.productId,
+
+      productId: product.productId,
+      productName: product.productName,
+      unit: product.productUnit,
+      quantity: 1,
+      unitPrice: product.sellingPrice.sellingPriceValue,
+      totalPrice: product.sellingPrice.sellingPriceValue,
+    };
+    setSelectedProductsDetails((prev) => [...prev, productDetail]);
   };
 
   const columns: TableProps<IProduct>["columns"] = [
@@ -185,7 +203,7 @@ const FoundedProductsTable: React.FC<FoundedProductsTableProps> = ({
       align: "center",
 
       render: (record: IProduct) => {
-        const isAdded = selectedProducts.some(
+        const isAdded = selectedProductsDetails.some(
           (p) => p.productId === record.productId,
         );
         return (
