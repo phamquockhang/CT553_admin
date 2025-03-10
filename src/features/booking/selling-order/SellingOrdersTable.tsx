@@ -249,7 +249,10 @@ const SellingOrdersTable: React.FC<SellingOrderTableProps> = ({
       render: (record: ISellingOrder) => (
         <Space>
           <ViewSellingOrder sellingOrderId={record.sellingOrderId} />
-          <Access permission={PERMISSIONS[Module.ORDERS].UPDATE} hideChildren>
+          <Access
+            permission={PERMISSIONS[Module.SELLING_ORDERS].UPDATE}
+            hideChildren
+          >
             <UpdateSellingOrder sellingOrderId={record.sellingOrderId} />
           </Access>
           <SellingOrderStatusHistory sellingOrderId={record.sellingOrderId} />

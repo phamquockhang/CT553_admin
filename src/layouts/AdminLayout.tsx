@@ -115,8 +115,10 @@ const AdminLayout: React.FC = () => {
       //////////////////////////////////////////
       const viewOrders = permissions.find(
         (item) =>
-          item.apiPath === PERMISSIONS[Module.ORDERS].GET_PAGINATION.apiPath &&
-          item.method === PERMISSIONS[Module.ORDERS].GET_PAGINATION.method,
+          item.apiPath ===
+            PERMISSIONS[Module.SELLING_ORDERS].GET_PAGINATION.apiPath &&
+          item.method ===
+            PERMISSIONS[Module.SELLING_ORDERS].GET_PAGINATION.method,
       );
       //////////////
       const hasOrderChildren: boolean = Boolean(viewOrders);

@@ -59,7 +59,7 @@ const SellingOrder: React.FC = () => {
   useDynamicTitle("Quản lý đơn bán");
 
   return (
-    <Access permission={PERMISSIONS[Module.ORDERS].GET_PAGINATION}>
+    <Access permission={PERMISSIONS[Module.SELLING_ORDERS].GET_PAGINATION}>
       <div className="card">
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-xl font-semibold">Quản lý đơn bán</h2>
@@ -75,7 +75,10 @@ const SellingOrder: React.FC = () => {
               />
             </div>
           </div>
-          <Access permission={PERMISSIONS[Module.ORDERS].CREATE} hideChildren>
+          <Access
+            permission={PERMISSIONS[Module.SELLING_ORDERS].CREATE}
+            hideChildren
+          >
             <AddSellingOrder />
           </Access>
         </div>
