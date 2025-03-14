@@ -12,6 +12,7 @@ import Profile from "../pages/Profile";
 import Item from "../pages/Item";
 import Product from "../pages/Product";
 import SellingOrder from "../pages/SellingOrder";
+import Transactions from "../pages/Transactions";
 
 const router = createBrowserRouter([
   {
@@ -63,10 +64,10 @@ const router = createBrowserRouter([
         path: "selling-orders",
         element: <SellingOrder />,
       },
-      // {
-      //   path: "buying-orders",
-      //   element: <div>Buying Order</div>,
-      // },
+      {
+        path: "transactions",
+        element: <Transactions />,
+      },
     ],
   },
 ]);

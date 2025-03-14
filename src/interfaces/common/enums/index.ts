@@ -24,7 +24,7 @@ export enum Module {
   BUYING_PRICES = "BUYING PRICE",
   WEIGHTS = "WEIGHT",
   PAYMENT_METHODS = "PAYMENT METHOD",
-  TRANSACTION = "TRANSACTION",
+  TRANSACTIONS = "TRANSACTION",
 }
 
 export enum RoleName {
@@ -55,4 +55,12 @@ export enum PaymentStatus {
 export enum whenCreate_PaymentStatus {
   COD = "COD",
   SUCCESS = "SUCCESS",
+}
+
+export enum TransactionStatus {
+  SUCCESS = "SUCCESS",
+  PENDING = "PENDING",
+  FAILED = "FAILED",
+  EXPIRED = "EXPIRED",
+  CANCELLED = "CANCELLED",
 }
