@@ -21,6 +21,7 @@ import { Module, PERMISSIONS } from "../interfaces";
 import { authService } from "../services";
 import { FaBoxesStacked } from "react-icons/fa6";
 import { BsFillBoxSeamFill } from "react-icons/bs";
+import { GiTakeMyMoney } from "react-icons/gi";
 
 const { Header, Sider } = Layout;
 
@@ -122,6 +123,17 @@ const AdminLayout: React.FC = () => {
       );
       //////////////
       const hasOrderChildren: boolean = Boolean(viewOrders);
+
+      //////////////////////////////////////////
+      const viewTransactions = permissions.find(
+        (item) =>
+          item.apiPath ===
+            PERMISSIONS[Module.TRANSACTIONS].GET_PAGINATION.apiPath &&
+          item.method ===
+            PERMISSIONS[Module.TRANSACTIONS].GET_PAGINATION.method,
+      );
+      //////////////
+      const hasTransactionChildren: boolean = Boolean(viewTransactions);
 
       const menuItems = [
         {
@@ -229,6 +241,37 @@ const AdminLayout: React.FC = () => {
                     : []),
                 ],
               },
+            ]
+          : []),
+        ...(hasTransactionChildren
+          ? [
+              // {
+              //   label: "Giao dịch",
+              //   key: "transactions",
+              //   icon: <FaBoxesStacked />,
+              //   children: [
+              //     ...(viewTransactions
+              //       ? [
+              //           {
+              //             label: (
+              //               <NavLink to="/transactions">Giao dịch</NavLink>
+              //             ),
+              //             key: "transactions",
+              //             icon: <GiTakeMyMoney />,
+              //           },
+              //         ]
+              //       : []),
+              //   ],
+              // },
+              ...(viewTransactions
+                ? [
+                    {
+                      label: <NavLink to="/transactions">Giao dịch</NavLink>,
+                      key: "transactions",
+                      icon: <GiTakeMyMoney />,
+                    },
+                  ]
+                : []),
             ]
           : []),
       ];

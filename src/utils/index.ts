@@ -18,6 +18,7 @@ import {
   IWard,
   OrderStatus,
   PaymentStatus,
+  TransactionStatus,
 } from "../interfaces";
 
 export function useDynamicTitle(title: string) {
@@ -102,6 +103,23 @@ export function getColorOrderStatus(status: string) {
   }
 }
 
+export function getColorTransactionStatus(status: string) {
+  switch (status) {
+    case TransactionStatus.PENDING:
+      return yellow[7];
+    case TransactionStatus.SUCCESS:
+      return blue[7];
+    case TransactionStatus.FAILED:
+      return orange[6];
+    case TransactionStatus.CANCELLED:
+      return red[6];
+    case TransactionStatus.EXPIRED:
+      return greyDark[6];
+    default:
+      return grey[10];
+  }
+}
+
 export function translateOrderStatus(status: string) {
   switch (status) {
     case OrderStatus.PENDING:
@@ -177,6 +195,40 @@ export function revertPaymentStatus(status: string) {
       return PaymentStatus.FAILED;
     case "Đã thanh toán":
       return PaymentStatus.SUCCESS;
+    default:
+      return status;
+  }
+}
+
+export function translateTransactionStatus(status: string) {
+  switch (status) {
+    case TransactionStatus.PENDING:
+      return "Đang chờ xử lý";
+    case TransactionStatus.SUCCESS:
+      return "Thành công";
+    case TransactionStatus.FAILED:
+      return "Thất bại";
+    case TransactionStatus.CANCELLED:
+      return "Đã hủy";
+    case TransactionStatus.EXPIRED:
+      return "Đã hết hạn";
+    default:
+      return status;
+  }
+}
+
+export function revertTransactionStatus(status: string) {
+  switch (status) {
+    case "Đang chờ xử lý":
+      return TransactionStatus.PENDING;
+    case "Thành công":
+      return TransactionStatus.SUCCESS;
+    case "Thất bại":
+      return TransactionStatus.FAILED;
+    case "Đã hủy":
+      return TransactionStatus.CANCELLED;
+    case "Đã hết hạn":
+      return TransactionStatus.EXPIRED;
     default:
       return status;
   }
