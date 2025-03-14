@@ -9,7 +9,7 @@ import {
   ISellingOrder,
   ISellingOrderDetail,
   OrderStatus,
-  PaidStatus,
+  PaymentStatus,
 } from "../../../../interfaces";
 import { sellingOrderService } from "../../../../services";
 import {
@@ -25,7 +25,6 @@ import AddProductToOrderForm from "./AddProductToOrderForm";
 import PaymentForm from "./PaymentForm";
 import SellingOrderDetails from "./SellingOrderDetails";
 import SellingOrderStatusHistory from "./SellingOrderStatusHistory";
-import { useLoggedInUser } from "../../../auth/hooks/useLoggedInUser";
 
 interface SellingOrderFormProps {
   sellingOrderToUpdate?: ISellingOrder;
@@ -144,7 +143,7 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
         const newValues = {
           ...values,
           orderStatus: values.orderStatus as OrderStatus,
-          paymentStatus: values.paymentStatus as PaidStatus,
+          paymentStatus: values.paymentStatus as PaymentStatus,
 
           customerId: isSaveCustomer ? choosenCustomer?.customerId : undefined,
           customerName: isSaveCustomer ? values.customerName : "Khách lẻ",
@@ -201,23 +200,21 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
       : OrderStatus.COMPLETED,
     paymentStatus: sellingOrderToUpdate
       ? translatePaymentStatus(sellingOrderToUpdate.paymentStatus)
-      : PaidStatus.PAID,
+      : PaymentStatus.SUCCESS,
   };
 
-  // config order status and payment status by user role
-  const { user: currentUser } = useLoggedInUser();
+  // // config order status and payment status by user role
+  // const { user: currentUser } = useLoggedInUser();
+  // const allOrderStatuses = useValidSellingOrderStatuses();
+  // const allPaymentStatuses = useValidPaymentStatuses();
   const currentOrderStatus = sellingOrderToUpdate?.orderStatus as OrderStatus;
   const currentPaymentStatus =
-    sellingOrderToUpdate?.paymentStatus as PaidStatus;
-  const allOrderStatuses = useValidSellingOrderStatuses();
-  const allPaymentStatuses = useValidPaymentStatuses();
+    sellingOrderToUpdate?.paymentStatus as PaymentStatus;
   const validOrderStatuses = useValidSellingOrderStatuses(currentOrderStatus);
   const validPaymentStatuses = useValidPaymentStatuses(currentPaymentStatus);
 
-  const optionsOrderStatus =
-    currentUser?.role.roleId === 2 ? validOrderStatuses : allOrderStatuses;
-  const optionsPaymentStatus =
-    currentUser?.role.roleId === 2 ? validPaymentStatuses : allPaymentStatuses;
+  const optionsOrderStatus = validOrderStatuses;
+  const optionsPaymentStatus = validPaymentStatuses;
 
   // console.log("selectedProductsDetails", selectedProductsDetails);
   // console.log("sellingOrderToUpdate", sellingOrderToUpdate);

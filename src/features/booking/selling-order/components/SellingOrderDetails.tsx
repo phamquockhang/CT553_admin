@@ -2,7 +2,7 @@ import { Table, TableProps, Typography } from "antd";
 import {
   ISellingOrder,
   ISellingOrderDetail,
-  PaidStatus,
+  PaymentStatus,
 } from "../../../../interfaces";
 const { Text } = Typography;
 
@@ -106,13 +106,13 @@ const SellingOrderDetails: React.FC<SellingOrderDetailsProps> = ({
         <div className="flex justify-between text-lg font-semibold">
           <Text>Đã thanh toán:</Text>
           <Text>
-            {paymentStatus === PaidStatus.PAID
+            {paymentStatus === PaymentStatus.SUCCESS
               ? totalAmount.toLocaleString() + " VND"
               : 0 + " VND"}
           </Text>
         </div>
 
-        {earnedScore && earnedScore > 0 && (
+        {earnedScore > 0 && (
           <div className="flex justify-between text-lg font-semibold">
             <Text>Điểm tích lũy cộng thêm:</Text>
             <Text>{earnedScore.toLocaleString()} điểm </Text>

@@ -17,7 +17,7 @@ import {
   IProvince,
   IWard,
   OrderStatus,
-  PaidStatus,
+  PaymentStatus,
 } from "../interfaces";
 
 export function useDynamicTitle(title: string) {
@@ -146,9 +146,17 @@ export function revertOrderStatus(status: string) {
 
 export function translatePaymentStatus(status: string) {
   switch (status) {
-    case PaidStatus.UNPAID:
-      return "Chưa thanh toán";
-    case PaidStatus.PAID:
+    case PaymentStatus.COD:
+      return "Thanh toán khi nhận hàng";
+    case PaymentStatus.PENDING:
+      return "Đang chờ thanh toán";
+    case PaymentStatus.CANCELLED:
+      return "Đã hủy thanh toán";
+    case PaymentStatus.EXPIRED:
+      return "Đã hết hạn thanh toán";
+    case PaymentStatus.FAILED:
+      return "Lỗi trong quá trình thanh toán";
+    case PaymentStatus.SUCCESS:
       return "Đã thanh toán";
     default:
       return status;
@@ -157,10 +165,18 @@ export function translatePaymentStatus(status: string) {
 
 export function revertPaymentStatus(status: string) {
   switch (status) {
-    case "Chưa thanh toán":
-      return PaidStatus.UNPAID;
+    case "Thanh toán khi nhận hàng":
+      return PaymentStatus.COD;
+    case "Đang chờ thanh toán":
+      return PaymentStatus.PENDING;
+    case "Đã hủy thanh toán":
+      return PaymentStatus.CANCELLED;
+    case "Đã hết hạn thanh toán":
+      return PaymentStatus.EXPIRED;
+    case "Lỗi trong quá trình thanh toán":
+      return PaymentStatus.FAILED;
     case "Đã thanh toán":
-      return PaidStatus.PAID;
+      return PaymentStatus.SUCCESS;
     default:
       return status;
   }

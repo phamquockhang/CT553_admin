@@ -1,17 +1,24 @@
 import { useMemo } from "react";
-import { PaidStatus } from "../../../../interfaces";
+import {
+  PaymentStatus,
+  whenCreate_PaymentStatus,
+} from "../../../../interfaces";
 import { translatePaymentStatus } from "../../../../utils";
 
-const validTransitions: Record<PaidStatus, PaidStatus[]> = {
-  [PaidStatus.UNPAID]: [PaidStatus.PAID],
-  [PaidStatus.PAID]: [],
+const validTransitions: Record<PaymentStatus, PaymentStatus[]> = {
+  [PaymentStatus.COD]: [PaymentStatus.SUCCESS],
+  [PaymentStatus.SUCCESS]: [],
+  [PaymentStatus.PENDING]: [],
+  [PaymentStatus.FAILED]: [],
+  [PaymentStatus.CANCELLED]: [],
+  [PaymentStatus.EXPIRED]: [],
 };
 
-export const useValidPaymentStatuses = (currentStatus?: PaidStatus) => {
+export const useValidPaymentStatuses = (currentStatus?: PaymentStatus) => {
   return useMemo(() => {
     const availableStatuses = currentStatus
       ? validTransitions[currentStatus]
-      : Object.values(PaidStatus);
+      : Object.values(whenCreate_PaymentStatus);
     return availableStatuses.map((status) => ({
       value: status,
       label: translatePaymentStatus(status),

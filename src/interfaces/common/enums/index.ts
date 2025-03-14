@@ -43,7 +43,16 @@ export enum OrderStatus {
   CANCELLED = "CANCELLED",
 }
 
-export enum PaidStatus {
-  PAID = "PAID",
-  UNPAID = "UNPAID",
+export enum PaymentStatus {
+  COD = "COD",
+  PENDING = "PENDING",
+  FAILED = "FAILED",
+  CANCELLED = "CANCELLED",
+  SUCCESS = "SUCCESS",
+  EXPIRED = "EXPIRED",
+}
+
+export enum whenCreate_PaymentStatus {
+  COD = "COD",
+  SUCCESS = "SUCCESS",
 }

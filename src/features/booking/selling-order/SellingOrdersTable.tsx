@@ -15,7 +15,7 @@ import {
   Module,
   OrderStatus,
   Page,
-  PaidStatus,
+  PaymentStatus,
   PERMISSIONS,
 } from "../../../interfaces";
 import {
@@ -168,8 +168,8 @@ const SellingOrdersTable: React.FC<SellingOrderTableProps> = ({
       dataIndex: "paymentStatus",
       width: "4%",
       align: "center",
-      render: (paymentStatus: PaidStatus) => {
-        const isPaid = paymentStatus === PaidStatus.PAID;
+      render: (paymentStatus: PaymentStatus) => {
+        const isPaid = paymentStatus === PaymentStatus.SUCCESS;
         const color = getActiveColor(isPaid);
         return (
           <div className="flex items-center justify-center">
@@ -182,8 +182,8 @@ const SellingOrdersTable: React.FC<SellingOrderTableProps> = ({
         );
       },
       filters: [
-        { text: "Đã thanh toán", value: PaidStatus.PAID },
-        { text: "Chưa thanh toán", value: PaidStatus.UNPAID },
+        { text: "Đã thanh toán", value: PaymentStatus.SUCCESS },
+        { text: "Chưa thanh toán", value: PaymentStatus.COD },
       ],
       defaultFilteredValue: getDefaultFilterValue(
         searchParams,
