@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Button,
   DatePicker,
@@ -6,7 +6,6 @@ import {
   Form,
   Input,
   Radio,
-  Select,
   Space,
   Switch,
 } from "antd";
@@ -15,11 +14,8 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { ICustomer } from "../../../interfaces";
 import { IAddress } from "../../../interfaces/address";
-import {
-  addressPublicApiService,
-  addressService,
-  customerService,
-} from "../../../services";
+import { addressService, customerService } from "../../../services";
+import AddAddress from "./components/AddAddress";
 import AddressItem from "./components/AddressItem";
 
 interface UpdateCustomerFormProps {
@@ -165,47 +161,6 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
       });
     }
   }
-
-  const { data: provinceData, isLoading: isLoadingProvince } = useQuery({
-    queryKey: ["province"],
-    queryFn: async () => {
-      const response = await addressPublicApiService.getProvinces();
-      return response.data;
-    },
-  });
-
-  const provinceOptions = provinceData?.map((province) => ({
-    value: province.ProvinceID,
-    label: province.ProvinceName,
-  }));
-
-  const { data: districtData, isLoading: isLoadingDistrict } = useQuery({
-    queryKey: ["district", provinceId],
-    queryFn: async () => {
-      const response = await addressPublicApiService.getDistricts(provinceId);
-      return response.data;
-    },
-    enabled: Boolean(provinceId),
-  });
-
-  const districtOptions = districtData?.map((district) => ({
-    value: district.DistrictID,
-    label: district.DistrictName,
-  }));
-
-  const { data: wardData, isLoading: isLoadingWard } = useQuery({
-    queryKey: ["ward", districtId],
-    queryFn: async () => {
-      const response = await addressPublicApiService.getWards(districtId);
-      return response.data;
-    },
-    enabled: Boolean(districtId),
-  });
-
-  const wardOptions = wardData?.map((ward) => ({
-    value: ward.WardCode,
-    label: ward.WardName,
-  }));
 
   const sortedAddress = userToUpdate?.addresses?.sort((a, b) => {
     return (a.createdAt ?? 0) > (b.createdAt ?? 0) ? -1 : 1;
@@ -398,167 +353,18 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
           </Form.Item>
         </div>
       ) : (
-        <>
-          <div className="flex gap-8">
-            <Form.Item
-              className="flex-1"
-              label="Tỉnh/Thành phố"
-              name="provinceId"
-              rules={[
-                {
-                  required: provinceId ? true : false,
-                  message: "Vui lòng chọn tỉnh/thành phố",
-                },
-              ]}
-            >
-              <Select
-                loading={isLoadingProvince}
-                allowClear
-                showSearch
-                placeholder="Chọn tỉnh/thành phố"
-                options={provinceOptions}
-                filterOption={(input, option) =>
-                  (
-                    option?.label
-                      ?.normalize("NFD")
-                      .replace(/[\u0300-\u036f]/g, "")
-                      .toLowerCase() ?? ""
-                  ).indexOf(
-                    input
-                      .normalize("NFD")
-                      .replace(/[\u0300-\u036f]/g, "")
-                      .toLowerCase(),
-                  ) >= 0
-                }
-                onSelect={(value: number) => {
-                  if (value !== provinceId) {
-                    setProvinceId(value);
-                    setDistrictId(undefined);
-                    setWardCode(undefined);
-                    form.setFieldsValue({
-                      districtId: undefined,
-                      wardCode: undefined,
-                    });
-                  }
-                }}
-                onClear={() => {
-                  setProvinceId(undefined);
-                  setDistrictId(undefined);
-                  setWardCode(undefined);
-                  form.setFieldsValue({
-                    districtId: undefined,
-                    wardCode: undefined,
-                  });
-                }}
-              />
-            </Form.Item>
-
-            <Form.Item
-              className="flex-1"
-              label="Quận/Huyện"
-              name="districtId"
-              rules={[
-                {
-                  required: provinceId ? true : false,
-                  message: "Vui lòng chọn quận/huyện",
-                },
-              ]}
-            >
-              <Select
-                loading={isLoadingDistrict}
-                allowClear
-                showSearch
-                placeholder="Chọn quận/huyện"
-                options={districtOptions}
-                filterOption={(input, option) =>
-                  (
-                    option?.label
-                      ?.normalize("NFD")
-                      .replace(/[\u0300-\u036f]/g, "")
-                      .toLowerCase() ?? ""
-                  ).indexOf(
-                    input
-                      .normalize("NFD")
-                      .replace(/[\u0300-\u036f]/g, "")
-                      .toLowerCase(),
-                  ) >= 0
-                }
-                onSelect={(value: number) => {
-                  if (value !== districtId) {
-                    setDistrictId(value);
-                    setWardCode(undefined);
-                    form.setFieldsValue({
-                      wardCode: undefined,
-                    });
-                  }
-                }}
-                onClear={() => {
-                  setDistrictId(undefined);
-                  setWardCode(undefined);
-                  form.setFieldsValue({
-                    wardCode: undefined,
-                  });
-                }}
-              />
-            </Form.Item>
-          </div>
-
-          <div className="flex gap-8">
-            <Form.Item
-              className="flex-1"
-              label="Phường/Xã"
-              name="wardCode"
-              rules={[
-                {
-                  required: provinceId ? true : false,
-                  message: "Vui lòng chọn phường/xã",
-                },
-              ]}
-            >
-              <Select
-                loading={isLoadingWard}
-                allowClear
-                showSearch
-                placeholder="Chọn phường/xã"
-                options={wardOptions}
-                filterOption={(input, option) =>
-                  (
-                    option?.label
-                      ?.normalize("NFD")
-                      .replace(/[\u0300-\u036f]/g, "")
-                      .toLowerCase() ?? ""
-                  ).indexOf(
-                    input
-                      .normalize("NFD")
-                      .replace(/[\u0300-\u036f]/g, "")
-                      .toLowerCase(),
-                  ) >= 0
-                }
-                onSelect={(value: string) => {
-                  setWardCode(value);
-                }}
-              />
-            </Form.Item>
-
-            <Form.Item
-              className="flex-1"
-              label="Địa chỉ chi tiết"
-              name="description"
-              rules={[
-                {
-                  required: provinceId ? true : false,
-                  message: "Vui lòng nhập địa chỉ chi tiết",
-                },
-              ]}
-            >
-              <Input
-                allowClear
-                placeholder="Địa chỉ chi tiết"
-                onChange={(e) => setDescription(e.target.value)}
-              />
-            </Form.Item>
-          </div>
-        </>
+        <AddAddress
+          form={form}
+          provinceId={provinceId}
+          setProvinceId={setProvinceId}
+          districtId={districtId}
+          setDistrictId={setDistrictId}
+          wardCode={wardCode}
+          setWardCode={setWardCode}
+          description={description}
+          setDescription={setDescription}
+          setFormattedAddress={() => {}}
+        />
       )}
       {!viewOnly && (
         <Form.Item className="text-right" wrapperCol={{ span: 24 }}>

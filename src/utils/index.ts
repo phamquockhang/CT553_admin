@@ -1,9 +1,24 @@
-import { blue, green, grey, orange, red } from "@ant-design/colors";
+import {
+  blue,
+  green,
+  grey,
+  greyDark,
+  orange,
+  purple,
+  red,
+  yellow,
+} from "@ant-design/colors";
 import { SortOrder } from "antd/es/table/interface";
 import dayjs from "dayjs";
 import { useEffect } from "react";
-import { IDistrict, IProvince, IWard } from "../interfaces";
-import { FileType } from "../interfaces";
+import {
+  FileType,
+  IDistrict,
+  IProvince,
+  IWard,
+  OrderStatus,
+  PaymentStatus,
+} from "../interfaces";
 
 export function useDynamicTitle(title: string) {
   useEffect(() => {
@@ -64,6 +79,107 @@ export function getUniqueColorByString(str: string) {
   }
   const index = Math.abs(hash % colors.length);
   return colors[index];
+}
+
+export function getColorOrderStatus(status: string) {
+  switch (status) {
+    case OrderStatus.PENDING:
+      return yellow[7];
+    case OrderStatus.CONFIRMED:
+      return purple[6];
+    case OrderStatus.PREPARING:
+      return orange[6];
+    case OrderStatus.DELIVERING:
+      return greyDark[6];
+    case OrderStatus.DELIVERED:
+      return green[6];
+    case OrderStatus.COMPLETED:
+      return blue[7];
+    case OrderStatus.CANCELLED:
+      return red[5];
+    default:
+      return grey[10];
+  }
+}
+
+export function translateOrderStatus(status: string) {
+  switch (status) {
+    case OrderStatus.PENDING:
+      return "Đang chờ xác nhận";
+    case OrderStatus.CONFIRMED:
+      return "Đã xác nhận";
+    case OrderStatus.PREPARING:
+      return "Đang chuẩn bị";
+    case OrderStatus.DELIVERING:
+      return "Đang giao hàng";
+    case OrderStatus.DELIVERED:
+      return "Đã giao hàng";
+    case OrderStatus.COMPLETED:
+      return "Hoàn thành";
+    case OrderStatus.CANCELLED:
+      return "Đã hủy";
+    default:
+      return status;
+  }
+}
+
+export function revertOrderStatus(status: string) {
+  switch (status) {
+    case "Đang chờ xác nhận":
+      return OrderStatus.PENDING;
+    case "Đã xác nhận":
+      return OrderStatus.CONFIRMED;
+    case "Đang chuẩn bị":
+      return OrderStatus.PREPARING;
+    case "Đang giao hàng":
+      return OrderStatus.DELIVERING;
+    case "Đã giao hàng":
+      return OrderStatus.DELIVERED;
+    case "Hoàn thành":
+      return OrderStatus.COMPLETED;
+    case "Đã hủy":
+      return OrderStatus.CANCELLED;
+    default:
+      return status;
+  }
+}
+
+export function translatePaymentStatus(status: string) {
+  switch (status) {
+    case PaymentStatus.COD:
+      return "Thanh toán khi nhận hàng";
+    case PaymentStatus.PENDING:
+      return "Đang chờ thanh toán";
+    case PaymentStatus.CANCELLED:
+      return "Đã hủy thanh toán";
+    case PaymentStatus.EXPIRED:
+      return "Đã hết hạn thanh toán";
+    case PaymentStatus.FAILED:
+      return "Lỗi trong quá trình thanh toán";
+    case PaymentStatus.SUCCESS:
+      return "Đã thanh toán";
+    default:
+      return status;
+  }
+}
+
+export function revertPaymentStatus(status: string) {
+  switch (status) {
+    case "Thanh toán khi nhận hàng":
+      return PaymentStatus.COD;
+    case "Đang chờ thanh toán":
+      return PaymentStatus.PENDING;
+    case "Đã hủy thanh toán":
+      return PaymentStatus.CANCELLED;
+    case "Đã hết hạn thanh toán":
+      return PaymentStatus.EXPIRED;
+    case "Lỗi trong quá trình thanh toán":
+      return PaymentStatus.FAILED;
+    case "Đã thanh toán":
+      return PaymentStatus.SUCCESS;
+    default:
+      return status;
+  }
 }
 
 export function groupBy<T, K>(

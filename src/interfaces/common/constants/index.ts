@@ -48,6 +48,12 @@ export const PERMISSIONS = {
     UPDATE: { method: "PUT", apiPath: "/api/v1/products/{id}" },
     DELETE: { method: "DELETE", apiPath: "/api/v1/products/{id}" },
   },
+  [Module.SELLING_ORDERS]: {
+    GET_PAGINATION: { method: "GET", apiPath: "/api/v1/selling_orders" },
+    GET_BY_ID: { method: "GET", apiPath: "/api/v1/selling_orders/{id}" },
+    CREATE: { method: "POST", apiPath: "/api/v1/selling_orders" },
+    UPDATE: { method: "PUT", apiPath: "/api/v1/selling_orders/{id}" },
+  },
 };
 
 // export const ROUTE_TYPE_TRANSLATION: Record<RouteType, string> = {

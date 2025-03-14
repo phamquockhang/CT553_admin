@@ -11,6 +11,7 @@ import Role from "../pages/Role";
 import Profile from "../pages/Profile";
 import Item from "../pages/Item";
 import Product from "../pages/Product";
+import SellingOrder from "../pages/SellingOrder";
 
 const router = createBrowserRouter([
   {
@@ -58,6 +59,14 @@ const router = createBrowserRouter([
         path: "products",
         element: <Product />,
       },
+      {
+        path: "selling-orders",
+        element: <SellingOrder />,
+      },
+      // {
+      //   path: "buying-orders",
+      //   element: <div>Buying Order</div>,
+      // },
     ],
   },
 ]);
