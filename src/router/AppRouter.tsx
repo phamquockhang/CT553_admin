@@ -13,6 +13,7 @@ import Item from "../pages/Item";
 import Product from "../pages/Product";
 import SellingOrder from "../pages/SellingOrder";
 import Transactions from "../pages/Transactions";
+import SellingOrderInfo from "../pages/SellingOrderInfo";
 
 const router = createBrowserRouter([
   {
@@ -62,7 +63,16 @@ const router = createBrowserRouter([
       },
       {
         path: "selling-orders",
-        element: <SellingOrder />,
+        children: [
+          {
+            path: "",
+            element: <SellingOrder />,
+          },
+          {
+            path: ":sellingOrderId",
+            element: <SellingOrderInfo />,
+          },
+        ],
       },
       {
         path: "transactions",

@@ -7,8 +7,6 @@ import { Space, Table, TablePaginationConfig, TableProps, Tag } from "antd";
 import { SorterResult } from "antd/es/table/interface";
 import { GetProp } from "antd/lib";
 import React, { useEffect, useState } from "react";
-import { FaCheck } from "react-icons/fa";
-import { RiCloseFill } from "react-icons/ri";
 import { useSearchParams } from "react-router-dom";
 import {
   ISellingOrder,
@@ -23,16 +21,17 @@ import {
   colorSortDownIcon,
   colorSortUpIcon,
   formatTimestamp,
-  getActiveColor,
   getColorOrderStatus,
+  getColorPaymentStatus,
   getDefaultFilterValue,
   getDefaultSortOrder,
   getSortDirection,
   translateOrderStatus,
+  translatePaymentStatus,
 } from "../../../utils";
-import ViewSellingOrder from "./ViewSellingOrder";
 import Access from "../../auth/Access";
 import UpdateSellingOrder from "./UpdateSellingOrder";
+import ViewSellingOrder from "./ViewSellingOrder";
 import SellingOrderStatusHistory from "./components/SellingOrderStatusHistory";
 
 interface TableParams {
@@ -164,27 +163,24 @@ const SellingOrdersTable: React.FC<SellingOrderTableProps> = ({
     },
     {
       key: "paymentStatus",
-      title: "Đã thanh toán",
+      title: "Trạng thái thanh toán",
       dataIndex: "paymentStatus",
       width: "4%",
       align: "center",
-      render: (paymentStatus: PaymentStatus) => {
-        const isPaid = paymentStatus === PaymentStatus.SUCCESS;
-        const color = getActiveColor(isPaid);
+      render: (text, record) => {
+        const paymentStatus = record.paymentStatus;
+        const color = getColorPaymentStatus(paymentStatus);
+        const translatedStatus = translatePaymentStatus(paymentStatus);
         return (
-          <div className="flex items-center justify-center">
-            {isPaid ? (
-              <FaCheck style={{ color }} />
-            ) : (
-              <RiCloseFill className="text-2xl" style={{ color }} />
-            )}
-          </div>
+          <Tag className="m-0 px-1" color={color}>
+            {translatedStatus}
+          </Tag>
         );
       },
-      filters: [
-        { text: "Đã thanh toán", value: PaymentStatus.SUCCESS },
-        { text: "Chưa thanh toán", value: PaymentStatus.COD },
-      ],
+      filters: Object.values(PaymentStatus).map((status) => ({
+        text: translatePaymentStatus(status),
+        value: status,
+      })),
       defaultFilteredValue: getDefaultFilterValue(
         searchParams,
         "paymentStatus",
@@ -227,7 +223,7 @@ const SellingOrdersTable: React.FC<SellingOrderTableProps> = ({
       key: "createdAt",
       title: "Ngày tạo",
       dataIndex: "createdAt",
-      width: "9%",
+      width: "5%",
       align: "center",
       render: (createdAt: string) =>
         createdAt ? formatTimestamp(createdAt) : "",
@@ -243,7 +239,7 @@ const SellingOrdersTable: React.FC<SellingOrderTableProps> = ({
     {
       title: "Hành động",
       key: "action",
-      width: "7%",
+      width: "5%",
       align: "center",
 
       render: (record: ISellingOrder) => (

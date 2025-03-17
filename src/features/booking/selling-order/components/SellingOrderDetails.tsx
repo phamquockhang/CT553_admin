@@ -85,7 +85,10 @@ const SellingOrderDetails: React.FC<SellingOrderDetailsProps> = ({
 
       <div className="border-t pt-4">
         <div className="flex justify-between">
-          <Text>Tổng tiền hàng:</Text>
+          <Text>
+            Tổng tiền hàng{" "}
+            <span className="font-normal italic">(trước VAT):</span>
+          </Text>
           <Text>{totalPrice.toLocaleString()} VND</Text>
         </div>
 
@@ -99,7 +102,9 @@ const SellingOrderDetails: React.FC<SellingOrderDetailsProps> = ({
         )}
 
         <div className="flex justify-between text-lg font-semibold">
-          <Text>Thành tiền:</Text>
+          <Text>
+            Thành tiền <span className="font-normal italic">(sau VAT):</span>
+          </Text>
           <Text className="">{totalAmount.toLocaleString()} VND</Text>
         </div>
 

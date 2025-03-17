@@ -103,6 +103,25 @@ export function getColorOrderStatus(status: string) {
   }
 }
 
+export function getColorPaymentStatus(status: string) {
+  switch (status) {
+    case PaymentStatus.COD:
+      return "green";
+    case PaymentStatus.PENDING:
+      return "yellow";
+    case PaymentStatus.CANCELLED:
+      return "red";
+    case PaymentStatus.EXPIRED:
+      return "gray";
+    case PaymentStatus.FAILED:
+      return "orange";
+    case PaymentStatus.SUCCESS:
+      return "blue";
+    default:
+      return "gray";
+  }
+}
+
 export function getColorTransactionStatus(status: string) {
   switch (status) {
     case TransactionStatus.PENDING:
@@ -173,7 +192,7 @@ export function translatePaymentStatus(status: string) {
     case PaymentStatus.EXPIRED:
       return "Đã hết hạn thanh toán";
     case PaymentStatus.FAILED:
-      return "Lỗi trong quá trình thanh toán";
+      return "Lỗi";
     case PaymentStatus.SUCCESS:
       return "Đã thanh toán";
     default:
