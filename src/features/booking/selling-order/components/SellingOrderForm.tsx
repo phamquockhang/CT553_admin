@@ -28,13 +28,11 @@ import SellingOrderStatusHistory from "./SellingOrderStatusHistory";
 
 interface SellingOrderFormProps {
   sellingOrderToUpdate?: ISellingOrder;
-  onCancel: () => void;
   viewMode?: boolean;
 }
 
 const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
   sellingOrderToUpdate,
-  onCancel,
   viewMode = false,
 }) => {
   const [form] = Form.useForm();
@@ -70,7 +68,6 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
             query.queryKey.includes("selling_order") ||
             query.queryKey.includes("customers"),
         });
-        onCancel();
 
         if (data.success) toast.success(data.message || "Operation successful");
         else if (!data.success) toast.error(data.message || "Operation failed");
@@ -103,7 +100,6 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
             query.queryKey.includes("selling_order") ||
             query.queryKey.includes("customers"),
         });
-        onCancel();
 
         if (data.success) toast.success(data.message || "Operation successful");
         else if (!data.success) toast.error(data.message || "Operation failed");
@@ -218,6 +214,7 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
 
   // console.log("selectedProductsDetails", selectedProductsDetails);
   // console.log("sellingOrderToUpdate", sellingOrderToUpdate);
+  console.log("initialValues", initialValues);
 
   return (
     <Form
@@ -328,7 +325,13 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
               }
               name="orderStatus"
             >
-              <Select disabled={viewMode}>
+              <Select
+                disabled={
+                  viewMode ||
+                  initialValues.orderStatus ===
+                    translateOrderStatus(OrderStatus.COMPLETED)
+                }
+              >
                 {optionsOrderStatus.map(({ value, label }) => (
                   <Select.Option key={value} value={value}>
                     {label}
@@ -343,7 +346,13 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
               label="Trạng thái thanh toán"
               name="paymentStatus"
             >
-              <Select disabled={viewMode}>
+              <Select
+                disabled={
+                  viewMode ||
+                  initialValues.paymentStatus ===
+                    translatePaymentStatus(PaymentStatus.SUCCESS)
+                }
+              >
                 {optionsPaymentStatus.map(({ value, label }) => (
                   <Select.Option key={value} value={value}>
                     {label}
@@ -400,11 +409,11 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
       )}
 
       {!viewMode && (
-        <Form.Item className="text-right" wrapperCol={{ span: 24 }}>
+        <Form.Item className="m-0 mt-5 text-right" wrapperCol={{ span: 24 }}>
           <Space>
             <Button
               disabled={isCreatingOrder || isUpdatingOrder}
-              onClick={onCancel}
+              onClick={() => window.history.back()}
             >
               Hủy
             </Button>
