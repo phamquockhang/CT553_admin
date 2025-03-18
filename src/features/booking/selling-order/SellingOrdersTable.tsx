@@ -127,7 +127,7 @@ const SellingOrdersTable: React.FC<SellingOrderTableProps> = ({
   const columns: TableProps<ISellingOrder>["columns"] = [
     {
       title: "STT",
-      width: "2%",
+      width: "1%",
       align: "center",
       render: (_, __, index) =>
         ((tableParams.pagination.current || 1) - 1) *
@@ -140,13 +140,13 @@ const SellingOrdersTable: React.FC<SellingOrderTableProps> = ({
       key: "sellingOrderId",
       dataIndex: "sellingOrderId",
       align: "left",
-      width: "7%",
+      width: "16%",
     },
     {
       title: "Giá trị đơn hàng (VNĐ)",
       key: "totalAmount",
       dataIndex: "totalAmount",
-      width: "7%",
+      width: "15%",
       align: "right",
       render: (text, record) => {
         const totalAmount = record.totalAmount.toLocaleString();
@@ -165,7 +165,7 @@ const SellingOrdersTable: React.FC<SellingOrderTableProps> = ({
       key: "paymentStatus",
       title: "Trạng thái thanh toán",
       dataIndex: "paymentStatus",
-      width: "4%",
+      // width: "5%",
       align: "center",
       render: (text, record) => {
         const paymentStatus = record.paymentStatus;
@@ -193,7 +193,7 @@ const SellingOrdersTable: React.FC<SellingOrderTableProps> = ({
       key: "orderStatus",
       title: "Trạng thái đơn hàng",
       dataIndex: "orderStatus",
-      width: "3%",
+      // width: "5%",
       align: "center",
       render: (text, record) => {
         const orderStatus = record.orderStatus;
@@ -223,7 +223,7 @@ const SellingOrdersTable: React.FC<SellingOrderTableProps> = ({
       key: "createdAt",
       title: "Ngày tạo",
       dataIndex: "createdAt",
-      width: "5%",
+      width: "15%",
       align: "center",
       render: (createdAt: string) =>
         createdAt ? formatTimestamp(createdAt) : "",
@@ -239,7 +239,7 @@ const SellingOrdersTable: React.FC<SellingOrderTableProps> = ({
     {
       title: "Hành động",
       key: "action",
-      width: "5%",
+      width: "4%",
       align: "center",
 
       render: (record: ISellingOrder) => (
