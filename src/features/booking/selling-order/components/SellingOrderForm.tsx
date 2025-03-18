@@ -8,6 +8,7 @@ import {
   ICustomer,
   ISellingOrder,
   ISellingOrderDetail,
+  IVoucher,
   OrderStatus,
   PaymentStatus,
 } from "../../../../interfaces";
@@ -29,11 +30,13 @@ import SellingOrderStatusHistory from "./SellingOrderStatusHistory";
 interface SellingOrderFormProps {
   sellingOrderToUpdate?: ISellingOrder;
   viewMode?: boolean;
+  onCancel?: () => void;
 }
 
 const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
   sellingOrderToUpdate,
   viewMode = false,
+  onCancel,
 }) => {
   const [form] = Form.useForm();
   const queryClient = useQueryClient();
@@ -54,6 +57,7 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
   const address = choosenCustomer?.addresses.find(
     (address) => address.isDefault,
   );
+  const [useVoucher, setUseVoucher] = useState<IVoucher>();
 
   const { mutate: createSellingOrder, isPending: isCreatingOrder } =
     useMutation({
@@ -148,6 +152,8 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
           address: isSaveCustomer ? formattedAddress : undefined,
           note: isSaveCustomer ? values.note : undefined,
 
+          voucherCode: useVoucher ? useVoucher.voucherCode : undefined,
+
           sellingOrderDetails: selectedProductsDetails.map((product) => ({
             sellingOrderDetailId: undefined,
             productId: product.productId,
@@ -214,7 +220,7 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
 
   // console.log("selectedProductsDetails", selectedProductsDetails);
   // console.log("sellingOrderToUpdate", sellingOrderToUpdate);
-  console.log("initialValues", initialValues);
+  // console.log("initialValues", initialValues);
 
   return (
     <Form
@@ -281,6 +287,8 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
             form={form}
             selectedProductsDetails={selectedProductsDetails}
             choosenCustomer={isSaveCustomer ? choosenCustomer : undefined}
+            useVoucher={useVoucher}
+            setUseVoucher={setUseVoucher}
           />
         </div>
       )}
@@ -413,9 +421,12 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
           <Space>
             <Button
               disabled={isCreatingOrder || isUpdatingOrder}
-              onClick={() => window.history.back()}
+              onClick={() => {
+                if (onCancel) onCancel();
+                else window.history.back();
+              }}
             >
-              Hủy
+              Thoát
             </Button>
 
             <Button
