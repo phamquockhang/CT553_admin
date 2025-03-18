@@ -1,11 +1,14 @@
 import { InfoCircleOutlined } from "@ant-design/icons";
-import { Checkbox, Form, FormInstance, Tooltip, Typography, Alert } from "antd";
+import { Alert, Checkbox, Form, FormInstance, Tooltip, Typography } from "antd";
 import { useEffect, useState } from "react";
 import {
+  DiscountType,
   ICustomer,
   ISellingOrderDetail,
+  IVoucher,
   POINT_VALUE,
 } from "../../../../interfaces";
+import ValidVouchers from "./ValidVouchers";
 
 const { Title, Text } = Typography;
 
@@ -13,77 +16,129 @@ interface PaymentFormProps {
   form: FormInstance;
   selectedProductsDetails: ISellingOrderDetail[];
   choosenCustomer?: ICustomer;
+  useVoucher: IVoucher | undefined;
+  setUseVoucher: React.Dispatch<React.SetStateAction<IVoucher | undefined>>;
 }
 
 const PaymentForm: React.FC<PaymentFormProps> = ({
   form,
   selectedProductsDetails,
   choosenCustomer,
+  useVoucher,
+  setUseVoucher,
 }) => {
-  console.log("choosenCustomer", choosenCustomer);
-  const [totalAmount, setTotalAmount] = useState(0);
+  // console.log("choosenCustomer", choosenCustomer);
+  const [basicOrderTotal, setBasicOrderTotal] = useState(0);
   const [usePoints, setUsePoints] = useState(false);
   const maxPointsAvailable = choosenCustomer?.score?.newValue || 0;
 
   // Maximum usable points based on order value
-  const [maxUsablePoints, setMaxUsablePoints] = useState(0);
-  const [discountAmount, setDiscountAmount] = useState(0);
-  const [finalAmount, setFinalAmount] = useState(0);
+  const [maxUsableScores, setMaxUsableScores] = useState(0);
+  const [scoreDiscount, setScoreDiscount] = useState(0);
+  const [finalAmountAfterScoreDiscount, setFinalAmountAfterScoreDiscount] =
+    useState(0);
+
+  const [voucherDiscount, setVoucherDiscount] = useState(0);
 
   useEffect(() => {
-    const newTotalAmount = selectedProductsDetails.reduce(
+    const newBasicOrderTotal = selectedProductsDetails.reduce(
       (total, product) => total + product.totalPrice,
       0,
     );
-    setTotalAmount(newTotalAmount);
-    form.setFieldsValue({ totalAmount: newTotalAmount });
+    setBasicOrderTotal(newBasicOrderTotal);
+    form.setFieldsValue({ totalAmount: newBasicOrderTotal });
 
     // Calculate maximum usable points based on order value
     const newMaxUsablePoints = Math.min(
       maxPointsAvailable,
-      Math.floor(newTotalAmount / POINT_VALUE),
+      Math.floor(newBasicOrderTotal / POINT_VALUE),
     );
-    setMaxUsablePoints(newMaxUsablePoints);
+    setMaxUsableScores(newMaxUsablePoints);
 
     // Calculate discount and final amount when total amount or usePoints changes
+    const calculatedScoreDiscount = newMaxUsablePoints * POINT_VALUE;
     if (usePoints) {
-      const calculatedDiscount = newMaxUsablePoints * POINT_VALUE;
-      setDiscountAmount(calculatedDiscount);
-      setFinalAmount(newTotalAmount - calculatedDiscount);
+      setScoreDiscount(calculatedScoreDiscount);
+      setFinalAmountAfterScoreDiscount(
+        newBasicOrderTotal - calculatedScoreDiscount,
+      );
     } else {
-      setDiscountAmount(0);
-      setFinalAmount(newTotalAmount);
+      setScoreDiscount(0);
+      setFinalAmountAfterScoreDiscount(newBasicOrderTotal);
     }
-  }, [selectedProductsDetails, maxPointsAvailable, usePoints, form]);
+
+    if (useVoucher) {
+      if (usePoints) {
+        if (useVoucher.discountType === DiscountType.PERCENTAGE) {
+          const discountValueByPercentage =
+            (newBasicOrderTotal - scoreDiscount) *
+            (useVoucher.discountValue / 100);
+          if (
+            useVoucher.maxDiscount &&
+            discountValueByPercentage > useVoucher.maxDiscount
+          ) {
+            setVoucherDiscount(useVoucher.maxDiscount);
+          } else {
+            setVoucherDiscount(discountValueByPercentage);
+          }
+        } else {
+          setVoucherDiscount(useVoucher.discountValue);
+        }
+      } else {
+        if (useVoucher.discountType === DiscountType.PERCENTAGE) {
+          const discountValueByPercentage =
+            newBasicOrderTotal * (useVoucher.discountValue / 100);
+          if (
+            useVoucher.maxDiscount &&
+            discountValueByPercentage > useVoucher.maxDiscount
+          ) {
+            setVoucherDiscount(useVoucher.maxDiscount);
+          } else {
+            setVoucherDiscount(discountValueByPercentage);
+          }
+        } else {
+          setVoucherDiscount(useVoucher.discountValue);
+        }
+      }
+    } else {
+      setVoucherDiscount(0);
+    }
+  }, [
+    selectedProductsDetails,
+    maxPointsAvailable,
+    usePoints,
+    form,
+    useVoucher,
+    scoreDiscount,
+  ]);
 
   useEffect(() => {
     // Update form values when discount changes
     form.setFieldsValue({
-      totalAmount: finalAmount,
-      usedScore: usePoints ? maxUsablePoints : 0,
+      usedScore: usePoints ? maxUsableScores : 0,
     });
-  }, [finalAmount, maxUsablePoints, usePoints, form]);
+  }, [maxUsableScores, usePoints, form]);
 
   const handleUsePointsChange = (checked: boolean) => {
     setUsePoints(checked);
 
     if (checked) {
-      const calculatedDiscount = maxUsablePoints * POINT_VALUE;
-      setDiscountAmount(calculatedDiscount);
-      setFinalAmount(totalAmount - calculatedDiscount);
+      const calculatedDiscount = maxUsableScores * POINT_VALUE;
+      setScoreDiscount(calculatedDiscount);
+      setFinalAmountAfterScoreDiscount(basicOrderTotal - calculatedDiscount);
     } else {
-      setDiscountAmount(0);
-      setFinalAmount(totalAmount);
+      setScoreDiscount(0);
+      setFinalAmountAfterScoreDiscount(basicOrderTotal);
     }
   };
 
   // Format the points for display
-  const formattedUsablePoints = maxUsablePoints.toLocaleString();
+  const formattedUsablePoints = maxUsableScores.toLocaleString();
   const formattedAvailablePoints = maxPointsAvailable.toLocaleString();
-  const discountValue = (maxUsablePoints * POINT_VALUE).toLocaleString();
+  const discountValue = (maxUsableScores * POINT_VALUE).toLocaleString();
 
   // Check if we're using partial points
-  const isPartialPointsUsage = maxUsablePoints < maxPointsAvailable;
+  const isPartialPointsUsage = maxUsableScores < maxPointsAvailable;
 
   return (
     <div className="rounded-md border border-gray-200 p-4">
@@ -103,7 +158,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               <Checkbox
                 checked={usePoints}
                 onChange={(e) => handleUsePointsChange(e.target.checked)}
-                disabled={!maxPointsAvailable || maxUsablePoints === 0}
+                disabled={!maxPointsAvailable || maxUsableScores === 0}
               >
                 Sử dụng điểm để giảm giá
               </Checkbox>
@@ -141,13 +196,22 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             </div>
           </div>
         )}
+
+        <ValidVouchers
+          totalAmount={basicOrderTotal}
+          useVoucher={useVoucher}
+          setUseVoucher={setUseVoucher}
+        />
       </div>
 
       <div className="border-t pt-4">
         <Form.Item className="mb-0" name="totalAmount">
           <div className="flex justify-between">
-            <Text>Tổng tiền hàng:</Text>
-            <Text>{totalAmount.toLocaleString()} VND</Text>
+            <Text>
+              Tổng tiền hàng{" "}
+              <span className="font-normal italic">(trước VAT):</span>
+            </Text>
+            <Text>{basicOrderTotal.toLocaleString()} VND</Text>
           </div>
         </Form.Item>
 
@@ -156,7 +220,18 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             <div className="flex justify-between">
               <Text>Giảm giá từ điểm:</Text>
               <Text className="text-red-500">
-                -{discountAmount.toLocaleString()} VND
+                -{scoreDiscount.toLocaleString()} VND
+              </Text>
+            </div>
+          </Form.Item>
+        )}
+
+        {useVoucher && (
+          <Form.Item className="mb-0">
+            <div className="flex justify-between">
+              <Text>Giảm giá từ voucher:</Text>
+              <Text className="text-red-500">
+                -{voucherDiscount.toLocaleString()} VND
               </Text>
             </div>
           </Form.Item>
@@ -164,8 +239,15 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
 
         <Form.Item className="m-0 font-semibold" name="finalAmount">
           <div className="flex justify-between">
-            <Text>Thành tiền:</Text>
-            <Text>{finalAmount.toLocaleString()} VND</Text>
+            <Text>
+              Thành tiền <span className="font-normal italic">(sau VAT):</span>
+            </Text>
+            <Text>
+              {(
+                finalAmountAfterScoreDiscount - voucherDiscount
+              ).toLocaleString()}{" "}
+              VND
+            </Text>
           </div>
         </Form.Item>
       </div>
@@ -175,7 +257,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       </Form.Item> */}
 
       <Form.Item className="hidden" name="usedScore">
-        {usePoints ? maxUsablePoints : 0}
+        {usePoints ? maxUsableScores : 0}
       </Form.Item>
     </div>
   );

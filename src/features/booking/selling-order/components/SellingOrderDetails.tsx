@@ -23,7 +23,10 @@ const SellingOrderDetails: React.FC<SellingOrderDetailsProps> = ({
     paymentStatus,
     sellingOrderDetails,
     totalAmount,
+    usedVoucher,
   } = sellingOrder;
+
+  console.log("sellingOrder", sellingOrder);
 
   const totalPrice = sellingOrderDetails.reduce(
     (total, product) => total + product.totalPrice,
@@ -97,6 +100,15 @@ const SellingOrderDetails: React.FC<SellingOrderDetailsProps> = ({
             <Text>Giảm giá từ điểm:</Text>
             <Text className="text-red-500">
               -{usedScore.toLocaleString()} VND
+            </Text>
+          </div>
+        )}
+
+        {usedVoucher && (
+          <div className="flex justify-between">
+            <Text>Giảm giá từ voucher:</Text>
+            <Text className="text-red-500">
+              -{usedVoucher.discountAmount.toLocaleString()} VND
             </Text>
           </div>
         )}

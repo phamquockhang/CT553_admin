@@ -36,5 +36,16 @@
 
   .right-input .ant-input-number-input {
     text-align: right !important;
+    padding-right: 25px !important;
+  }
+
+  .centered-input .ant-input-number-input {
+    text-align: center !important;
+    padding: 0 !important;
+    /* margin: 0 !important; */
+  }
+
+  .centered-input .ant-input-number-group-addon {
+    padding: 0 !important;
   }
 }

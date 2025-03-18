@@ -359,7 +359,7 @@ const AdminLayout: React.FC = () => {
       >
         <Header
           style={headerStyle}
-          className="shadow-md transition-all duration-200"
+          className="max-w-screen-2xl shadow-md transition-all duration-200"
         >
           <div className="flex items-center justify-between">
             <Button
@@ -405,7 +405,7 @@ const AdminLayout: React.FC = () => {
           </div>
         </Header>
 
-        <Layout.Content>
+        <Layout.Content className="max-w-screen-2xl">
           <div className="m-2 mt-[70px]">
             <Outlet />
           </div>

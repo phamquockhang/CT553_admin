@@ -1,3 +1,5 @@
+import { DiscountType, VoucherStatus } from "../common";
+
 export interface ISellingOrder {
   sellingOrderId: string;
   customerId?: string;
@@ -13,6 +15,7 @@ export interface ISellingOrder {
   orderStatus: string;
   orderStatuses: IOrderStatus[];
   sellingOrderDetails: ISellingOrderDetail[];
+  usedVoucher?: IUsedVoucher;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -41,6 +44,46 @@ export interface ISellingOrderDetail {
 export interface SellingOrderFilterCriteria {
   orderStatus?: string;
   paymentStatus?: string;
+}
+
+export interface IVoucher {
+  voucherId: number;
+  voucherCode: string;
+  status: VoucherStatus;
+  discountType: DiscountType;
+  discountValue: number;
+  minOrderValue: number;
+  maxDiscount?: number;
+  startDate: string;
+  endDate: string;
+  usageLimit: number;
+  usedCount: number;
+  usedVoucher?: IUsedVoucher[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface IBriefVoucher {
+  discountType: string;
+  discountValue: number;
+  minOrderValue: number;
+  maxDiscount?: number;
+  startDate: string;
+  endDate: string;
+  usageLimit: number;
+}
+
+export interface VoucherFilterCriteria {
+  status?: string;
+  discountType?: string;
+}
+
+export interface IUsedVoucher {
+  usedVoucherId: number;
+  voucherCode: string;
+  sellingOrderId: string;
+  discountAmount: number;
+  createdAt: string;
 }
 
 export const POINT_VALUE = 1;
