@@ -43,6 +43,19 @@ export enum OrderStatus {
   CANCELLED = "CANCELLED",
 }
 
+export enum VoucherStatus {
+  INACTIVE = "INACTIVE",
+  ACTIVE = "ACTIVE",
+  OUT_OF_USE = "OUT_OF_USE",
+  EXPIRED = "EXPIRED",
+  DISABLED = "DISABLED",
+}
+
+export enum DiscountType {
+  PERCENTAGE = "PERCENTAGE",
+  AMOUNT = "AMOUNT",
+}
+
 export enum PaymentStatus {
   COD = "COD",
   PENDING = "PENDING",
