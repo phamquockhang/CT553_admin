@@ -11,7 +11,11 @@ import {
   FaUserCog,
   FaUsers,
 } from "react-icons/fa";
-import { IoIosNotifications } from "react-icons/io";
+import {
+  IoIosNotifications,
+  IoMdArrowDropleft,
+  IoMdArrowDropright,
+} from "react-icons/io";
 import { IoShieldCheckmark } from "react-icons/io5";
 import { MdCategory, MdDashboard } from "react-icons/md";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -66,6 +70,15 @@ const AdminLayout: React.FC = () => {
       ),
     },
   ];
+
+  useEffect(() => {
+    const newKeys =
+      location.pathname === "/"
+        ? ["dashboard"]
+        : location.pathname.slice(1).split("/");
+
+    setSelectedKeys(newKeys);
+  }, [location.pathname]);
 
   useEffect(() => {
     if (user?.role.permissions) {
@@ -362,14 +375,33 @@ const AdminLayout: React.FC = () => {
           className="max-w-screen-2xl shadow-md transition-all duration-200"
         >
           <div className="flex items-center justify-between">
-            <Button
-              type="text"
-              icon={collapsed ? <AiOutlineMenuUnfold /> : <AiOutlineMenuFold />}
-              onClick={() => setCollapsed(!collapsed)}
-              style={{
-                fontSize: "20px",
-              }}
-            />
+            <div className="flex items-center gap-3">
+              <Tooltip title={collapsed ? "Mở menu" : "Đóng menu"}>
+                <Button
+                  type="text"
+                  icon={
+                    collapsed ? <AiOutlineMenuUnfold /> : <AiOutlineMenuFold />
+                  }
+                  onClick={() => setCollapsed(!collapsed)}
+                  style={{
+                    fontSize: "20px",
+                  }}
+                />
+              </Tooltip>
+              <Tooltip title="Quay lại">
+                <IoMdArrowDropleft
+                  className="text-2xl"
+                  onClick={() => window.history.back()}
+                />
+              </Tooltip>
+              <Tooltip title="Đi tới">
+                <IoMdArrowDropright
+                  className="text-2xl"
+                  onClick={() => window.history.forward()}
+                />
+              </Tooltip>
+            </div>
+
             <div className="relative mr-5 flex items-center gap-3">
               <Tooltip title="Thông báo">
                 <NavLink to="/notifications">
