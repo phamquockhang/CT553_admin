@@ -393,13 +393,13 @@ const AdminLayout: React.FC = () => {
                   }}
                 />
               </Tooltip>
-              <Tooltip title="Quay lại">
+              <Tooltip className="cursor-pointer" title="Quay lại">
                 <IoMdArrowDropleft
                   className="text-2xl"
                   onClick={() => window.history.back()}
                 />
               </Tooltip>
-              <Tooltip title="Đi tới">
+              <Tooltip title="Đi tới" className="cursor-pointer">
                 <IoMdArrowDropright
                   className="text-2xl"
                   onClick={() => window.history.forward()}

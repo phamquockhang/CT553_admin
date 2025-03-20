@@ -7,17 +7,20 @@ import { Space, Table, TablePaginationConfig, TableProps, Tag } from "antd";
 import { SorterResult } from "antd/es/table/interface";
 import { GetProp } from "antd/lib";
 import React, { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import {
   DiscountType,
   IVoucher,
+  Module,
   Page,
+  PERMISSIONS,
   VoucherStatus,
 } from "../../../interfaces";
 import {
   colorFilterIcon,
   colorSortDownIcon,
   colorSortUpIcon,
+  formatTime,
   formatTimestamp,
   getColorDiscountType,
   getColorVoucherStatus,
@@ -27,6 +30,9 @@ import {
   translateDiscountType,
   translateVoucherStatus,
 } from "../../../utils";
+import Access from "../../auth/Access";
+import ViewVoucher from "./ViewVoucher";
+import UpdateVoucher from "./UpdateVoucher";
 
 interface TableParams {
   pagination: TablePaginationConfig;
@@ -54,7 +60,6 @@ const VouchersTable: React.FC<VoucherTableProps> = ({
       showTotal: (total) => `Tổng ${total} mã giảm giá`,
     },
   }));
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (voucherPage) {
@@ -184,63 +189,13 @@ const VouchersTable: React.FC<VoucherTableProps> = ({
         <FilterFilled style={{ color: colorFilterIcon(filtered) }} />
       ),
     },
-    // {
-    //   title: "Giá trị giảm",
-    //   key: "discountValue",
-    //   dataIndex: "discountValue",
-    //   // width: "5%",
-    //   align: "right",
-    //   render: (_, record) => {
-    //     const discountValue = record.discountValue.toLocaleString();
-    //     return <p>{discountValue}</p>;
-    //   },
-    //   sorter: true,
-    //   defaultSortOrder: getDefaultSortOrder(searchParams, "discountValue"),
-    //   sortIcon: ({ sortOrder }) => (
-    //     <div className="flex flex-col text-[10px]">
-    //       <CaretUpFilled style={{ color: colorSortUpIcon(sortOrder) }} />
-    //       <CaretDownFilled style={{ color: colorSortDownIcon(sortOrder) }} />
-    //     </div>
-    //   ),
-    // },
-    // {
-    //   title: "Giá trị đơn hàng tối thiểu",
-    //   key: "minOrderValue",
-    //   dataIndex: "minOrderValue",
-    //   // width: "5%",
-    //   align: "right",
-    //   render: (_, record) => {
-    //     const minOrderValue = record.minOrderValue.toLocaleString();
-    //     return <p>{minOrderValue}</p>;
-    //   },
-    //   sorter: true,
-    //   defaultSortOrder: getDefaultSortOrder(searchParams, "minOrderValue"),
-    //   sortIcon: ({ sortOrder }) => (
-    //     <div className="flex flex-col text-[10px]">
-    //       <CaretUpFilled style={{ color: colorSortUpIcon(sortOrder) }} />
-    //       <CaretDownFilled style={{ color: colorSortDownIcon(sortOrder) }} />
-    //     </div>
-    //   ),
-    // },
-    // {
-    //   title: "Giá trị giảm tối đa",
-    //   key: "maxDiscount",
-    //   dataIndex: "maxDiscount",
-    //   // width: "5%",
-    //   align: "right",
-    //   render: (_, record) => {
-    //     const maxDiscount = record.maxDiscount?.toLocaleString();
-    //     return <p>{maxDiscount || "Không có"}</p>;
-    //   },
-    // },
     {
       title: "Bắt đầu từ",
       key: "startDate",
       dataIndex: "startDate",
-      width: "15%",
+      //   width: "15%",
       align: "center",
-      render: (startDate: string) =>
-        startDate ? formatTimestamp(startDate) : "",
+      render: (startDate: string) => (startDate ? formatTime(startDate) : ""),
       sorter: true,
       defaultSortOrder: getDefaultSortOrder(searchParams, "startDate"),
       sortIcon: ({ sortOrder }) => (
@@ -254,9 +209,9 @@ const VouchersTable: React.FC<VoucherTableProps> = ({
       title: "Kết thúc vào",
       key: "endDate",
       dataIndex: "endDate",
-      width: "15%",
+      //   width: "15%",
       align: "center",
-      render: (endDate: string) => (endDate ? formatTimestamp(endDate) : ""),
+      render: (endDate: string) => (endDate ? formatTime(endDate) : ""),
       sorter: true,
       defaultSortOrder: getDefaultSortOrder(searchParams, "endDate"),
       sortIcon: ({ sortOrder }) => (
@@ -308,12 +263,29 @@ const VouchersTable: React.FC<VoucherTableProps> = ({
       key: "createdAt",
       title: "Ngày tạo",
       dataIndex: "createdAt",
-      width: "15%",
+      width: "12%",
       align: "center",
       render: (createdAt: string) =>
         createdAt ? formatTimestamp(createdAt) : "",
       sorter: true,
       defaultSortOrder: getDefaultSortOrder(searchParams, "createdAt"),
+      sortIcon: ({ sortOrder }) => (
+        <div className="flex flex-col text-[10px]">
+          <CaretUpFilled style={{ color: colorSortUpIcon(sortOrder) }} />
+          <CaretDownFilled style={{ color: colorSortDownIcon(sortOrder) }} />
+        </div>
+      ),
+    },
+    {
+      key: "updatedAt",
+      title: "Ngày cập nhật",
+      dataIndex: "updatedAt",
+      width: "12%",
+      align: "center",
+      render: (updatedAt: string) =>
+        updatedAt ? formatTimestamp(updatedAt) : "",
+      sorter: true,
+      defaultSortOrder: getDefaultSortOrder(searchParams, "updatedAt"),
       sortIcon: ({ sortOrder }) => (
         <div className="flex flex-col text-[10px]">
           <CaretUpFilled style={{ color: colorSortUpIcon(sortOrder) }} />
@@ -329,14 +301,10 @@ const VouchersTable: React.FC<VoucherTableProps> = ({
 
       render: (record: IVoucher) => (
         <Space>
-          {/* <ViewVoucher voucherId={record.voucherId} />
-          <Access
-            permission={PERMISSIONS[Module.SELLING_ORDERS].UPDATE}
-            hideChildren
-          >
+          <ViewVoucher voucherId={record.voucherId} />
+          <Access permission={PERMISSIONS[Module.VOUCHERS].UPDATE} hideChildren>
             <UpdateVoucher voucherId={record.voucherId} />
           </Access>
-          <VoucherStatusHistory voucherId={record.voucherId} /> */}
         </Space>
       ),
     },

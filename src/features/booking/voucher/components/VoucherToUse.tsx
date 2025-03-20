@@ -17,10 +17,15 @@ const VoucherToUse: React.FC<VoucherToUseProps> = ({
   useVoucher,
   setUseVoucher,
 }) => {
-  const expirationDate = new Date(voucher.endDate);
+  const expirationDate =
+    voucher.endDate instanceof Date
+      ? voucher.endDate
+      : new Date(voucher.endDate.toString());
   const timeDifference = expirationDate.getTime() - currentDate.getTime();
   const daysUntilExpiration = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
-  const usedPercentage = (voucher.usedCount / voucher.usageLimit) * 100;
+  const usedPercentage = parseFloat(
+    (((voucher?.usedCount ?? 0) / (voucher?.usageLimit ?? 1)) * 100).toFixed(2),
+  );
   const isValueValid = totalAmount >= voucher.minOrderValue;
 
   return (

@@ -12,6 +12,7 @@ import {
 import { useDynamicTitle } from "../utils";
 import { voucherService } from "../services/booking/voucher-service";
 import VouchersTable from "../features/booking/voucher/VouchersTable";
+import AddVoucher from "../features/booking/voucher/AddVoucher";
 
 const Voucher: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -54,7 +55,7 @@ const Voucher: React.FC = () => {
 
   useDynamicTitle("Quản lý mã giảm giá");
 
-  console.log(data?.payload);
+  //   console.log(data?.payload);
 
   return (
     <Access permission={PERMISSIONS[Module.VOUCHERS].GET_PAGINATION}>
@@ -73,6 +74,9 @@ const Voucher: React.FC = () => {
               />
             </div>
           </div>
+          <Access permission={PERMISSIONS[Module.VOUCHERS].CREATE} hideChildren>
+            <AddVoucher />
+          </Access>
         </div>
         <VouchersTable
           voucherPage={data?.payload}

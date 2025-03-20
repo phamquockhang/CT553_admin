@@ -150,11 +150,11 @@ export function getColorVoucherStatus(status: string) {
     case VoucherStatus.ACTIVE:
       return "blue";
     case VoucherStatus.OUT_OF_USES:
-      return "red";
+      return "green";
     case VoucherStatus.EXPIRED:
-      return "yellow";
+      return "gold";
     case VoucherStatus.DISABLED:
-      return "gray";
+      return "red";
     default:
       return "gray";
   }
@@ -163,9 +163,9 @@ export function getColorVoucherStatus(status: string) {
 export function getColorDiscountType(discountType: string) {
   switch (discountType) {
     case DiscountType.AMOUNT:
-      return "blue";
+      return blue[7];
     case DiscountType.PERCENTAGE:
-      return "green";
+      return green[6];
     default:
       return "gray";
   }
@@ -218,7 +218,7 @@ export function translateVoucherStatus(status: string) {
     case VoucherStatus.INACTIVE:
       return "Chưa kích hoạt";
     case VoucherStatus.ACTIVE:
-      return "Đang hoạt động";
+      return "Đang kích hoạt";
     case VoucherStatus.OUT_OF_USES:
       return "Đã hết lượt sử dụng";
     case VoucherStatus.EXPIRED:
@@ -234,7 +234,7 @@ export function revertVoucherStatus(status: string) {
   switch (status) {
     case "Chưa kích hoạt":
       return VoucherStatus.INACTIVE;
-    case "Đang hoạt động":
+    case "Đang kích hoạt":
       return VoucherStatus.ACTIVE;
     case "Đã hết lượt sử dụng":
       return VoucherStatus.OUT_OF_USES;
@@ -250,7 +250,7 @@ export function revertVoucherStatus(status: string) {
 export function translateDiscountType(discountType: string) {
   switch (discountType) {
     case DiscountType.AMOUNT:
-      return "Trực tiếp";
+      return "Cố định";
     case DiscountType.PERCENTAGE:
       return "Phần trăm";
     default:
@@ -260,7 +260,7 @@ export function translateDiscountType(discountType: string) {
 
 export function revertDiscountType(discountType: string) {
   switch (discountType) {
-    case "Trực tiếp":
+    case "Cố định":
       return DiscountType.AMOUNT;
     case "Phần trăm":
       return DiscountType.PERCENTAGE;
@@ -397,6 +397,10 @@ export function getDefaultFilterValue(
 
 export function formatTimestamp(timestamp: string) {
   return dayjs(timestamp).format("DD-MM-YYYY HH:mm:ss");
+}
+
+export function formatTime(time: string) {
+  return dayjs(time).format("DD-MM-YYYY");
 }
 
 export async function getBase64(file: FileType): Promise<string> {
