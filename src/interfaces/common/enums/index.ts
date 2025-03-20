@@ -76,4 +76,5 @@ export enum TransactionStatus {
   FAILED = "FAILED",
   EXPIRED = "EXPIRED",
   CANCELLED = "CANCELLED",
+  COD_PENDING = "COD_PENDING",
 }

@@ -134,6 +134,8 @@ export function getColorTransactionStatus(status: string) {
       return red[6];
     case TransactionStatus.EXPIRED:
       return greyDark[6];
+    case TransactionStatus.COD_PENDING:
+      return green[6];
     default:
       return grey[10];
   }
@@ -231,6 +233,8 @@ export function translateTransactionStatus(status: string) {
       return "Đã hủy";
     case TransactionStatus.EXPIRED:
       return "Đã hết hạn";
+    case TransactionStatus.COD_PENDING:
+      return "Thanh toán khi nhận hàng";
     default:
       return status;
   }
@@ -248,6 +252,8 @@ export function revertTransactionStatus(status: string) {
       return TransactionStatus.CANCELLED;
     case "Đã hết hạn":
       return TransactionStatus.EXPIRED;
+    case "Thanh toán khi nhận hàng":
+      return TransactionStatus.COD_PENDING;
     default:
       return status;
   }
