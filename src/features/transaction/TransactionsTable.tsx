@@ -44,7 +44,7 @@ const TransactionsTable: React.FC<TransactionTableProps> = ({
       current: Number(searchParams.get("page")) || 1,
       pageSize: Number(searchParams.get("pageSize")) || 10,
       showSizeChanger: true,
-      showTotal: (total) => `Tổng ${total} đơn hàng`,
+      showTotal: (total) => `Tổng ${total} giao dịch`,
     },
   }));
   const navigate = useNavigate();

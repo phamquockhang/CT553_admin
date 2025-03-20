@@ -12,6 +12,7 @@ import { SortOrder } from "antd/es/table/interface";
 import dayjs from "dayjs";
 import { useEffect } from "react";
 import {
+  DiscountType,
   FileType,
   IDistrict,
   IProvince,
@@ -19,6 +20,7 @@ import {
   OrderStatus,
   PaymentStatus,
   TransactionStatus,
+  VoucherStatus,
 } from "../interfaces";
 
 export function useDynamicTitle(title: string) {
@@ -141,6 +143,34 @@ export function getColorTransactionStatus(status: string) {
   }
 }
 
+export function getColorVoucherStatus(status: string) {
+  switch (status) {
+    case VoucherStatus.INACTIVE:
+      return "orange";
+    case VoucherStatus.ACTIVE:
+      return "blue";
+    case VoucherStatus.OUT_OF_USES:
+      return "red";
+    case VoucherStatus.EXPIRED:
+      return "yellow";
+    case VoucherStatus.DISABLED:
+      return "gray";
+    default:
+      return "gray";
+  }
+}
+
+export function getColorDiscountType(discountType: string) {
+  switch (discountType) {
+    case DiscountType.AMOUNT:
+      return "blue";
+    case DiscountType.PERCENTAGE:
+      return "green";
+    default:
+      return "gray";
+  }
+}
+
 export function translateOrderStatus(status: string) {
   switch (status) {
     case OrderStatus.PENDING:
@@ -180,6 +210,62 @@ export function revertOrderStatus(status: string) {
       return OrderStatus.CANCELLED;
     default:
       return status;
+  }
+}
+
+export function translateVoucherStatus(status: string) {
+  switch (status) {
+    case VoucherStatus.INACTIVE:
+      return "Chưa kích hoạt";
+    case VoucherStatus.ACTIVE:
+      return "Đang hoạt động";
+    case VoucherStatus.OUT_OF_USES:
+      return "Đã hết lượt sử dụng";
+    case VoucherStatus.EXPIRED:
+      return "Hết hạn";
+    case VoucherStatus.DISABLED:
+      return "Đã vô hiệu";
+    default:
+      return status;
+  }
+}
+
+export function revertVoucherStatus(status: string) {
+  switch (status) {
+    case "Chưa kích hoạt":
+      return VoucherStatus.INACTIVE;
+    case "Đang hoạt động":
+      return VoucherStatus.ACTIVE;
+    case "Đã hết lượt sử dụng":
+      return VoucherStatus.OUT_OF_USES;
+    case "Hết hạn":
+      return VoucherStatus.EXPIRED;
+    case "Đã vô hiệu":
+      return VoucherStatus.DISABLED;
+    default:
+      return status;
+  }
+}
+
+export function translateDiscountType(discountType: string) {
+  switch (discountType) {
+    case DiscountType.AMOUNT:
+      return "Trực tiếp";
+    case DiscountType.PERCENTAGE:
+      return "Phần trăm";
+    default:
+      return discountType;
+  }
+}
+
+export function revertDiscountType(discountType: string) {
+  switch (discountType) {
+    case "Trực tiếp":
+      return DiscountType.AMOUNT;
+    case "Phần trăm":
+      return DiscountType.PERCENTAGE;
+    default:
+      return discountType;
   }
 }
 

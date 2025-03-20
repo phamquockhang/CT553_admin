@@ -4,6 +4,7 @@ import { MenuProps } from "antd/lib";
 import { useEffect, useState } from "react";
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
 import { BiSolidCategory } from "react-icons/bi";
+import { BsFillBoxSeamFill } from "react-icons/bs";
 import {
   FaKey,
   FaSitemap,
@@ -11,21 +12,20 @@ import {
   FaUserCog,
   FaUsers,
 } from "react-icons/fa";
+import { FaBoxesStacked, FaMoneyBillTrendUp } from "react-icons/fa6";
 import {
   IoIosNotifications,
   IoMdArrowDropleft,
   IoMdArrowDropright,
 } from "react-icons/io";
 import { IoShieldCheckmark } from "react-icons/io5";
+import { LuTicketPercent } from "react-icons/lu";
 import { MdCategory, MdDashboard } from "react-icons/md";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import Loading from "../common/components/Loading";
 import { useLoggedInUser } from "../features/auth/hooks/useLoggedInUser";
 import { Module, PERMISSIONS } from "../interfaces";
 import { authService } from "../services";
-import { FaBoxesStacked } from "react-icons/fa6";
-import { BsFillBoxSeamFill } from "react-icons/bs";
-import { GiTakeMyMoney } from "react-icons/gi";
 
 const { Header, Sider } = Layout;
 
@@ -148,6 +148,16 @@ const AdminLayout: React.FC = () => {
       //////////////
       const hasTransactionChildren: boolean = Boolean(viewTransactions);
 
+      //////////////////////////////////////////
+      const viewVouchers = permissions.find(
+        (item) =>
+          item.apiPath ===
+            PERMISSIONS[Module.VOUCHERS].GET_PAGINATION.apiPath &&
+          item.method === PERMISSIONS[Module.VOUCHERS].GET_PAGINATION.method,
+      );
+      //////////////
+      const hasVoucherChildren: boolean = Boolean(viewVouchers);
+
       const menuItems = [
         {
           label: (
@@ -258,30 +268,25 @@ const AdminLayout: React.FC = () => {
           : []),
         ...(hasTransactionChildren
           ? [
-              // {
-              //   label: "Giao dịch",
-              //   key: "transactions",
-              //   icon: <FaBoxesStacked />,
-              //   children: [
-              //     ...(viewTransactions
-              //       ? [
-              //           {
-              //             label: (
-              //               <NavLink to="/transactions">Giao dịch</NavLink>
-              //             ),
-              //             key: "transactions",
-              //             icon: <GiTakeMyMoney />,
-              //           },
-              //         ]
-              //       : []),
-              //   ],
-              // },
               ...(viewTransactions
                 ? [
                     {
                       label: <NavLink to="/transactions">Giao dịch</NavLink>,
                       key: "transactions",
-                      icon: <GiTakeMyMoney />,
+                      icon: <FaMoneyBillTrendUp />,
+                    },
+                  ]
+                : []),
+            ]
+          : []),
+        ...(hasVoucherChildren
+          ? [
+              ...(viewVouchers
+                ? [
+                    {
+                      label: <NavLink to="/vouchers">Mã giảm giá</NavLink>,
+                      key: "vouchers",
+                      icon: <LuTicketPercent />,
                     },
                   ]
                 : []),
