@@ -1,3 +1,4 @@
+import { Dayjs } from "dayjs";
 import { DiscountType, VoucherStatus } from "../common";
 
 export interface ISellingOrder {
@@ -54,13 +55,15 @@ export interface IVoucher {
   discountValue: number;
   minOrderValue: number;
   maxDiscount?: number;
-  startDate: string;
-  endDate: string;
+  startDate: string | Dayjs;
+  endDate: string | Dayjs;
   usageLimit: number;
   usedCount: number;
   usedVoucher?: IUsedVoucher[];
   createdAt?: string;
   updatedAt?: string;
+
+  dateRange?: [string | Dayjs, string | Dayjs];
 }
 
 export interface IBriefVoucher {
@@ -68,8 +71,8 @@ export interface IBriefVoucher {
   discountValue: number;
   minOrderValue: number;
   maxDiscount?: number;
-  startDate: string;
-  endDate: string;
+  startDate: string | Dayjs;
+  endDate: string | Dayjs;
   usageLimit: number;
 }
 

@@ -25,6 +25,7 @@ export enum Module {
   WEIGHTS = "WEIGHT",
   PAYMENT_METHODS = "PAYMENT METHOD",
   TRANSACTIONS = "TRANSACTION",
+  VOUCHERS = "VOUCHER",
 }
 
 export enum RoleName {
@@ -46,7 +47,7 @@ export enum OrderStatus {
 export enum VoucherStatus {
   INACTIVE = "INACTIVE",
   ACTIVE = "ACTIVE",
-  OUT_OF_USE = "OUT_OF_USE",
+  OUT_OF_USES = "OUT_OF_USES",
   EXPIRED = "EXPIRED",
   DISABLED = "DISABLED",
 }
@@ -76,4 +77,5 @@ export enum TransactionStatus {
   FAILED = "FAILED",
   EXPIRED = "EXPIRED",
   CANCELLED = "CANCELLED",
+  COD_PENDING = "COD_PENDING",
 }

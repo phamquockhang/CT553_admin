@@ -59,6 +59,13 @@ export const PERMISSIONS = {
     GET_BY_ID: { method: "GET", apiPath: "/api/v1/transactions/{id}" },
     CREATE: { method: "POST", apiPath: "/api/v1/transactions" },
   },
+  [Module.VOUCHERS]: {
+    GET_PAGINATION: { method: "GET", apiPath: "/api/v1/vouchers" },
+    GET_BY_ID: { method: "GET", apiPath: "/api/v1/vouchers/{id}" },
+    CREATE: { method: "POST", apiPath: "/api/v1/vouchers" },
+    UPDATE: { method: "PUT", apiPath: "/api/v1/vouchers/{id}" },
+    DELETE: { method: "DELETE", apiPath: "/api/v1/vouchers/{id}" },
+  },
 };
 
 // export const ROUTE_TYPE_TRANSLATION: Record<RouteType, string> = {

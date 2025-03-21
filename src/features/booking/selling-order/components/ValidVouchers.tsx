@@ -5,9 +5,8 @@ import {
   IVoucher,
   SortParams,
   VoucherFilterCriteria,
-  VoucherStatus,
 } from "../../../../interfaces";
-import { voucherService } from "../../../../services/booking/voucher-service";
+import { voucherService } from "../../../../services";
 import VoucherToUse from "../../voucher/components/VoucherToUse";
 
 interface ValidVouchersProps {
@@ -34,7 +33,7 @@ const ValidVouchers: React.FC<ValidVouchersProps> = ({
     direction: "asc",
   };
   const filter: VoucherFilterCriteria = {
-    status: VoucherStatus.ACTIVE,
+    status: undefined,
     // status: "",
     discountType: undefined,
   };
@@ -45,7 +44,8 @@ const ValidVouchers: React.FC<ValidVouchersProps> = ({
     isFetching,
   } = useQuery({
     queryKey: ["vouchers", pagination, query, sort, filter],
-    queryFn: () => voucherService.getVouchers(pagination, query, filter, sort),
+    queryFn: () =>
+      voucherService.getValidVouchers(pagination, query, filter, sort),
     select: (data) => data?.payload,
   });
 

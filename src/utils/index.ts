@@ -12,6 +12,7 @@ import { SortOrder } from "antd/es/table/interface";
 import dayjs from "dayjs";
 import { useEffect } from "react";
 import {
+  DiscountType,
   FileType,
   IDistrict,
   IProvince,
@@ -19,6 +20,7 @@ import {
   OrderStatus,
   PaymentStatus,
   TransactionStatus,
+  VoucherStatus,
 } from "../interfaces";
 
 export function useDynamicTitle(title: string) {
@@ -134,8 +136,38 @@ export function getColorTransactionStatus(status: string) {
       return red[6];
     case TransactionStatus.EXPIRED:
       return greyDark[6];
+    case TransactionStatus.COD_PENDING:
+      return green[6];
     default:
       return grey[10];
+  }
+}
+
+export function getColorVoucherStatus(status: string) {
+  switch (status) {
+    case VoucherStatus.INACTIVE:
+      return "orange";
+    case VoucherStatus.ACTIVE:
+      return "blue";
+    case VoucherStatus.OUT_OF_USES:
+      return "green";
+    case VoucherStatus.EXPIRED:
+      return "gold";
+    case VoucherStatus.DISABLED:
+      return "red";
+    default:
+      return "gray";
+  }
+}
+
+export function getColorDiscountType(discountType: string) {
+  switch (discountType) {
+    case DiscountType.AMOUNT:
+      return blue[7];
+    case DiscountType.PERCENTAGE:
+      return green[6];
+    default:
+      return "gray";
   }
 }
 
@@ -178,6 +210,62 @@ export function revertOrderStatus(status: string) {
       return OrderStatus.CANCELLED;
     default:
       return status;
+  }
+}
+
+export function translateVoucherStatus(status: string) {
+  switch (status) {
+    case VoucherStatus.INACTIVE:
+      return "Chưa kích hoạt";
+    case VoucherStatus.ACTIVE:
+      return "Đang kích hoạt";
+    case VoucherStatus.OUT_OF_USES:
+      return "Đã hết lượt sử dụng";
+    case VoucherStatus.EXPIRED:
+      return "Hết hạn";
+    case VoucherStatus.DISABLED:
+      return "Đã vô hiệu";
+    default:
+      return status;
+  }
+}
+
+export function revertVoucherStatus(status: string) {
+  switch (status) {
+    case "Chưa kích hoạt":
+      return VoucherStatus.INACTIVE;
+    case "Đang kích hoạt":
+      return VoucherStatus.ACTIVE;
+    case "Đã hết lượt sử dụng":
+      return VoucherStatus.OUT_OF_USES;
+    case "Hết hạn":
+      return VoucherStatus.EXPIRED;
+    case "Đã vô hiệu":
+      return VoucherStatus.DISABLED;
+    default:
+      return status;
+  }
+}
+
+export function translateDiscountType(discountType: string) {
+  switch (discountType) {
+    case DiscountType.AMOUNT:
+      return "Cố định";
+    case DiscountType.PERCENTAGE:
+      return "Phần trăm";
+    default:
+      return discountType;
+  }
+}
+
+export function revertDiscountType(discountType: string) {
+  switch (discountType) {
+    case "Cố định":
+      return DiscountType.AMOUNT;
+    case "Phần trăm":
+      return DiscountType.PERCENTAGE;
+    default:
+      return discountType;
   }
 }
 
@@ -231,6 +319,8 @@ export function translateTransactionStatus(status: string) {
       return "Đã hủy";
     case TransactionStatus.EXPIRED:
       return "Đã hết hạn";
+    case TransactionStatus.COD_PENDING:
+      return "Thanh toán khi nhận hàng";
     default:
       return status;
   }
@@ -248,6 +338,8 @@ export function revertTransactionStatus(status: string) {
       return TransactionStatus.CANCELLED;
     case "Đã hết hạn":
       return TransactionStatus.EXPIRED;
+    case "Thanh toán khi nhận hàng":
+      return TransactionStatus.COD_PENDING;
     default:
       return status;
   }
@@ -305,6 +397,10 @@ export function getDefaultFilterValue(
 
 export function formatTimestamp(timestamp: string) {
   return dayjs(timestamp).format("DD-MM-YYYY HH:mm:ss");
+}
+
+export function formatTime(time: string) {
+  return dayjs(time).format("DD-MM-YYYY");
 }
 
 export async function getBase64(file: FileType): Promise<string> {

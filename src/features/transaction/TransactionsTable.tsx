@@ -3,11 +3,11 @@ import {
   CaretUpFilled,
   FilterFilled,
 } from "@ant-design/icons";
-import { Space, Table, TablePaginationConfig, TableProps, Tag } from "antd";
+import { Table, TablePaginationConfig, TableProps, Tag } from "antd";
 import { SorterResult } from "antd/es/table/interface";
 import { GetProp } from "antd/lib";
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ITransaction, Page, TransactionStatus } from "../../interfaces";
 import {
   colorFilterIcon,
@@ -44,9 +44,10 @@ const TransactionsTable: React.FC<TransactionTableProps> = ({
       current: Number(searchParams.get("page")) || 1,
       pageSize: Number(searchParams.get("pageSize")) || 10,
       showSizeChanger: true,
-      showTotal: (total) => `Tổng ${total} đơn hàng`,
+      showTotal: (total) => `Tổng ${total} giao dịch`,
     },
   }));
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (transactionPage) {
@@ -113,28 +114,41 @@ const TransactionsTable: React.FC<TransactionTableProps> = ({
 
   const columns: TableProps<ITransaction>["columns"] = [
     {
-      title: "Mã gia dịch",
+      title: "Mã giao dịch",
       key: "transactionId",
       dataIndex: "transactionId",
       render: (transactionId) => "#" + transactionId,
       align: "center",
-      width: "3%",
+      width: "15%",
     },
     {
       title: "Mã đơn hàng",
       key: "sellingOrder",
       dataIndex: "sellingOrder",
-      render: (sellingOrder) => sellingOrder?.sellingOrderId,
+      render: (sellingOrder) => {
+        return (
+          <p
+            className="cursor-pointer hover:underline"
+            onClick={() =>
+              navigate(
+                `/selling-orders/${sellingOrder?.sellingOrderId}?mode=view`,
+              )
+            }
+          >
+            {sellingOrder?.sellingOrderId}
+          </p>
+        );
+      },
       align: "center",
-      width: "7%",
+      width: "20%",
     },
     {
       title: "Giá trị đơn hàng (VNĐ)",
       key: "amount",
       dataIndex: "amount",
-      width: "5%",
+      // width: "5%",
       align: "right",
-      render: (text, record) => {
+      render: (_, record) => {
         const totalAmount = record.amount.toLocaleString();
         return <p>{totalAmount}</p>;
       },
@@ -151,7 +165,7 @@ const TransactionsTable: React.FC<TransactionTableProps> = ({
       key: "status",
       title: "Trạng thái thanh toán",
       dataIndex: "status",
-      width: "5%",
+      // width: "5%",
       align: "center",
       render: (text, record) => {
         const transactionStatus = record.status;
@@ -179,7 +193,7 @@ const TransactionsTable: React.FC<TransactionTableProps> = ({
       key: "createdAt",
       title: "Ngày tạo",
       dataIndex: "createdAt",
-      width: "5%",
+      width: "15%",
       align: "center",
       render: (createdAt: string) =>
         createdAt ? formatTimestamp(createdAt) : "",
@@ -192,42 +206,42 @@ const TransactionsTable: React.FC<TransactionTableProps> = ({
         </div>
       ),
     },
-    {
-      key: "updatedAt",
-      title: "Ngày cập nhật",
-      dataIndex: "updatedAt",
-      width: "5%",
-      align: "center",
-      render: (createdAt: string) =>
-        createdAt ? formatTimestamp(createdAt) : "",
-      sorter: true,
-      defaultSortOrder: getDefaultSortOrder(searchParams, "updatedAt"),
-      sortIcon: ({ sortOrder }) => (
-        <div className="flex flex-col text-[10px]">
-          <CaretUpFilled style={{ color: colorSortUpIcon(sortOrder) }} />
-          <CaretDownFilled style={{ color: colorSortDownIcon(sortOrder) }} />
-        </div>
-      ),
-    },
-    {
-      title: "Hành động",
-      key: "action",
-      width: "3%",
-      align: "center",
+    // {
+    //   key: "updatedAt",
+    //   title: "Ngày cập nhật",
+    //   dataIndex: "updatedAt",
+    //   width: "5%",
+    //   align: "center",
+    //   render: (createdAt: string) =>
+    //     createdAt ? formatTimestamp(createdAt) : "",
+    //   sorter: true,
+    //   defaultSortOrder: getDefaultSortOrder(searchParams, "updatedAt"),
+    //   sortIcon: ({ sortOrder }) => (
+    //     <div className="flex flex-col text-[10px]">
+    //       <CaretUpFilled style={{ color: colorSortUpIcon(sortOrder) }} />
+    //       <CaretDownFilled style={{ color: colorSortDownIcon(sortOrder) }} />
+    //     </div>
+    //   ),
+    // },
+    // {
+    //   title: "Hành động",
+    //   key: "action",
+    //   width: "3%",
+    //   align: "center",
 
-      render: (record: ITransaction) => (
-        <Space>
-          {/* <ViewTransaction transactionId={record.transactionId} />
-          <Access
-            permission={PERMISSIONS[Module.SELLING_ORDERS].UPDATE}
-            hideChildren
-          >
-            <UpdateTransaction transactionId={record.transactionId} />
-          </Access>
-          <TransactionStatusHistory transactionId={record.transactionId} /> */}
-        </Space>
-      ),
-    },
+    //   render: (record: ITransaction) => (
+    //     <Space>
+    //       {/* <ViewTransaction transactionId={record.transactionId} />
+    //       <Access
+    //         permission={PERMISSIONS[Module.SELLING_ORDERS].UPDATE}
+    //         hideChildren
+    //       >
+    //         <UpdateTransaction transactionId={record.transactionId} />
+    //       </Access>
+    //       <TransactionStatusHistory transactionId={record.transactionId} /> */}
+    //     </Space>
+    //   ),
+    // },
   ];
 
   return (
