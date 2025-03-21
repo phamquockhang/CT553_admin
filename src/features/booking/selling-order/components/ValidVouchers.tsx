@@ -34,7 +34,7 @@ const ValidVouchers: React.FC<ValidVouchersProps> = ({
     direction: "asc",
   };
   const filter: VoucherFilterCriteria = {
-    status: VoucherStatus.ACTIVE,
+    status: undefined,
     // status: "",
     discountType: undefined,
   };
@@ -45,7 +45,8 @@ const ValidVouchers: React.FC<ValidVouchersProps> = ({
     isFetching,
   } = useQuery({
     queryKey: ["vouchers", pagination, query, sort, filter],
-    queryFn: () => voucherService.getVouchers(pagination, query, filter, sort),
+    queryFn: () =>
+      voucherService.getValidVouchers(pagination, query, filter, sort),
     select: (data) => data?.payload,
   });
 

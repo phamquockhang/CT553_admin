@@ -18,6 +18,12 @@ interface IVoucherService {
     filter?: VoucherFilterCriteria,
     sort?: SortParams,
   ): Promise<ApiResponse<Page<IVoucher>>>;
+  getValidVouchers(
+    pagination: PaginationParams,
+    query: string,
+    filter?: VoucherFilterCriteria,
+    sort?: SortParams,
+  ): Promise<ApiResponse<Page<IVoucher>>>;
   create(newVoucher: IBriefVoucher): Promise<ApiResponse<void>>;
   update(
     voucherId: number,
@@ -39,6 +45,23 @@ class VoucherService implements IVoucherService {
     sort?: SortParams,
   ): Promise<ApiResponse<Page<IVoucher>>> {
     return await apiClient.get("", {
+      params: {
+        ...pagination,
+        ...filter,
+        query,
+        sortBy: sort?.sortBy !== "" ? sort?.sortBy : undefined,
+        direction: sort?.direction !== "" ? sort?.direction : undefined,
+      },
+    });
+  }
+
+  async getValidVouchers(
+    pagination: PaginationParams,
+    query: string,
+    filter?: VoucherFilterCriteria,
+    sort?: SortParams,
+  ): Promise<ApiResponse<Page<IVoucher>>> {
+    return await apiClient.get("/valid", {
       params: {
         ...pagination,
         ...filter,
