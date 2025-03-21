@@ -5,9 +5,8 @@ import {
   IVoucher,
   SortParams,
   VoucherFilterCriteria,
-  VoucherStatus,
 } from "../../../../interfaces";
-import { voucherService } from "../../../../services/booking/voucher-service";
+import { voucherService } from "../../../../services";
 import VoucherToUse from "../../voucher/components/VoucherToUse";
 
 interface ValidVouchersProps {

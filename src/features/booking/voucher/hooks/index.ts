@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useMemo } from "react";
 import toast from "react-hot-toast";
 import { IBriefVoucher, IVoucher, VoucherStatus } from "../../../../interfaces";
-import { voucherService } from "../../../../services/booking/voucher-service";
+import { voucherService } from "../../../../services";
 
 export const useVoucherService = () => {
   const { mutate: createVoucher, isPending: isCreatingVoucher } = useMutation({

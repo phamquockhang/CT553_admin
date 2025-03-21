@@ -10,7 +10,7 @@ import {
   VoucherFilterCriteria,
 } from "../interfaces";
 import { useDynamicTitle } from "../utils";
-import { voucherService } from "../services/booking/voucher-service";
+import { voucherService } from "../services";
 import VouchersTable from "../features/booking/voucher/VouchersTable";
 import AddVoucher from "../features/booking/voucher/AddVoucher";
 

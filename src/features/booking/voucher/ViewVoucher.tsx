@@ -2,7 +2,7 @@ import { EyeOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { Modal, Tooltip } from "antd";
 import { useState } from "react";
-import { voucherService } from "../../../services/booking/voucher-service";
+import { voucherService } from "../../../services";
 import ViewVoucherForm from "./components/ViewVoucherForm";
 
 interface ViewVoucherProps {
