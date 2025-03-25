@@ -1,15 +1,15 @@
-import { Card, Col, Spin, Typography } from "antd";
+import { Card, Col, Spin, Typography, Button } from "antd";
 import { AiFillCloseCircle, AiFillDollarCircle } from "react-icons/ai";
 import { FaCheckCircle, FaShippingFast } from "react-icons/fa";
 import { GiCardboardBoxClosed } from "react-icons/gi";
 import { useSellingOrderStatistics } from "./hooks/useSellingOrderStatistics";
+import { TbReload } from "react-icons/tb";
 
 const { Title } = Typography;
 
 const OverviewStatistic: React.FC = () => {
-  const { sellingOrderStatisticsData, isLoading } = useSellingOrderStatistics();
-
-  console.log(sellingOrderStatisticsData);
+  const { sellingOrderStatisticsData, isLoading, refetch } =
+    useSellingOrderStatistics();
 
   const data = [
     {
@@ -59,14 +59,26 @@ const OverviewStatistic: React.FC = () => {
       <Card
         className="custom-card"
         title={
-          <Title level={4} style={{ marginBottom: 0 }}>
-            Tổng quan kết quả kinh doanh trong ngày
-          </Title>
+          <div className="flex items-center justify-between">
+            <Title level={4} style={{ marginBottom: 0 }}>
+              Tổng quan kết quả kinh doanh trong ngày
+            </Title>
+            <Button
+              type="primary"
+              onClick={() => refetch()}
+              loading={isLoading}
+            >
+              Làm mới <TbReload />
+            </Button>
+          </div>
         }
       >
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-          {data.map((item) => (
-            <div className="rounded-md p-4 shadow-[0px_0px_5px_1px_rgba(0,0,0,0.24)]">
+          {data.map((item, index) => (
+            <div
+              key={index}
+              className="rounded-md p-4 shadow-[0px_0px_5px_1px_rgba(0,0,0,0.24)]"
+            >
               <div className="flex items-center gap-3">
                 {isLoading ? (
                   <Spin />
