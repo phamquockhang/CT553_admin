@@ -89,4 +89,12 @@ export interface IUsedVoucher {
   createdAt: string;
 }
 
+export interface ISellingOrderStatistics {
+  totalRevenue: number;
+  totalNewOrders: number;
+  totalDeliveringOrders: number;
+  totalDeliveredOrders: number;
+  totalCancelledOrders: number;
+}
+
 export const POINT_VALUE = 1;
