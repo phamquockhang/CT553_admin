@@ -10,6 +10,7 @@ export const useSellingOrderStatistics = () => {
     queryKey: ["selling-order-statistics"],
     queryFn: () => sellingOrderService.getSellingOrderStatistics(),
     select: (data) => data.payload,
+    refetchInterval: 1000 * 10,
   });
 
   return { sellingOrderStatisticsData, isLoading, refetch };

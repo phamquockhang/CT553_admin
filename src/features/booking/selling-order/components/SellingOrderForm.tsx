@@ -70,7 +70,11 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
           predicate: (query) =>
             query.queryKey.includes("selling_orders") ||
             query.queryKey.includes("selling_order") ||
-            query.queryKey.includes("customers"),
+            query.queryKey.includes("customers") ||
+            query.queryKey.includes("vouchers") ||
+            query.queryKey.includes("products") ||
+            query.queryKey.includes("items") ||
+            query.queryKey.includes("selling-order-statistics"),
         });
 
         if (data.success) toast.success(data.message || "Operation successful");
@@ -102,7 +106,11 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
           predicate: (query) =>
             query.queryKey.includes("selling_orders") ||
             query.queryKey.includes("selling_order") ||
-            query.queryKey.includes("customers"),
+            query.queryKey.includes("customers") ||
+            query.queryKey.includes("vouchers") ||
+            query.queryKey.includes("products") ||
+            query.queryKey.includes("items") ||
+            query.queryKey.includes("selling-order-statistics"),
         });
 
         if (data.success) toast.success(data.message || "Operation successful");
