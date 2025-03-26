@@ -7,7 +7,7 @@ export const useSellingOrderStatistics = () => {
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ["selling-order-statistics"],
+    queryKey: ["statistics", "selling-order"],
     queryFn: () => sellingOrderService.getSellingOrderStatistics(),
     select: (data) => data.payload,
     refetchInterval: 1000 * 10,

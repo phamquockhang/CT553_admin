@@ -32,7 +32,7 @@ const SellingOrder: React.FC = () => {
   };
 
   const { data, isLoading, isFetching } = useQuery({
-    queryKey: ["selling_orders", pagination, query, sort, filter].filter(
+    queryKey: ["selling-orders", pagination, query, sort, filter].filter(
       (key) => {
         if (typeof key === "string") {
           return key !== "";

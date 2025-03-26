@@ -68,14 +68,16 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
       onSuccess: (data) => {
         queryClient.invalidateQueries({
           predicate: (query) =>
-            query.queryKey.includes("selling_orders") ||
-            query.queryKey.includes("selling_order") ||
+            query.queryKey.includes("selling-orders") ||
+            query.queryKey.includes("selling-order") ||
             query.queryKey.includes("customers") ||
             query.queryKey.includes("vouchers") ||
             query.queryKey.includes("products") ||
             query.queryKey.includes("items") ||
-            query.queryKey.includes("selling-order-statistics"),
+            query.queryKey.includes("statistics"),
         });
+
+        if (onCancel) onCancel();
 
         if (data.success) toast.success(data.message || "Operation successful");
         else if (!data.success) toast.error(data.message || "Operation failed");
@@ -104,13 +106,13 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
       onSuccess: (data) => {
         queryClient.invalidateQueries({
           predicate: (query) =>
-            query.queryKey.includes("selling_orders") ||
-            query.queryKey.includes("selling_order") ||
+            query.queryKey.includes("selling-orders") ||
+            query.queryKey.includes("selling-order") ||
             query.queryKey.includes("customers") ||
             query.queryKey.includes("vouchers") ||
             query.queryKey.includes("products") ||
             query.queryKey.includes("items") ||
-            query.queryKey.includes("selling-order-statistics"),
+            query.queryKey.includes("statistics"),
         });
 
         if (data.success) toast.success(data.message || "Operation successful");
