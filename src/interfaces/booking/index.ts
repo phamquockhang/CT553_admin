@@ -91,9 +91,9 @@ export interface IUsedVoucher {
 
 export interface ISellingOrderStatistics {
   totalRevenue: number;
+  totalCompletedOrders: number;
   totalNewOrders: number;
   totalDeliveringOrders: number;
-  totalDeliveredOrders: number;
   totalCancelledOrders: number;
 }
 

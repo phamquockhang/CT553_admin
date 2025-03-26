@@ -4,6 +4,7 @@ import {
   IBriefSellingOrderStatus,
   ISellingOrder,
   ISellingOrderStatistics,
+  TimeRange,
   Page,
   PaginationParams,
   SellingOrderFilterCriteria,
@@ -19,7 +20,9 @@ interface ISellingOrderService {
     filter?: SellingOrderFilterCriteria,
     sort?: SortParams,
   ): Promise<ApiResponse<Page<ISellingOrder>>>;
-  getSellingOrderStatistics(): Promise<ApiResponse<ISellingOrderStatistics>>;
+  getSellingOrderStatistics(
+    timeRange: TimeRange,
+  ): Promise<ApiResponse<ISellingOrderStatistics>>;
   create(
     newSellingOrder: Omit<ISellingOrder, "sellingOrderId">,
   ): Promise<ApiResponse<void>>;
@@ -55,10 +58,12 @@ class SellingOrderService implements ISellingOrderService {
     });
   }
 
-  async getSellingOrderStatistics(): Promise<
-    ApiResponse<ISellingOrderStatistics>
-  > {
-    return await apiClient.get("/today");
+  async getSellingOrderStatistics(
+    timeRange: TimeRange,
+  ): Promise<ApiResponse<ISellingOrderStatistics>> {
+    return await apiClient.get("/selling-order-statistics", {
+      params: timeRange,
+    });
   }
 
   async create(
