@@ -1,11 +1,13 @@
 import { plotlib } from "@antv/g2-extension-plot";
 import { Runtime, corelib, extend } from "@antv/g2";
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 const Chart = extend(Runtime, { ...corelib(), ...plotlib() });
 
 const SunburstChart: React.FC = () => {
   const chartContainer = useRef<HTMLDivElement>(null);
+  const resizeTimeout = useRef<number | null>(null);
+  const chartRef = useRef<InstanceType<typeof Chart> | null>(null);
 
   const values = useMemo(
     () => ({
@@ -34,32 +36,60 @@ const SunburstChart: React.FC = () => {
     [],
   );
 
-  useEffect(() => {
+  const renderChart = useCallback(() => {
     if (!chartContainer.current) return;
 
-    chartContainer.current.innerHTML = ""; // Clear previous chart
+    // if (chartRef.current) {
+    chartRef.current?.destroy();
+    // }
 
-    const chart = new Chart({
+    const newChart = new Chart({
       container: chartContainer.current,
       autoFit: true,
     });
 
-    chart
+    newChart
       .sunburst()
       .data({
-        value: values, // Use the modified hierarchical data
+        value: values,
       })
-      .encode("value", "weight") // Use weight as the value
-      .encode("color", "name") // Different colors for items and products
-      .coordinate({ type: "polar", innerRadius: 0.2 }) // Adjust inner radius
+      .encode("value", "weight")
+      .encode("color", "name")
+      .coordinate({ type: "polar", innerRadius: 0.2 })
       .animate("enter", { type: "waveIn" });
 
-    chart.render();
+    newChart.render();
+
+    chartRef.current = newChart;
+  }, [values]);
+
+  useEffect(() => {
+    renderChart();
 
     return () => {
-      chart.destroy();
+      chartRef.current?.destroy();
     };
-  }, [values]);
+  }, [renderChart]);
+
+  useEffect(() => {
+    if (!chartContainer.current) return;
+
+    const resizeObserver = new ResizeObserver(() => {
+      if (resizeTimeout.current) {
+        clearTimeout(resizeTimeout.current);
+      }
+
+      resizeTimeout.current = window.setTimeout(() => {
+        requestAnimationFrame(() => {
+          renderChart();
+        });
+      }, 1000); // Debounce 1s
+    });
+
+    resizeObserver.observe(chartContainer.current);
+
+    return () => resizeObserver.disconnect();
+  }, [renderChart]);
 
   return (
     <div className="rounded-lg bg-white">
@@ -68,7 +98,7 @@ const SunburstChart: React.FC = () => {
           Khối lượng hàng hóa theo danh mục
         </h2>
       </div>
-      <div ref={chartContainer} className="h-[400px] w-full" />
+      <div ref={chartContainer} className="" />
     </div>
   );
 };
