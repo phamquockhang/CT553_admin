@@ -16,6 +16,7 @@ import { TbReload } from "react-icons/tb";
 import { useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
 import { TimeRange } from "../../interfaces";
+import { motion } from "framer-motion";
 
 const { Title } = Typography;
 const { RangePicker } = DatePicker;
@@ -189,8 +190,11 @@ const OverviewStatistic: React.FC = () => {
       >
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {data.map((item, index) => (
-            <div
+            <motion.div
               key={index}
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 1 }}
               className="rounded-md p-4 shadow-[0px_0px_5px_1px_rgba(0,0,0,0.24)]"
             >
               <div className="flex items-center gap-3">
@@ -207,14 +211,25 @@ const OverviewStatistic: React.FC = () => {
                       >
                         {item.title}
                       </Title>
-                      <Title level={4} style={{ margin: 0, color: item.color }}>
-                        {item.value}
-                      </Title>
+                      <motion.div
+                        key={item.value}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.5 }}
+                      >
+                        <Title
+                          level={4}
+                          style={{ margin: 0, color: item.color }}
+                        >
+                          {item.value}
+                        </Title>
+                      </motion.div>
                     </Col>
                   </>
                 )}
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </Card>
