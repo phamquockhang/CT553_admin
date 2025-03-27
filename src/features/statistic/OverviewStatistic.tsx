@@ -49,13 +49,41 @@ const OverviewStatistic: React.FC = () => {
         startDate = dayjs();
         endDate = dayjs();
         break;
+      case "yesterday":
+        startDate = dayjs().subtract(1, "day").startOf("day");
+        endDate = dayjs().subtract(1, "day").endOf("day");
+        break;
       case "thisWeek":
         startDate = dayjs().startOf("week");
         endDate = dayjs().endOf("week");
         break;
+      case "lastWeek":
+        startDate = dayjs().subtract(1, "week").startOf("week");
+        endDate = dayjs().subtract(1, "week").endOf("week");
+        break;
       case "thisMonth":
         startDate = dayjs().startOf("month");
         endDate = dayjs().endOf("month");
+        break;
+      case "lastMonth":
+        startDate = dayjs().subtract(1, "month").startOf("month");
+        endDate = dayjs().subtract(1, "month").endOf("month");
+        break;
+      case "thisQuarter":
+        startDate = dayjs().startOf("quarter");
+        endDate = dayjs().endOf("quarter");
+        break;
+      case "lastQuarter":
+        startDate = dayjs().subtract(1, "quarter").startOf("quarter");
+        endDate = dayjs().subtract(1, "quarter").endOf("quarter");
+        break;
+      case "thisYear":
+        startDate = dayjs().startOf("year");
+        endDate = dayjs().endOf("year");
+        break;
+      case "lastYear":
+        startDate = dayjs().subtract(1, "year").startOf("year");
+        endDate = dayjs().subtract(1, "year").endOf("year");
         break;
       case "custom":
         startDate = null;
@@ -120,6 +148,7 @@ const OverviewStatistic: React.FC = () => {
                 Tổng quan kết quả kinh doanh trong
               </Title>
               <Select
+                style={{ width: 150 }}
                 value={selectedRange}
                 onChange={(value) => {
                   setSelectedRange(value);
@@ -127,8 +156,15 @@ const OverviewStatistic: React.FC = () => {
                 }}
                 options={[
                   { value: "today", label: "Hôm nay" },
+                  { value: "yesterday", label: "Hôm qua" },
                   { value: "thisWeek", label: "Tuần này" },
+                  { value: "lastWeek", label: "Tuần trước" },
                   { value: "thisMonth", label: "Tháng này" },
+                  { value: "lastMonth", label: "Tháng trước" },
+                  { value: "thisQuarter", label: "Quý này" },
+                  { value: "lastQuarter", label: "Quý trước" },
+                  { value: "thisYear", label: "Năm nay" },
+                  { value: "lastYear", label: "Năm trước" },
                   { value: "custom", label: "Khoảng thời gian" },
                 ]}
               />
