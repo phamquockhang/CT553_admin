@@ -4,6 +4,7 @@ import {
   ApiResponse,
   IBriefItem,
   IItem,
+  IItemStatistics,
   ItemFilterCriteria,
   Page,
   PaginationParams,
@@ -18,6 +19,7 @@ interface IItemService {
     filter?: ItemFilterCriteria,
     sort?: SortParams,
   ): Promise<ApiResponse<Page<IItem>>>;
+  getItemStatistics(): Promise<ApiResponse<IItemStatistics[]>>;
   getAllItems(): Promise<ApiResponse<IItem[]>>;
   create(newItem: Omit<IBriefItem, "itemId">): Promise<ApiResponse<IItem>>;
   update(itemId: number, updatedItem: IBriefItem): Promise<ApiResponse<IItem>>;
@@ -45,6 +47,10 @@ class ItemService implements IItemService {
         direction: sort?.direction !== "" ? sort?.direction : undefined,
       },
     });
+  }
+
+  async getItemStatistics(): Promise<ApiResponse<IItemStatistics[]>> {
+    return await apiClient.get("/item-statistics");
   }
 
   async getAllItems(): Promise<ApiResponse<IItem[]>> {

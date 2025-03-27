@@ -21,6 +21,12 @@ export interface ItemFilterCriteria {
   isActivated?: string;
 }
 
+export interface IItemStatistics {
+  itemId: number;
+  itemName: string;
+  products: IProductStatistics[];
+}
+
 export interface IProduct {
   productId: number;
   productName: string;
@@ -50,6 +56,12 @@ export interface IBriefProduct {
 export interface ProductFilterCriteria {
   isActivated?: string;
   itemId?: string;
+}
+
+export interface IProductStatistics {
+  productId: number;
+  productName: string;
+  remainingQuantity: string;
 }
 
 export interface IProductImage {

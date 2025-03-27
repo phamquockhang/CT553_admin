@@ -1,6 +1,9 @@
 import { plotlib } from "@antv/g2-extension-plot";
 import { Runtime, corelib, extend } from "@antv/g2";
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useItemStatistics } from "./hooks/useItemStatistics";
+import { Button, Spin } from "antd";
+import { TbReload } from "react-icons/tb";
 
 const Chart = extend(Runtime, { ...corelib(), ...plotlib() });
 
@@ -8,33 +11,23 @@ const SunburstChart: React.FC = () => {
   const chartContainer = useRef<HTMLDivElement>(null);
   const resizeTimeout = useRef<number | null>(null);
   const chartRef = useRef<InstanceType<typeof Chart> | null>(null);
+  const { itemStatisticsData, isLoading, refetch } = useItemStatistics();
 
-  const values = useMemo(
-    () => ({
+  const values = useMemo(() => {
+    if (!itemStatisticsData) return { name: "Items", children: [] };
+
+    return {
       name: "Items",
-      children: [
-        {
-          name: "Electronics",
-          weight: 6,
-          children: [
-            { name: "Laptop", weight: 3 },
-            { name: "Smartphone", weight: 2 },
-            { name: "Tablet", weight: 5 },
-          ],
-        },
-        {
-          name: "Furniture",
-          weight: 9,
-          children: [
-            { name: "Chair", weight: 4 },
-            { name: "Table", weight: 3 },
-            { name: "Sofa", weight: 2 },
-          ],
-        },
-      ],
-    }),
-    [],
-  );
+      children: itemStatisticsData.map((item) => ({
+        name: item.itemName,
+        còn: " ", // Để giữ format
+        children: item.products.map((product) => ({
+          name: product.productName,
+          còn: product.remainingQuantity,
+        })),
+      })),
+    };
+  }, [itemStatisticsData]);
 
   const renderChart = useCallback(() => {
     if (!chartContainer.current) return;
@@ -53,7 +46,7 @@ const SunburstChart: React.FC = () => {
       .data({
         value: values,
       })
-      .encode("value", "weight")
+      .encode("value", "còn")
       .encode("color", "name")
       .coordinate({ type: "polar", innerRadius: 0.2 })
       .animate("enter", { type: "waveIn" });
@@ -95,10 +88,20 @@ const SunburstChart: React.FC = () => {
     <div className="rounded-lg bg-white">
       <div className="flex items-center justify-between px-6 pt-6">
         <h2 className="text-xl font-semibold">
-          Khối lượng hàng hóa theo danh mục
+          Khối lượng hàng hóa hiện tại theo danh mục
         </h2>
+        <Button type="primary" onClick={() => refetch()} loading={isLoading}>
+          Làm mới <TbReload />
+        </Button>
       </div>
-      <div ref={chartContainer} className="" />
+
+      {isLoading ? (
+        <div className="flex min-h-96 items-center justify-center">
+          <Spin />
+        </div>
+      ) : (
+        <div ref={chartContainer} className="" />
+      )}
     </div>
   );
 };
