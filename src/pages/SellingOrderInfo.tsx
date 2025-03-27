@@ -15,7 +15,7 @@ const SellingOrderInfo: React.FC = () => {
   const mode = useLocation().search.split("=")[1];
 
   const { data: orderData, isLoading: isOrderLoading } = useQuery({
-    queryKey: ["selling_order", sellingOrderId],
+    queryKey: ["selling-order", sellingOrderId],
     queryFn: () => sellingOrderService.getSellingOrder(sellingOrderId || ""),
     select: (data) => data.payload,
   });

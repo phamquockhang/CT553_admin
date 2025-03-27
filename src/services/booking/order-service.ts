@@ -3,6 +3,8 @@ import {
   ApiResponse,
   IBriefSellingOrderStatus,
   ISellingOrder,
+  ISellingOrderStatistics,
+  TimeRange,
   Page,
   PaginationParams,
   SellingOrderFilterCriteria,
@@ -18,6 +20,9 @@ interface ISellingOrderService {
     filter?: SellingOrderFilterCriteria,
     sort?: SortParams,
   ): Promise<ApiResponse<Page<ISellingOrder>>>;
+  getSellingOrderStatistics(
+    timeRange: TimeRange,
+  ): Promise<ApiResponse<ISellingOrderStatistics>>;
   create(
     newSellingOrder: Omit<ISellingOrder, "sellingOrderId">,
   ): Promise<ApiResponse<void>>;
@@ -50,6 +55,14 @@ class SellingOrderService implements ISellingOrderService {
         sortBy: sort?.sortBy !== "" ? sort?.sortBy : undefined,
         direction: sort?.direction !== "" ? sort?.direction : undefined,
       },
+    });
+  }
+
+  async getSellingOrderStatistics(
+    timeRange: TimeRange,
+  ): Promise<ApiResponse<ISellingOrderStatistics>> {
+    return await apiClient.get("/selling-order-statistics", {
+      params: timeRange,
     });
   }
 

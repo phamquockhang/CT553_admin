@@ -48,4 +48,8 @@
   .centered-input .ant-input-number-group-addon {
     padding: 0 !important;
   }
+
+  .custom-card div.ant-card-body {
+    padding: 10px 15px 15px !important;
+  }
 }

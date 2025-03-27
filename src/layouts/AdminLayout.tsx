@@ -13,17 +13,14 @@ import {
   FaUsers,
 } from "react-icons/fa";
 import { FaBoxesStacked, FaMoneyBillTrendUp } from "react-icons/fa6";
-import {
-  IoIosNotifications,
-  IoMdArrowDropleft,
-  IoMdArrowDropright,
-} from "react-icons/io";
+import { IoMdArrowDropleft, IoMdArrowDropright } from "react-icons/io";
 import { IoShieldCheckmark } from "react-icons/io5";
 import { LuTicketPercent } from "react-icons/lu";
 import { MdCategory, MdDashboard } from "react-icons/md";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import Loading from "../common/components/Loading";
 import { useLoggedInUser } from "../features/auth/hooks/useLoggedInUser";
+import Notification from "../features/notification/Notification";
 import { Module, PERMISSIONS } from "../interfaces";
 import { authService } from "../services";
 
@@ -358,7 +355,11 @@ const AdminLayout: React.FC = () => {
         theme="light"
       >
         <div className="demo-logo-vertical flex flex-col items-center pb-6">
-          <img src="/src/assets/logo_512.png" alt="Logo" className="w-36 p-3" />
+          <img
+            src="/src/assets/img/logo_512.png"
+            alt="Logo"
+            className="w-36 p-3"
+          />
           {!collapsed && <h1 className="font-bold">{user?.firstName}</h1>}
         </div>
         <Menu
@@ -408,13 +409,7 @@ const AdminLayout: React.FC = () => {
             </div>
 
             <div className="relative mr-5 flex items-center gap-3">
-              <Tooltip title="Thông báo">
-                <NavLink to="/notifications">
-                  <div className="flex items-center gap-1">
-                    <IoIosNotifications className="text-2xl" />
-                  </div>
-                </NavLink>
-              </Tooltip>
+              <Notification />
 
               <Dropdown
                 menu={{ items }}
