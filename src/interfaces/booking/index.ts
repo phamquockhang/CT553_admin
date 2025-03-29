@@ -45,6 +45,7 @@ export interface ISellingOrderDetail {
 export interface SellingOrderFilterCriteria {
   orderStatus?: string;
   paymentStatus?: string;
+  assignedStaffEmail?: string;
 }
 
 export interface IVoucher {
