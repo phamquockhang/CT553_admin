@@ -1,14 +1,14 @@
-import { useState, useEffect } from "react";
-import { Popover, Badge } from "antd";
 import { BellOutlined } from "@ant-design/icons";
+import { Badge, Button, Popover } from "antd";
 import dayjs from "dayjs";
+import "dayjs/locale/vi";
 import relativeTime from "dayjs/plugin/relativeTime";
 import updateLocale from "dayjs/plugin/updateLocale";
-import "dayjs/locale/vi";
-import { Howl } from "howler";
 import { motion } from "framer-motion";
-import { useNotification } from "./hooks/useNotification";
+import { Howl } from "howler";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import { useNotification } from "./hooks/useNotification";
 
 dayjs.extend(relativeTime);
 dayjs.extend(updateLocale);
@@ -38,7 +38,7 @@ const notificationSound = new Howl({
 });
 
 const OverviewNotification: React.FC = () => {
-  const { notificationData } = useNotification();
+  const { notificationData, notificationMeta } = useNotification();
   const [visible, setVisible] = useState(false);
   const [hasNotification, setHasNotification] = useState(false);
   const [previousCount, setPreviousCount] = useState(
@@ -50,7 +50,7 @@ const OverviewNotification: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (notificationData && notificationData?.length > previousCount) {
+    if (notificationData && notificationData.length > previousCount) {
       setHasNotification(true);
       notificationSound.play();
     }
@@ -71,16 +71,17 @@ const OverviewNotification: React.FC = () => {
         {notificationData?.map((notification, index) => (
           <div
             key={notification.notificationId}
-            className={`flex items-start space-x-3 rounded-lg p-3 transition hover:bg-gray-200 ${
+            className={`flex items-start space-x-3 rounded-lg p-3 transition ${
               notification.isRead
                 ? "bg-gray-0 cursor-not-allowed hover:opacity-50"
                 : "cursor-pointer bg-blue-100/80 hover:bg-blue-200"
-            } `}
+            }`}
             onClick={() => {
               if (!notification.isRead) {
                 navigate(
                   `/selling-orders/${notification.sellingOrderId}?mode=update`,
                 );
+                setVisible(false);
               }
             }}
           >
@@ -102,14 +103,28 @@ const OverviewNotification: React.FC = () => {
             )}
           </div>
         ))}
-        {notificationData?.length === 0 ||
-          (!notificationData && (
-            <div className="flex h-32 items-center justify-center">
-              <p className="text-gray-500">Không có thông báo mới</p>
-              <BellOutlined className="text-2xl text-gray-500" />
-            </div>
-          ))}
+        {notificationData?.length === 0 && (
+          <div className="flex h-32 items-center justify-center">
+            <p className="text-gray-500">Không có thông báo mới</p>
+            <BellOutlined className="text-2xl text-gray-500" />
+          </div>
+        )}
       </div>
+
+      {notificationMeta && notificationMeta?.total > 10 && (
+        <div className="mt-3 flex justify-center border-t pt-3">
+          <Button
+            type="primary"
+            className="w-full"
+            onClick={() => {
+              setVisible(false);
+              navigate("/notifications");
+            }}
+          >
+            Xem thêm
+          </Button>
+        </div>
+      )}
     </div>
   );
 
@@ -127,7 +142,7 @@ const OverviewNotification: React.FC = () => {
         transition={{ duration: 0.5, ease: "easeInOut" }}
         onAnimationComplete={() => setHasNotification(false)}
       >
-        <Badge count={notificationData?.length}>
+        <Badge count={notificationMeta && notificationMeta?.total}>
           <BellOutlined className="text-xl" />
         </Badge>
       </motion.div>

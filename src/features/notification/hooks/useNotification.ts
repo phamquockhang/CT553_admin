@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { notificationService } from "../../../services";
 import { NotificationFilterCriteria, SortParams } from "../../../interfaces";
@@ -5,15 +6,13 @@ import { useLoggedInUser } from "../../auth/hooks/useLoggedInUser";
 
 export const useNotification = () => {
   const { user } = useLoggedInUser();
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
-  const pagination = {
-    page: 1,
-    pageSize: 10,
-  };
   const query = undefined;
   const sort: SortParams = {
-    sortBy: "",
-    direction: "",
+    sortBy: "createdAt",
+    direction: user?.role.roleId === 2 ? "asc" : "desc",
   };
   const filter: NotificationFilterCriteria = {
     isRead: user?.role.roleId === 2 ? false : undefined,
@@ -23,27 +22,28 @@ export const useNotification = () => {
   const { data, isLoading, refetch } = useQuery({
     queryKey: [
       "statistics",
-      "notification",
-      pagination,
-      query,
-      sort,
-      filter,
-    ].filter((key) => {
-      if (typeof key === "string") {
-        return key !== "";
-      } else if (key instanceof Object) {
-        return Object.values(key).some(
-          (value) => value !== undefined && value !== "",
-        );
-      }
-    }),
+      "notifications",
+      { page, pageSize, query, sort, filter },
+    ],
     queryFn: () =>
-      notificationService.getNotifications(pagination, query, filter, sort),
+      notificationService.getNotifications(
+        { page, pageSize },
+        query,
+        filter,
+        sort,
+      ),
     select: (data) => data?.payload,
   });
 
-  const notificationData = data?.data;
+  const notificationData = data?.data || [];
   const notificationMeta = data?.meta;
 
-  return { notificationData, notificationMeta, isLoading, refetch };
+  return {
+    notificationData,
+    notificationMeta,
+    isLoading,
+    refetch,
+    setPage,
+    setPageSize,
+  };
 };
