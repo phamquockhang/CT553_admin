@@ -20,7 +20,7 @@ import { MdCategory, MdDashboard } from "react-icons/md";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import Loading from "../common/components/Loading";
 import { useLoggedInUser } from "../features/auth/hooks/useLoggedInUser";
-import Notification from "../features/notification/Notification";
+import OverviewNotification from "../features/notification/OverviewNotification";
 import { Module, PERMISSIONS } from "../interfaces";
 import { authService } from "../services";
 
@@ -81,6 +81,9 @@ const AdminLayout: React.FC = () => {
     if (user?.role.permissions) {
       const permissions = user.role.permissions;
 
+      const hasDashboard = Boolean(user.role.roleId === 1);
+
+      //////////////////////////////////////////
       const viewStaffs = permissions.find(
         (item) =>
           item.apiPath === PERMISSIONS[Module.STAFF].GET_PAGINATION.apiPath &&
@@ -156,15 +159,19 @@ const AdminLayout: React.FC = () => {
       const hasVoucherChildren: boolean = Boolean(viewVouchers);
 
       const menuItems = [
-        {
-          label: (
-            <NavLink className="" to="/">
-              Trang chủ
-            </NavLink>
-          ),
-          key: "dashboard",
-          icon: <MdDashboard />,
-        },
+        ...(hasDashboard
+          ? [
+              {
+                label: (
+                  <NavLink className="" to="/">
+                    Trang chủ
+                  </NavLink>
+                ),
+                key: "dashboard",
+                icon: <MdDashboard />,
+              },
+            ]
+          : []),
         ...(hasAuthChildren
           ? [
               {
@@ -409,7 +416,7 @@ const AdminLayout: React.FC = () => {
             </div>
 
             <div className="relative mr-5 flex items-center gap-3">
-              <Notification />
+              <OverviewNotification />
 
               <Dropdown
                 menu={{ items }}

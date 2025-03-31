@@ -79,3 +79,7 @@ export enum TransactionStatus {
   CANCELLED = "CANCELLED",
   COD_PENDING = "COD_PENDING",
 }
+
+export enum NotificationType {
+  NEW_ORDER = "NEW_ORDER",
+}

@@ -13,9 +13,11 @@ import { sellingOrderService } from "../services";
 import { useDynamicTitle } from "../utils";
 import SellingOrdersTable from "../features/booking/selling-order/SellingOrdersTable";
 import AddSellingOrder from "../features/booking/selling-order/AddSellingOrder";
+import { useLoggedInUser } from "../features/auth/hooks/useLoggedInUser";
 
 const SellingOrder: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { user } = useLoggedInUser();
 
   const pagination = {
     page: Number(searchParams.get("page")) || 1,
@@ -29,6 +31,7 @@ const SellingOrder: React.FC = () => {
   const filter: SellingOrderFilterCriteria = {
     orderStatus: searchParams.get("orderStatus") || undefined,
     paymentStatus: searchParams.get("paymentStatus") || undefined,
+    assignedStaffEmail: user?.role.roleId === 2 ? user?.email : undefined,
   };
 
   const { data, isLoading, isFetching } = useQuery({

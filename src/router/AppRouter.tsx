@@ -15,6 +15,7 @@ import SellingOrder from "../pages/SellingOrder";
 import Transactions from "../pages/Transactions";
 import SellingOrderInfo from "../pages/SellingOrderInfo";
 import Voucher from "../pages/Voucher";
+import Notification from "../pages/Notification";
 
 const router = createBrowserRouter([
   {
@@ -82,6 +83,10 @@ const router = createBrowserRouter([
       {
         path: "vouchers",
         element: <Voucher />,
+      },
+      {
+        path: "notifications",
+        element: <Notification />,
       },
     ],
   },
