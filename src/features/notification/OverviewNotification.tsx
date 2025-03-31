@@ -1,4 +1,5 @@
 import { BellOutlined } from "@ant-design/icons";
+import { Client } from "@stomp/stompjs";
 import { Badge, Button, Popover } from "antd";
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
@@ -8,7 +9,11 @@ import { motion } from "framer-motion";
 import { Howl } from "howler";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import SockJS from "sockjs-client";
+import { useLoggedInUser } from "../auth/hooks/useLoggedInUser";
 import { useNotification } from "./hooks/useNotification";
+
+const WebSocketURL = import.meta.env.VITE_WEBSOCKET_URL as string;
 
 dayjs.extend(relativeTime);
 dayjs.extend(updateLocale);
@@ -38,7 +43,9 @@ const notificationSound = new Howl({
 });
 
 const OverviewNotification: React.FC = () => {
-  const { notificationData, notificationMeta } = useNotification();
+  const { notificationData, notificationMeta, refetch } = useNotification();
+  const { user } = useLoggedInUser();
+  const [, setClient] = useState<Client | null>(null);
   const [visible, setVisible] = useState(false);
   const [hasNotification, setHasNotification] = useState(false);
   const [previousCount, setPreviousCount] = useState(
@@ -48,6 +55,36 @@ const OverviewNotification: React.FC = () => {
     () => notificationData?.map((n) => dayjs(n.createdAt)) || [],
   );
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user?.staffId) return;
+
+    const socket = new SockJS(WebSocketURL);
+    const stompClient = new Client({
+      webSocketFactory: () => socket,
+      onConnect: () => {
+        console.log("Connected to WebSocket");
+        stompClient.subscribe(
+          `/topic/notifications/${user.staffId}`,
+          (message) => {
+            console.log("🔔 Nhận thông báo mới:", message.body);
+            setHasNotification(true);
+            refetch(); // Gọi lại API để cập nhật danh sách thông báo
+          },
+        );
+      },
+      onStompError: (frame) => {
+        console.error("STOMP error:", frame);
+      },
+    });
+
+    stompClient.activate();
+    setClient(stompClient);
+
+    return () => {
+      stompClient.deactivate();
+    };
+  }, [user, refetch]);
 
   useEffect(() => {
     if (notificationData && notificationData.length > previousCount) {
