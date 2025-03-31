@@ -1,7 +1,6 @@
 import { ApiResponse, IDistrict, IProvince, IWard } from "../../interfaces";
 
-const addressHost =
-  "https://online-gateway.ghn.vn/shiip/public-api/master-data";
+const addressHost = import.meta.env.VITE_ADDRESS_GHN_URL as string;
 
 const requestInit = {
   headers: {

@@ -16,7 +16,8 @@ export const useNotification = () => {
   };
   const filter: NotificationFilterCriteria = {
     isRead: user?.role.roleId === 2 ? false : undefined,
-    staffEmail: user?.role.roleId === 2 ? user?.email : undefined,
+    // staffEmail: user?.role.roleId === 2 ? user?.email : undefined,
+    staffEmail: user?.email,
   };
 
   const { data, isLoading, refetch } = useQuery({
