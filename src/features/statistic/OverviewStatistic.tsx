@@ -28,14 +28,26 @@ const OverviewStatistic: React.FC = () => {
   ]);
   const [selectedRange, setSelectedRange] = useState<string>("today");
 
-  const timeRange: TimeRange = {
-    startTime:
-      dateRange[0]?.format("YYYY-MM-DD") || dayjs().format("YYYY-MM-DD"),
-    endTime: dateRange[1]?.format("YYYY-MM-DD") || dayjs().format("YYYY-MM-DD"),
-  };
+  // const timeRange: TimeRange = {
+  //   startTime:
+  //     dateRange[0]?.format("YYYY-MM-DD") || dayjs().format("YYYY-MM-DD"),
+  //   endTime: dateRange[1]?.format("YYYY-MM-DD") || dayjs().format("YYYY-MM-DD"),
+  // };
+  const timeRange: TimeRange | undefined =
+    dateRange[0] && dateRange[1]
+      ? {
+          startTime: dateRange[0].format("YYYY-MM-DD"),
+          endTime: dateRange[1].format("YYYY-MM-DD"),
+        }
+      : undefined;
 
   const { sellingOrderStatisticsData, isLoading, refetch } =
-    useSellingOrderStatistics(timeRange);
+    useSellingOrderStatistics(
+      timeRange || {
+        startTime: dayjs().format("YYYY-MM-DD"),
+        endTime: dayjs().format("YYYY-MM-DD"),
+      },
+    );
 
   const disabledDate: DatePickerProps["disabledDate"] = (current) => {
     return current && dayjs(current).isAfter(dayjs().endOf("day"));
@@ -172,7 +184,14 @@ const OverviewStatistic: React.FC = () => {
               {selectedRange === "custom" && (
                 <RangePicker
                   // picker=""
-                  onChange={(dates) => setDateRange(dates as [Dayjs, Dayjs])}
+                  // onChange={(dates) => setDateRange(dates as [Dayjs, Dayjs])}
+                  onChange={(dates) => {
+                    if (dates) {
+                      setDateRange(dates as [Dayjs | null, Dayjs | null]);
+                    } else {
+                      setDateRange([null, null]);
+                    }
+                  }}
                   disabledDate={disabledDate}
                 />
               )}
