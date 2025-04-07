@@ -2,13 +2,17 @@ import { Chart } from "@antv/g2";
 import { useCallback, useEffect, useRef } from "react";
 
 const data = [
-  { TIME: "10:10", call: 4, waiting: 2, people: 2 },
-  { TIME: "10:15", call: 2, waiting: 6, people: 3 },
-  { TIME: "10:20", call: 13, waiting: 2, people: 5 },
-  { TIME: "10:25", call: 9, waiting: 9, people: 1 },
-  { TIME: "10:30", call: 5, waiting: 2, people: 3 },
-  { TIME: "10:35", call: 8, waiting: 2, people: 1 },
-  { TIME: "10:40", call: 13, waiting: 1, people: 2 },
+  { "Nhân viên": "Nguyễn Văn A", "Số đơn đã xử lí": 2, "Số đơn xử lí chậm": 2 },
+  { "Nhân viên": "Nguyễn Văn B", "Số đơn đã xử lí": 6, "Số đơn xử lí chậm": 3 },
+  { "Nhân viên": "Nguyễn Văn C", "Số đơn đã xử lí": 2, "Số đơn xử lí chậm": 5 },
+  {
+    "Nhân viên": "Nguyễn Văn D",
+    "Số đơn đã xử lí": 20,
+    "Số đơn xử lí chậm": 1,
+  },
+  { "Nhân viên": "Nguyễn Văn E", "Số đơn đã xử lí": 2, "Số đơn xử lí chậm": 3 },
+  { "Nhân viên": "Nguyễn Văn F", "Số đơn đã xử lí": 2, "Số đơn xử lí chậm": 1 },
+  { "Nhân viên": "Nguyễn Văn G", "Số đơn đã xử lí": 1, "Số đơn xử lí chậm": 2 },
 ];
 
 const Test: React.FC = () => {
@@ -32,20 +36,24 @@ const Test: React.FC = () => {
 
     newChart
       .interval()
-      .encode("x", "TIME")
-      .encode("y", "waiting")
-      .encode("color", () => "waiting")
-      .encode("series", () => "waiting")
-      .axis("y", { title: "Waiting" });
+      .encode("x", "Nhân viên")
+      .encode("y", "Số đơn đã xử lí")
+      .encode("color", () => "Số đơn đã xử lí") // custom màu cho '"Số đơn đã xử lí"'
+      .encode("series", () => "Số đơn đã xử lí");
+    // .axis("y", { title: "Số đơn đã xử lí" });
 
     newChart
       .interval()
-      .encode("x", "TIME")
-      .encode("y", "people")
-      .encode("color", () => "people")
-      .encode("series", () => "people")
-      .scale("y", { independent: true })
-      .axis("y", { position: "right", grid: null, title: "People" });
+      .encode("x", "Nhân viên")
+      .encode("y", "Số đơn xử lí chậm")
+      .encode("color", () => "Số đơn xử lí chậm")
+      .encode("series", () => "Số đơn xử lí chậm")
+      // .scale("y", { independent: true })
+      .axis("y", {
+        // position: "right",
+        // grid: null,
+        title: "Số  đơn",
+      });
 
     newChart.render();
 
@@ -88,7 +96,9 @@ const Test: React.FC = () => {
   return (
     <div className="rounded-lg bg-white">
       <div className="flex items-center justify-between px-6 pt-6">
-        <h2 className="text-xl font-semibold">Test</h2>
+        <h2 className="text-xl font-semibold">
+          Thống kê đơn hàng theo nhân viên
+        </h2>
       </div>
 
       <div ref={chartContainer} className="" />

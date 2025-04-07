@@ -49,7 +49,20 @@ const ValidVouchers: React.FC<ValidVouchersProps> = ({
     select: (data) => data?.payload,
   });
 
-  const voucherData = vouchers?.data;
+  // valid vouchers has startDate < currentDate < endDate
+  const voucherData = vouchers?.data.filter((voucher: IVoucher) => {
+    const startDate = new Date(
+      voucher.startDate instanceof Object && "toDate" in voucher.startDate
+        ? voucher.startDate.toDate()
+        : voucher.startDate,
+    );
+    const endDate = new Date(
+      voucher.endDate instanceof Object && "toDate" in voucher.endDate
+        ? voucher.endDate.toDate()
+        : voucher.endDate,
+    );
+    return startDate <= new Date() && endDate >= new Date();
+  });
   const voucherMeta = vouchers?.meta;
 
   const currentDate = new Date();

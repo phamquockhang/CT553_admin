@@ -1,6 +1,6 @@
 import { useLoggedInUser } from "../features/auth/hooks/useLoggedInUser";
 import OverviewStatistic from "../features/statistic/OverviewStatistic";
-import SunburstChart from "../features/statistic/SunburstChart";
+import ProductDistributionChart from "../features/statistic/ProductDistributionChart";
 import Test from "../features/statistic/Test";
 import { useDynamicTitle } from "../utils";
 import { motion } from "framer-motion";
@@ -16,9 +16,7 @@ const Dashboard: React.FC = () => {
       {isManager ? (
         <div className="flex flex-col gap-2">
           <OverviewStatistic />
-          <SunburstChart />
-          <Test />
-          <Test />
+          <ProductDistributionChart />
           <Test />
         </div>
       ) : (
