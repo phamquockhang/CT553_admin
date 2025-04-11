@@ -12,6 +12,7 @@ import isoWeek from "dayjs/plugin/isoWeek";
 import quarterOfYear from "dayjs/plugin/quarterOfYear";
 import isBetween from "dayjs/plugin/isBetween";
 import { PRIMARY_COLOR, VIETNAM_TIMEZONE } from "./interfaces/common";
+import FloatingChat from "./features/chat-box/FloatingChat";
 
 dayjs.locale("vi");
 dayjs.extend(utc);
@@ -50,6 +51,7 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <ReactQueryDevtools initialIsOpen={true} buttonPosition="bottom-left" />
         <AppRouter />
+        <FloatingChat />
       </QueryClientProvider>
       <Toaster
         position="top-center"
