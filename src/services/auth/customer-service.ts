@@ -18,6 +18,7 @@ interface ICustomerService {
     sort?: SortParams,
   ): Promise<ApiResponse<Page<ICustomer>>>;
   getCustomerIdByEmail(email: string): Promise<ApiResponse<string>>;
+  getCustomerById(id: string): Promise<ApiResponse<ICustomer>>;
   create(
     newCustomer: Omit<ICustomer, "customerId">,
   ): Promise<ApiResponse<ICustomer>>;
@@ -53,6 +54,10 @@ class CustomerService implements ICustomerService {
 
   async getCustomerIdByEmail(email: string): Promise<ApiResponse<string>> {
     return await apiClient.get(`/customer_id/${email}`);
+  }
+
+  async getCustomerById(id: string): Promise<ApiResponse<ICustomer>> {
+    return await apiClient.get(`/${id}`);
   }
 
   async create(
