@@ -34,7 +34,7 @@ const FloatingChat = () => {
 
       {visible && !selectedConversationId && (
         <motion.div
-          className="fixed right-6 top-20 z-50 w-[400px] max-w-[90%]"
+          className="fixed bottom-10 right-6 z-50 w-[400px] max-w-[90%]"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
