@@ -4,15 +4,14 @@ import { ConfigProvider } from "antd";
 import viVN from "antd/locale/vi_VN";
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
-import { Toaster } from "react-hot-toast";
-import AppRouter from "./router/AppRouter";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
+import isBetween from "dayjs/plugin/isBetween";
 import isoWeek from "dayjs/plugin/isoWeek";
 import quarterOfYear from "dayjs/plugin/quarterOfYear";
-import isBetween from "dayjs/plugin/isBetween";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+import { Toaster } from "react-hot-toast";
 import { PRIMARY_COLOR, VIETNAM_TIMEZONE } from "./interfaces/common";
-import FloatingChat from "./features/chat-box/FloatingChat";
+import AppRouter from "./router/AppRouter";
 
 dayjs.locale("vi");
 dayjs.extend(utc);
@@ -51,7 +50,6 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <ReactQueryDevtools initialIsOpen={true} buttonPosition="bottom-left" />
         <AppRouter />
-        <FloatingChat />
       </QueryClientProvider>
       <Toaster
         position="top-center"

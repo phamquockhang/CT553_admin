@@ -23,6 +23,7 @@ import { useLoggedInUser } from "../features/auth/hooks/useLoggedInUser";
 import OverviewNotification from "../features/notification/OverviewNotification";
 import { Module, PERMISSIONS } from "../interfaces";
 import { authService } from "../services";
+import FloatingChat from "../features/chat-box/FloatingChat";
 
 const { Header, Sider } = Layout;
 
@@ -353,6 +354,8 @@ const AdminLayout: React.FC = () => {
 
   return (
     <Layout className="min-h-screen">
+      <FloatingChat />
+
       <Sider
         style={siderStyle}
         width={230}

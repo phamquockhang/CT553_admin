@@ -66,23 +66,21 @@ export const PERMISSIONS = {
     UPDATE: { method: "PUT", apiPath: "/api/v1/vouchers/{id}" },
     DELETE: { method: "DELETE", apiPath: "/api/v1/vouchers/{id}" },
   },
+  [Module.CONVERSATIONS]: {
+    GET_PAGINATION: { method: "GET", apiPath: "/api/v1/conversations" },
+    GET_BY_ID: { method: "GET", apiPath: "/api/v1/conversations/{id}" },
+    CREATE: { method: "POST", apiPath: "/api/v1/conversations" },
+    UPDATE: { method: "PUT", apiPath: "/api/v1/conversations/{id}" },
+    DELETE: { method: "DELETE", apiPath: "/api/v1/conversations/{id}" },
+  },
+  [Module.MESSAGES]: {
+    GET_PAGINATION: { method: "GET", apiPath: "/api/v1/messages" },
+    GET_BY_ID: { method: "GET", apiPath: "/api/v1/messages/{id}" },
+    CREATE: { method: "POST", apiPath: "/api/v1/messages" },
+    UPDATE: { method: "PUT", apiPath: "/api/v1/messages/{id}" },
+    DELETE: { method: "DELETE", apiPath: "/api/v1/messages/{id}" },
+  },
 };
-
-// export const ROUTE_TYPE_TRANSLATION: Record<RouteType, string> = {
-//   [RouteType.DOMESTIC]: "Nội địa",
-//   [RouteType.INTERNATIONAL]: "Quốc tế",
-// };
-
-// export const PASSENGER_TYPE_TRANSLATION: Record<PassengerType, string> = {
-//   [PassengerType.ADULT]: "Người lớn",
-//   [PassengerType.CHILD]: "Trẻ em",
-//   [PassengerType.INFANT]: "Em bé",
-// };
-
-// export const COUPON_TYPE_TRANSLATION: Record<CouponType, string> = {
-//   [CouponType.AMOUNT]: "VND",
-//   [CouponType.PERCENTAGE]: "%",
-// };
 
 export const VIETNAM_TIMEZONE = "Asia/Ho_Chi_Minh";
 
