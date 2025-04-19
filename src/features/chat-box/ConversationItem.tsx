@@ -9,10 +9,9 @@ dayjs.extend(relativeTime);
 interface ConversationItemProps {
   conversation: IConversation;
   participantId: string | undefined;
-  onSelect: (conversationId: string) => void;
+  onSelect: React.Dispatch<React.SetStateAction<IConversation | undefined>>;
 }
 
-// Component riêng để hiển thị mỗi item
 const ConversationItem: React.FC<ConversationItemProps> = ({
   conversation,
   participantId,
@@ -28,12 +27,12 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
   return (
     <List.Item
       className="cursor-pointer px-4 py-3 transition-colors hover:bg-gray-50"
-      onClick={() => onSelect(conversation.conversationId)}
+      onClick={() => onSelect(conversation)}
     >
       <List.Item.Meta
         avatar={
           <Avatar alt="avatar" size={48} className="border bg-blue-800">
-            {getUserInfomation?.lastName?.charAt(0)?.toUpperCase() ||
+            {getUserInfomation?.firstName?.charAt(0)?.toUpperCase() ||
               customerId.charAt(0).toUpperCase()}
           </Avatar>
         }

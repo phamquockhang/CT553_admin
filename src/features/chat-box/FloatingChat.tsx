@@ -1,8 +1,10 @@
 import { MessageOutlined } from "@ant-design/icons";
+import { useQuery } from "@tanstack/react-query";
 import { FloatButton } from "antd";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { Module, PERMISSIONS } from "../../interfaces";
+import { IConversation, Module, PERMISSIONS } from "../../interfaces";
+import { conversationService } from "../../services";
 import Access from "../auth/Access";
 import { useLoggedInUser } from "../auth/hooks/useLoggedInUser";
 import ChatBox from "./ChatBox";
@@ -10,11 +12,23 @@ import ConversationList from "./ConversationList";
 
 const FloatingChat = () => {
   const [visible, setVisible] = useState(false);
-  const [selectedConversationId, setSelectedConversationId] = useState<
-    string | null
-  >(null);
+  const [selectedConversation, setSelectedConversation] = useState<
+    IConversation | undefined
+  >(undefined);
 
   const { user } = useLoggedInUser();
+  const participantId = user?.staffId;
+
+  const {
+    data: conversationData,
+    isLoading: isLoadingConversations,
+    error,
+  } = useQuery({
+    queryKey: ["conversations", participantId],
+    queryFn: () => conversationService.getConversations(participantId || ""),
+    select: (data) => data.payload,
+    enabled: !!participantId,
+  });
 
   if (user?.email !== "supporter@gmail.com") return null;
 
@@ -32,7 +46,7 @@ const FloatingChat = () => {
         />
       )}
 
-      {visible && !selectedConversationId && (
+      {visible && !selectedConversation && (
         <motion.div
           className="fixed bottom-10 right-6 z-50 w-[400px] max-w-[90%]"
           initial={{ opacity: 0, y: 20 }}
@@ -41,24 +55,28 @@ const FloatingChat = () => {
           transition={{ duration: 0.3 }}
         >
           <ConversationList
+            conversationData={conversationData}
+            isLoadingConversations={isLoadingConversations}
+            error={error}
+            participantId={participantId}
             setVisible={setVisible}
-            setSelectedConversationId={setSelectedConversationId}
+            setSelectedConversation={setSelectedConversation}
           />
         </motion.div>
       )}
 
-      {visible && selectedConversationId && (
+      {visible && selectedConversation && (
         <motion.div
-          className="fixed right-6 top-20 z-50 w-[400px] max-w-[90%]"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          className="fixed bottom-10 right-6 z-50 w-[400px] max-w-[90%]"
+          initial={{ opacity: 0.1, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, y: 20 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.2 }}
         >
           <ChatBox
             setVisible={setVisible}
-            conversationId={selectedConversationId}
-            setSelectedConversationId={setSelectedConversationId}
+            conversation={selectedConversation}
+            setSelectedConversation={setSelectedConversation}
           />
         </motion.div>
       )}

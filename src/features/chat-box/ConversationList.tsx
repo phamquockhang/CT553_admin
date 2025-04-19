@@ -1,50 +1,56 @@
-import { useQuery } from "@tanstack/react-query";
 import { Card, Empty, List, Spin } from "antd";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useEffect, useState } from "react";
 import { IoCloseOutline } from "react-icons/io5";
 import { IConversation } from "../../interfaces";
-import { conversationService } from "../../services";
-import { useLoggedInUser } from "../auth/hooks/useLoggedInUser";
 import ConversationItem from "./ConversationItem";
 
 dayjs.extend(relativeTime);
 
 interface ConversationListProps {
+  conversationData: IConversation[] | undefined;
+  isLoadingConversations: boolean;
+  error: Error | null;
+  participantId: string | undefined;
   setVisible: (visible: boolean) => void;
-  setSelectedConversationId: (conversationId: string | null) => void;
+  setSelectedConversation: React.Dispatch<
+    React.SetStateAction<IConversation | undefined>
+  >;
 }
 
 const ConversationList: React.FC<ConversationListProps> = ({
+  conversationData,
+  isLoadingConversations,
+  error,
+  participantId,
   setVisible,
-  setSelectedConversationId,
+  setSelectedConversation,
 }) => {
   const [conversations, setConversations] = useState<IConversation[]>([]);
-  const { user } = useLoggedInUser();
-  const participantId = user?.staffId;
-
-  const {
-    data: conversationData,
-    isLoading: isLoadingConversations,
-    error,
-  } = useQuery({
-    queryKey: ["conversations", participantId],
-    queryFn: () => conversationService.getConversations(participantId || ""),
-    select: (data) => data.payload,
-    enabled: !!participantId,
-  });
 
   useEffect(() => {
     if (conversationData) {
-      setConversations(conversationData);
+      const filteredAndSortedConversations = conversationData
+        .filter((conversation) => conversation.lastMessageContent)
+        .sort((a, b) => {
+          const aDate = dayjs(a.updatedAt);
+          const bDate = dayjs(b.updatedAt);
+          return bDate.isAfter(aDate) ? 1 : -1;
+        });
+      setConversations(filteredAndSortedConversations);
+    } else {
+      setConversations([]);
     }
   }, [conversationData]);
+
+  // console.log("conversationData: ", conversationData);
+  // console.log("Conversations: ", conversations);
 
   return (
     <Card
       title="Danh sách trò chuyện"
-      className="mx-auto mt-4 w-full max-w-2xl rounded-2xl shadow-lg"
+      className="mx-auto mt-2 w-full max-w-2xl rounded-2xl shadow-lg"
       extra={
         <div
           className="cursor-pointer p-1 transition-opacity hover:opacity-80"
@@ -54,7 +60,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
         </div>
       }
     >
-      <div className="scrollbar-thin scrollbar-thumb-gray-300 h-96 overflow-y-auto">
+      <div className="scrollbar-thin scrollbar-thumb-gray-300 h-[415.6px] overflow-y-auto">
         {isLoadingConversations ? (
           <div className="flex h-full items-center justify-center">
             <Spin tip="Đang tải..." />
@@ -71,7 +77,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
               <ConversationItem
                 conversation={conversation}
                 participantId={participantId}
-                onSelect={setSelectedConversationId}
+                onSelect={setSelectedConversation}
               />
             )}
           />

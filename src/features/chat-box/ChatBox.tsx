@@ -9,7 +9,7 @@ import { IoMdArrowRoundBack } from "react-icons/io";
 import { IoCloseOutline, IoSend } from "react-icons/io5";
 import SockJS from "sockjs-client";
 import Loading from "../../common/components/Loading";
-import { IMessage, PaginationParams } from "../../interfaces";
+import { IConversation, IMessage, PaginationParams } from "../../interfaces";
 import { messageService } from "../../services";
 import { useLoggedInUser } from "../auth/hooks/useLoggedInUser";
 
@@ -20,15 +20,18 @@ const WebSocketURL = import.meta.env.VITE_WEBSOCKET_URL as string;
 
 interface ChatBoxProps {
   setVisible: (visible: boolean) => void;
-  conversationId: string;
-  setSelectedConversationId: (conversationId: string | null) => void;
+  conversation: IConversation;
+  setSelectedConversation: React.Dispatch<
+    React.SetStateAction<IConversation | undefined>
+  >;
 }
 
 const ChatBox: React.FC<ChatBoxProps> = ({
   setVisible,
-  conversationId,
-  setSelectedConversationId,
+  conversation,
+  setSelectedConversation,
 }) => {
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [pagination, setPagination] = useState<PaginationParams>({
     page: 1,
@@ -44,26 +47,38 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
 
+  const customerId =
+    conversation.participantId1 === senderId
+      ? conversation.participantId2
+      : conversation.participantId1;
+
   useEffect(() => {
     if (shouldScrollToBottom && messages.length > 0) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      messagesEndRef.current?.scrollIntoView({
+        behavior: isInitialLoad ? "auto" : "smooth",
+      });
+
+      if (isInitialLoad) {
+        setIsInitialLoad(false);
+      }
     }
-  }, [messages, shouldScrollToBottom]);
+  }, [messages, shouldScrollToBottom, isInitialLoad]);
 
   const { data: existedMessages, isLoading } = useQuery({
-    queryKey: ["messages", pagination, conversationId],
-    queryFn: () => messageService.getMessages(pagination, conversationId),
+    queryKey: ["messages", pagination, conversation.conversationId],
+    queryFn: () =>
+      messageService.getMessages(pagination, conversation.conversationId),
     select: (data) => data.payload?.data,
-    enabled: hasMore,
+    enabled: !!conversation.conversationId,
   });
 
   useEffect(() => {
-    if (existedMessages && existedMessages.length > 0) {
+    if (existedMessages) {
       setMessages((prev) => {
         const newMessages = existedMessages.filter(
           (newMsg) => !prev.some((msg) => msg.messageId === newMsg.messageId),
         );
-        const updatedMessages = [...newMessages, ...prev];
+        const updatedMessages = [...prev, ...newMessages];
         const sortedMessages = updatedMessages.sort((a, b) =>
           dayjs(a.createdAt).isBefore(dayjs(b.createdAt)) ? -1 : 1,
         );
@@ -72,28 +87,43 @@ const ChatBox: React.FC<ChatBoxProps> = ({
         }
         return sortedMessages;
       });
+
       if (existedMessages.length < pagination.pageSize) {
         setHasMore(false);
       }
+
+      queryClient.invalidateQueries({
+        predicate: (query) => {
+          return (
+            query.queryKey.includes("conversations") ||
+            query.queryKey.includes("messages")
+          );
+        },
+      });
     }
-  }, [existedMessages, pagination.page, pagination.pageSize]);
+  }, [existedMessages, pagination.page, pagination.pageSize, queryClient]);
+
+  // `/topic/messages/${conversation.conversationId}`,
 
   useEffect(() => {
     const socket = new SockJS(WebSocketURL);
     const client = new Client({
       webSocketFactory: () => socket,
       onConnect: () => {
-        client.subscribe(`/topic/messages/${conversationId}`, (message) => {
-          const messageObj: IMessage = JSON.parse(message.body);
-          setShouldScrollToBottom(true);
-          setMessages((prev) =>
-            prev.some((msg) => msg.messageId === messageObj.messageId)
-              ? prev
-              : [...prev, messageObj].sort((a, b) =>
-                  dayjs(a.createdAt).isBefore(dayjs(b.createdAt)) ? -1 : 1,
-                ),
-          );
-        });
+        client.subscribe(
+          `/topic/messages/${conversation.conversationId}`,
+          (message) => {
+            const messageObj: IMessage = JSON.parse(message.body);
+            setShouldScrollToBottom(true);
+            setMessages((prev) =>
+              prev.some((msg) => msg.messageId === messageObj.messageId)
+                ? prev
+                : [...prev, messageObj].sort((a, b) =>
+                    dayjs(a.createdAt).isBefore(dayjs(b.createdAt)) ? -1 : 1,
+                  ),
+            );
+          },
+        );
       },
       onStompError: (error) => {
         console.error("WebSocket error:", error);
@@ -108,14 +138,14 @@ const ChatBox: React.FC<ChatBoxProps> = ({
         console.error("Error during client deactivation:", error);
       });
     };
-  }, [conversationId]);
+  }, [conversation.conversationId]);
 
   const sendMessage = () => {
     if (stompClient.current?.connected && input.trim()) {
       const messagePayload = {
-        conversationId,
+        conversationId: conversation.conversationId,
         senderId,
-        receiverId: "44ec8f26-0e4e-4111-9ead-b7ff85a91cc2", // TODO: Lấy từ dữ liệu conversation
+        receiverId: customerId,
         content: input,
         status: "SENT",
         sentAt: new Date().toISOString(),
@@ -128,7 +158,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({
       setShouldScrollToBottom(true);
       queryClient.invalidateQueries({
         predicate: (query) => {
-          return query.queryKey.includes("conversations");
+          return (
+            query.queryKey.includes("conversations") ||
+            query.queryKey.includes("messages")
+          );
         },
       });
     }
@@ -146,12 +179,15 @@ const ChatBox: React.FC<ChatBoxProps> = ({
     }
   };
 
-  useEffect(() => {
-    setMessages([]);
-    setPagination({ page: 1, pageSize: 30 });
-    setHasMore(true);
-    setShouldScrollToBottom(true);
-  }, [conversationId]);
+  // useEffect(() => {
+  //   setMessages([]);
+  //   setPagination({ page: 1, pageSize: 30 });
+  //   setHasMore(true);
+  //   setShouldScrollToBottom(true);
+  // }, [conversationId]);
+
+  // console.log("existedMessages", existedMessages);
+  // console.log("messages", messages);
 
   return (
     <Card
@@ -159,7 +195,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
         <div className="flex gap-2">
           <IoMdArrowRoundBack
             className="cursor-pointer text-xl text-black hover:opacity-80"
-            onClick={() => setSelectedConversationId(null)}
+            onClick={() => setSelectedConversation(undefined)}
           />
           Tin nhắn
         </div>
@@ -183,7 +219,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
           </div>
         ) : (
           <>
-            {messages.map((msg, index) => {
+            {/* {messages.map((msg, index) => {
               const isSender = msg.senderId === senderId;
               const prevMsg = messages[index - 1];
               const isDifferentDay =
@@ -241,10 +277,97 @@ const ChatBox: React.FC<ChatBoxProps> = ({
                       )}
                     </div>
 
-                    {isLastSenderMessage && (
-                      <div className="mt-1 rounded-md bg-gray-400 px-1 text-xs text-white">
-                        {renderStatus(msg.status)}
+                    {index === messages.length - 1 && (
+                      <>
+                        {isSender ? (
+                          <div className="mt-1 rounded-md bg-gray-400 px-1 text-xs text-white">
+                            {renderStatus(msg.status)}
+                          </div>
+                        ) : (
+                          <div className="mt-1 text-xs text-gray-500">
+                            {dayjs(msg.createdAt).format("HH:mm")}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              );
+            })} */}
+            {messages.map((msg, index) => {
+              const isSender = msg.senderId === senderId;
+              const prevMsg = messages[index - 1];
+              const isDifferentDay =
+                index === 0 ||
+                !dayjs(msg.createdAt).isSame(dayjs(prevMsg?.createdAt), "day");
+
+              const isLastSenderMessage =
+                isSender &&
+                (index === messages.length - 1 ||
+                  messages[index + 1]?.senderId !== senderId);
+              const isLastReceiverMessage =
+                !isSender &&
+                (index === messages.length - 1 ||
+                  messages[index + 1]?.senderId === senderId);
+              const isReplyToLastSender =
+                !isSender && prevMsg?.senderId === senderId;
+
+              const renderStatus = (status: string) => {
+                switch (status) {
+                  case "SENT":
+                    return "✓ Đã gửi";
+                  case "DELIVERED":
+                    return "✓✓ Đã nhận";
+                  case "SEEN":
+                    return "✓✓ Đã xem";
+                  default:
+                    return "";
+                }
+              };
+
+              return (
+                <div key={msg.messageId || index}>
+                  {isDifferentDay && (
+                    <div className="mb-2 mt-2 border-t border-t-slate-300 text-center text-xs text-gray-400">
+                      {dayjs(msg.createdAt).isToday()
+                        ? "Hôm nay"
+                        : dayjs(msg.createdAt).format("DD/MM/YYYY HH:mm")}
+                    </div>
+                  )}
+
+                  <div
+                    className={`flex flex-col ${
+                      isSender ? "items-end" : "items-start"
+                    } `}
+                  >
+                    <div
+                      className={`inline-block min-w-16 max-w-60 break-words rounded-md px-4 py-2 ${
+                        isSender
+                          ? "bg-blue-900 text-white"
+                          : isReplyToLastSender
+                            ? "mt-2 bg-gray-200 text-black"
+                            : "bg-gray-200 text-black"
+                      } `}
+                    >
+                      <div className="whitespace-pre-wrap text-sm">
+                        {msg.content}
                       </div>
+
+                      {(isLastSenderMessage || isLastReceiverMessage) && (
+                        <div className="mt-1 text-xs font-thin">
+                          {dayjs(msg.createdAt).format("HH:mm")}
+                        </div>
+                      )}
+                    </div>
+
+                    {index === messages.length - 1 && (
+                      <>
+                        {isSender && (
+                          <div className="mt-1 rounded-md bg-gray-400 px-1 text-xs text-white">
+                            {renderStatus(msg.status)}
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
