@@ -1,13 +1,14 @@
-import { plotlib } from "@antv/g2-extension-plot";
 import { Runtime, corelib, extend } from "@antv/g2";
-import { useCallback, useEffect, useMemo, useRef } from "react";
-import { useItemStatistics } from "./hooks/useItemStatistics";
+import { plotlib } from "@antv/g2-extension-plot";
 import { Button, Spin } from "antd";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { TbReload } from "react-icons/tb";
+import ProductList from "./components/ProductList";
+import { useItemStatistics } from "./hooks/useItemStatistics";
 
 const Chart = extend(Runtime, { ...corelib(), ...plotlib() });
 
-const SunburstChart: React.FC = () => {
+const ProductDistributionChart: React.FC = () => {
   const chartContainer = useRef<HTMLDivElement>(null);
   const resizeTimeout = useRef<number | null>(null);
   const chartRef = useRef<InstanceType<typeof Chart> | null>(null);
@@ -100,10 +101,14 @@ const SunburstChart: React.FC = () => {
           <Spin />
         </div>
       ) : (
-        <div ref={chartContainer} className="" />
+        <>
+          <div ref={chartContainer} className="" />
+
+          <ProductList />
+        </>
       )}
     </div>
   );
 };
 
-export default SunburstChart;
+export default ProductDistributionChart;

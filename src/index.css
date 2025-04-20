@@ -53,3 +53,13 @@
     padding: 10px 15px 15px !important;
   }
 }
+
+/* Ẩn scrollbar cho các trình duyệt phổ biến */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
