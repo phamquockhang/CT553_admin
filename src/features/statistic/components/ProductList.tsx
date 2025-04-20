@@ -56,7 +56,7 @@ const ProductList: React.FC = () => {
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-xl font-semibold">Danh sách sản phẩm</h2>
 
-          <div className="w-[30%]">
+          <div className="w-[60%]">
             <div className="flex gap-3">
               <Input.Search
                 placeholder="Nhập tên sản phẩm để tìm kiếm..."

@@ -2,6 +2,7 @@ import { AxiosInstance } from "axios";
 import {
   ApiResponse,
   IStaff,
+  IStaffByOrderStatistic,
   Page,
   PaginationParams,
   SortParams,
@@ -17,6 +18,7 @@ interface IStaffService {
     filter?: StaffFilterCriteria,
     sort?: SortParams,
   ): Promise<ApiResponse<Page<IStaff>>>;
+  getStaffByOrderStatistic(): Promise<ApiResponse<IStaffByOrderStatistic[]>>;
   create(newStaff: Omit<IStaff, "staffId">): Promise<ApiResponse<IStaff>>;
   update(staffId: string, updatedStaff: IStaff): Promise<ApiResponse<IStaff>>;
   delete(staffId: string): Promise<ApiResponse<void>>;
@@ -43,6 +45,12 @@ class StaffService implements IStaffService {
         direction: sort?.direction !== "" ? sort?.direction : undefined,
       },
     });
+  }
+
+  async getStaffByOrderStatistic(): Promise<
+    ApiResponse<IStaffByOrderStatistic[]>
+  > {
+    return await apiClient.get("/statistic");
   }
 
   async create(

@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useLoggedInUser } from "../features/auth/hooks/useLoggedInUser";
 import OverviewStatistic from "../features/statistic/OverviewStatistic";
 import ProductDistributionChart from "../features/statistic/ProductDistributionChart";
-import Test from "../features/statistic/Test";
+import OrderByStaff from "../features/statistic/OrderByStaff";
 import { useDynamicTitle } from "../utils";
 
 const Dashboard: React.FC = () => {
@@ -16,8 +16,8 @@ const Dashboard: React.FC = () => {
       {isManager ? (
         <div className="flex flex-col gap-2">
           <OverviewStatistic />
+          <OrderByStaff />
           <ProductDistributionChart />
-          <Test />
         </div>
       ) : (
         <div className="flex flex-col gap-4">
