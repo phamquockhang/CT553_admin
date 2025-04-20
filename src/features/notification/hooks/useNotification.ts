@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { messageService } from "../../../services";
+import { notificationService } from "../../../services";
 import { NotificationFilterCriteria, SortParams } from "../../../interfaces";
 import { useLoggedInUser } from "../../auth/hooks/useLoggedInUser";
 
@@ -27,7 +27,12 @@ export const useNotification = () => {
       { page, pageSize, query, sort, filter },
     ],
     queryFn: () =>
-      messageService.getMessages({ page, pageSize }, query, filter, sort),
+      notificationService.getNotifications(
+        { page, pageSize },
+        query,
+        filter,
+        sort,
+      ),
     select: (data) => data?.payload,
   });
 
