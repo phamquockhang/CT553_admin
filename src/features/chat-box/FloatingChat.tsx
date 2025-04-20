@@ -2,19 +2,24 @@ import { MessageOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { FloatButton } from "antd";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IConversation, Module, PERMISSIONS } from "../../interfaces";
 import { conversationService } from "../../services";
 import Access from "../auth/Access";
 import { useLoggedInUser } from "../auth/hooks/useLoggedInUser";
 import ChatBox from "./ChatBox";
 import ConversationList from "./ConversationList";
+import SockJS from "sockjs-client";
+import { Client } from "@stomp/stompjs";
+
+const WebSocketURL = import.meta.env.VITE_WEBSOCKET_URL as string;
 
 const FloatingChat = () => {
   const [visible, setVisible] = useState(false);
   const [selectedConversation, setSelectedConversation] = useState<
     IConversation | undefined
   >(undefined);
+  const [, setClient] = useState<Client | null>(null);
 
   const { user } = useLoggedInUser();
   const participantId = user?.staffId;
@@ -23,12 +28,43 @@ const FloatingChat = () => {
     data: conversationData,
     isLoading: isLoadingConversations,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["conversations", participantId],
     queryFn: () => conversationService.getConversations(participantId || ""),
     select: (data) => data.payload,
     enabled: !!participantId,
   });
+
+  useEffect(() => {
+    const socket = new SockJS(WebSocketURL);
+    const refetchConversationClient = new Client({
+      webSocketFactory: () => socket,
+      onConnect: () => {
+        console.log("Connected to WebSocket - For Conversations");
+        refetchConversationClient.subscribe(
+          `/topic/conversations/${participantId}`,
+          (message) => {
+            console.log("Received message:", message.body);
+            console.log("REFETCHING CONVERSATION");
+            refetch();
+          },
+        );
+      },
+      onStompError: (error) => {
+        console.error("WebSocket error:", error);
+      },
+    });
+
+    refetchConversationClient.activate();
+    setClient(refetchConversationClient);
+
+    return () => {
+      refetchConversationClient.deactivate().catch((error) => {
+        console.error("Error during client deactivation:", error);
+      });
+    };
+  }, [participantId, refetch]);
 
   if (user?.email !== "supporter@gmail.com") return null;
 
@@ -77,6 +113,7 @@ const FloatingChat = () => {
             setVisible={setVisible}
             conversation={selectedConversation}
             setSelectedConversation={setSelectedConversation}
+            refetch={refetch}
           />
         </motion.div>
       )}

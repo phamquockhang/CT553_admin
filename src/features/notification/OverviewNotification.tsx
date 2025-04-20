@@ -63,7 +63,7 @@ const OverviewNotification: React.FC = () => {
     const stompClient = new Client({
       webSocketFactory: () => socket,
       onConnect: () => {
-        console.log("Connected to WebSocket");
+        console.log("Connected to WebSocket - For Notifications");
         stompClient.subscribe(
           `/topic/notifications/${user.staffId}`,
           (message) => {
