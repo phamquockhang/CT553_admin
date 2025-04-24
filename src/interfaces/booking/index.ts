@@ -19,11 +19,15 @@ export interface ISellingOrder {
   usedVoucher?: IUsedVoucher;
   createdAt?: string;
   updatedAt?: string;
+
+  totalWeightBySellingOrderDetailId?: number;
 }
 
 export interface IBriefSellingOrderStatus {
   orderStatus: string;
   paymentStatus: string;
+
+  sellingOrderDetails: ISellingOrderDetail[];
 }
 
 export interface IOrderStatus {
@@ -38,6 +42,7 @@ export interface ISellingOrderDetail {
   productName: string;
   unit: string;
   quantity: number;
+  totalWeight?: number;
   unitPrice: number;
   totalPrice: number;
 }

@@ -135,12 +135,55 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
         return;
       }
 
+      // const newSellingOrderStatus = {
+      //   orderStatus: revertOrderStatus(values.orderStatus as string),
+      //   paymentStatus: revertPaymentStatus(values.paymentStatus as string),
+      // };
+
+      const result = Object.entries(
+        values.totalWeightBySellingOrderDetailId || {},
+      ).map(([id, totalWeight]) => ({
+        sellingOrderDetailId: Number(id),
+        totalWeight,
+      }));
+
+      console.log("result", result);
+      if (!result || result.length === 0) {
+        toast.error("Vui lòng nhập khối lượng");
+        return;
+      } else {
+        for (const item of result) {
+          if (item.totalWeight <= 0 || item.totalWeight === undefined) {
+            toast.error(
+              "Vui lòng nhập đầy đủ các khối lượng tương ứng của các sản phẩm được đặt hàng!",
+            );
+            return;
+          }
+        }
+      }
+
+      const newSellingOrderDetails =
+        sellingOrderToUpdate.sellingOrderDetails.map((sellingOrderDetail) => ({
+          ...sellingOrderDetail,
+
+          totalWeight:
+            result.find(
+              (detail) =>
+                detail.sellingOrderDetailId ===
+                sellingOrderDetail.sellingOrderDetailId,
+            )?.totalWeight || 0,
+        }));
+
       const newSellingOrderStatus = {
         orderStatus: revertOrderStatus(values.orderStatus as string),
         paymentStatus: revertPaymentStatus(values.paymentStatus as string),
+        sellingOrderDetails: newSellingOrderDetails,
       };
 
-      console.log("Updating with values", newSellingOrderStatus);
+      console.log("values", values);
+      console.log("Updating with values", {
+        newSellingOrderStatus,
+      });
 
       updateOrderStatus({
         sellingOrderId: values.sellingOrderId,
@@ -170,6 +213,7 @@ const SellingOrderForm: React.FC<SellingOrderFormProps> = ({
             productName: product.productName,
             unit: product.unit,
             quantity: product.quantity,
+            // totalWeight: product.totalWeight,
             unitPrice: product.unitPrice,
             totalPrice: product.totalPrice,
           })),

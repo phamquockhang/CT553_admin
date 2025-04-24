@@ -1,4 +1,4 @@
-import { Table, TableProps, Typography } from "antd";
+import { Form, InputNumber, Table, TableProps, Typography } from "antd";
 import {
   ISellingOrder,
   ISellingOrderDetail,
@@ -26,12 +26,21 @@ const SellingOrderDetails: React.FC<SellingOrderDetailsProps> = ({
     usedVoucher,
   } = sellingOrder;
 
-  console.log("sellingOrder", sellingOrder);
+  // console.log("sellingOrder", sellingOrder);
 
   const totalPrice = sellingOrderDetails.reduce(
     (total, product) => total + product.totalPrice,
     0,
   );
+
+  const handleChangeTotalWeight = (
+    value: number,
+    sellingOrderDetail: ISellingOrderDetail,
+  ) => {
+    // Handle the change of total weight here
+    console.log("Value changed:", value);
+    console.log("Selling Order Detail:", sellingOrderDetail);
+  };
 
   const columns: TableProps<ISellingOrderDetail>["columns"] = [
     {
@@ -56,6 +65,36 @@ const SellingOrderDetails: React.FC<SellingOrderDetailsProps> = ({
           <span>
             {record.quantity} {record.unit}
           </span>
+        );
+      },
+    },
+    {
+      title: "Khối lượng tương ứng (kg)",
+      dataIndex: "totalWeight",
+      key: "totalWeight",
+      align: "center",
+      render: (_, record) => {
+        return (
+          <>
+            <Form.Item
+              name={[
+                "totalWeightBySellingOrderDetailId",
+                `${record.sellingOrderDetailId}`,
+              ]}
+              style={{ margin: 0 }}
+              initialValue={record.totalWeight}
+            >
+              <InputNumber
+                className="centered-input w-20 p-1"
+                min={0}
+                // value={record.totalWeight}
+                disabled={record.totalWeight !== undefined}
+                onChange={(e) => {
+                  handleChangeTotalWeight(e as number, record);
+                }}
+              />
+            </Form.Item>
+          </>
         );
       },
     },
