@@ -32,8 +32,12 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
       <List.Item.Meta
         avatar={
           <Avatar alt="avatar" size={48} className="border bg-blue-800">
-            {getUserInfomation?.firstName?.charAt(0)?.toUpperCase() ||
-              customerId.charAt(0).toUpperCase()}
+            {getUserInfomation?.firstName
+              .trim()
+              .split(" ")
+              .pop()
+              ?.charAt(0)
+              ?.toUpperCase() || customerId.charAt(0).toUpperCase()}
           </Avatar>
         }
         title={
