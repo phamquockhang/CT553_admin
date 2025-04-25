@@ -294,23 +294,23 @@ const ProductsTable: React.FC<ProductTableProps> = ({
         </div>
       ),
     },
-    {
-      key: "updatedAt",
-      title: "Ngày cập nhật",
-      dataIndex: "updatedAt",
-      width: "9%",
-      align: "center",
-      render: (updatedAt: string) =>
-        updatedAt ? formatTimestamp(updatedAt) : "",
-      sorter: true,
-      defaultSortOrder: getDefaultSortOrder(searchParams, "updatedAt"),
-      sortIcon: ({ sortOrder }) => (
-        <div className="flex flex-col text-[10px]">
-          <CaretUpFilled style={{ color: colorSortUpIcon(sortOrder) }} />
-          <CaretDownFilled style={{ color: colorSortDownIcon(sortOrder) }} />
-        </div>
-      ),
-    },
+    // {
+    //   key: "updatedAt",
+    //   title: "Ngày cập nhật",
+    //   dataIndex: "updatedAt",
+    //   width: "9%",
+    //   align: "center",
+    //   render: (updatedAt: string) =>
+    //     updatedAt ? formatTimestamp(updatedAt) : "",
+    //   sorter: true,
+    //   defaultSortOrder: getDefaultSortOrder(searchParams, "updatedAt"),
+    //   sortIcon: ({ sortOrder }) => (
+    //     <div className="flex flex-col text-[10px]">
+    //       <CaretUpFilled style={{ color: colorSortUpIcon(sortOrder) }} />
+    //       <CaretDownFilled style={{ color: colorSortDownIcon(sortOrder) }} />
+    //     </div>
+    //   ),
+    // },
     {
       title: "Hành động",
       key: "action",
