@@ -102,10 +102,7 @@ const ProductDistributionChart: React.FC = () => {
         </div>
       ) : (
         <div className="flex">
-          <div
-            ref={chartContainer}
-            // className="h-96"
-          />
+          <div ref={chartContainer} className="w-[30%]" />
 
           <ProductList />
         </div>
