@@ -16,6 +16,12 @@ export interface IStaff {
   updatedAt?: string;
 }
 
+export interface IStaffByOrderStatistic {
+  staffName: string;
+  processedOrders: number;
+  delayedOrders: number;
+}
+
 export interface StaffFilterCriteria {
   isActivated?: string;
 }

@@ -481,6 +481,7 @@ import Loading from "../../common/components/Loading";
 import { IConversation, IMessage, PaginationParams } from "../../interfaces";
 import { messageService } from "../../services";
 import { useLoggedInUser } from "../auth/hooks/useLoggedInUser";
+import { useUserInfomation } from "./hooks";
 
 dayjs.extend(isToday);
 dayjs.extend(isSameOrBefore);
@@ -522,6 +523,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({
     conversation.participantId1 === senderId
       ? conversation.participantId2
       : conversation.participantId1;
+
+  const { getUserInfomation } = useUserInfomation(customerId);
+  console.log("customer", getUserInfomation);
 
   useEffect(() => {
     if (shouldScrollToBottom && messages.length > 0) {
@@ -712,7 +716,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
             className="cursor-pointer text-xl text-black hover:opacity-80"
             onClick={() => setSelectedConversation(undefined)}
           />
-          Tin nhắn
+          {getUserInfomation?.lastName + " " + getUserInfomation?.firstName}
         </div>
       }
       className="mx-auto mt-2 max-h-full w-full max-w-2xl rounded-2xl shadow"

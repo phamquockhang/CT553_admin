@@ -101,11 +101,11 @@ const ProductDistributionChart: React.FC = () => {
           <Spin />
         </div>
       ) : (
-        <>
-          <div ref={chartContainer} className="" />
+        <div className="flex">
+          <div ref={chartContainer} className="w-[30%]" />
 
           <ProductList />
-        </>
+        </div>
       )}
     </div>
   );

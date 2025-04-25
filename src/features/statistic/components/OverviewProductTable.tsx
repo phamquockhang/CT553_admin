@@ -4,7 +4,14 @@ import {
   FilterFilled,
 } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Table, TablePaginationConfig, TableProps, Tag, Tooltip } from "antd";
+import {
+  Space,
+  Table,
+  TablePaginationConfig,
+  TableProps,
+  Tag,
+  Tooltip,
+} from "antd";
 import { SorterResult } from "antd/es/table/interface";
 import { GetProp } from "antd/lib";
 import React, { useEffect, useState } from "react";
@@ -23,6 +30,7 @@ import {
   getSortDirection,
   getUniqueColorByString,
 } from "../../../utils";
+import ViewProduct from "../../category/product/ViewProduct";
 // import DeleteProduct from "./DeleteProduct";
 // import UpdateProduct from "./UpdateProduct";
 // import ViewProduct from "./ViewProduct";
@@ -286,7 +294,7 @@ const OverviewProductTable: React.FC<ProductTableProps> = ({
       key: "weight",
       title: "Khối lượng tồn kho (kg)",
       dataIndex: ["weights.weightValue"],
-      // width: "7%",
+      width: "13%",
       align: "center",
       render: (_, record) => {
         const weight = record.weight.weightValue.toLocaleString();
@@ -342,27 +350,27 @@ const OverviewProductTable: React.FC<ProductTableProps> = ({
     //     </div>
     //   ),
     // },
-    // {
-    //   title: "Hành động",
-    //   key: "action",
-    //   // width: "7%",
-    //   align: "center",
+    {
+      title: "Hành động",
+      key: "action",
+      // width: "7%",
+      align: "center",
 
-    //   render: (record: IProduct) => (
-    //     <Space>
-    //       <ViewProduct product={record} />
-    //       <Access permission={PERMISSIONS[Module.PRODUCTS].UPDATE} hideChildren>
-    //         <UpdateProduct productId={record.productId} />
-    //       </Access>
-    //       <Access permission={PERMISSIONS[Module.PRODUCTS].DELETE} hideChildren>
-    //         <DeleteProduct
-    //           productId={record.productId}
-    //           setIsDeleting={setIsDeleting}
-    //         />
-    //       </Access>
-    //     </Space>
-    //   ),
-    // },
+      render: (record: IProduct) => (
+        <Space>
+          <ViewProduct product={record} />
+          {/* <Access permission={PERMISSIONS[Module.PRODUCTS].UPDATE} hideChildren>
+            <UpdateProduct productId={record.productId} />
+          </Access>
+          <Access permission={PERMISSIONS[Module.PRODUCTS].DELETE} hideChildren>
+            <DeleteProduct
+              productId={record.productId}
+              setIsDeleting={setIsDeleting}
+            />
+          </Access> */}
+        </Space>
+      ),
+    },
   ];
 
   // if (!isLoading) {
