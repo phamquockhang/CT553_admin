@@ -1,7 +1,8 @@
+import { IAddress } from "../address";
 import { Dayjs } from "dayjs";
 
 export interface IStaff {
-  id: string;
+  staffId: string;
   email: string;
   firstName: string;
   lastName: string;
@@ -13,6 +14,12 @@ export interface IStaff {
   role: IRole;
   createdAt: string;
   updatedAt?: string;
+}
+
+export interface IStaffByOrderStatistic {
+  staffName: string;
+  processedOrders: number;
+  delayedOrders: number;
 }
 
 export interface StaffFilterCriteria {
@@ -20,7 +27,7 @@ export interface StaffFilterCriteria {
 }
 
 export interface ICustomer {
-  id: string;
+  customerId: string;
   email: string;
   firstName: string;
   lastName: string;
@@ -30,12 +37,28 @@ export interface ICustomer {
   isActivated: boolean;
   dob: string | Dayjs;
   role: IRole;
+  addresses: IAddress[];
+  score: IScore;
   createdAt: string;
   updatedAt?: string;
+
+  // Custom fields to init address for new customer
+  provinceId: number;
+  districtId: number;
+  wardCode: string;
+  description: string;
 }
 
 export interface CustomerFilterCriteria {
   isActivated?: string;
+}
+
+export interface IScore {
+  scoreId: string;
+  changeAmount: number;
+  newValue: number;
+  isCurrent: boolean;
+  createdAt: string;
 }
 
 export interface IPermission {
@@ -55,12 +78,16 @@ export interface PermissionFilterCriteria {
 
 export interface IRole {
   roleId: number;
-  roleName: string;
-  active: boolean;
-  description?: string;
+  name: string;
+  description: string;
+  isActivated: boolean;
   permissions: IPermission[];
   createdAt: string;
   updatedAt?: string;
+}
+
+export interface RoleFilterCriteria {
+  isActivated?: string;
 }
 
 export interface IAuthRequest {

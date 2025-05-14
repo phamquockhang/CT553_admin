@@ -16,6 +16,7 @@ const Access: React.FC<AccessProps> = ({
   //hideChildren = true: check quyền và hiển thị children, nếu không sẽ không hiển thị gì cả
   const [isAllowed, setIsAllowed] = useState<boolean>(true);
   const { user } = useLoggedInUser();
+
   useEffect(() => {
     if (user) {
       const { permissions } = user.role;

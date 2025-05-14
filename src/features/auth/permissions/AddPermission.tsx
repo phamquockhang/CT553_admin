@@ -1,7 +1,7 @@
 import { PlusOutlined } from "@ant-design/icons";
 import { Button, Modal } from "antd";
 import { useState } from "react";
-import UpdateUserForm from "./UpdatePermissionForm";
+import UpdatePermissionForm from "./UpdatePermissionForm";
 
 const AddPermission: React.FC = () => {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
@@ -27,7 +27,7 @@ const AddPermission: React.FC = () => {
         onCancel={handleCloseModal}
         footer={null}
       >
-        <UpdateUserForm onCancel={handleCloseModal} />
+        <UpdatePermissionForm onCancel={handleCloseModal} />
       </Modal>
     </>
   );

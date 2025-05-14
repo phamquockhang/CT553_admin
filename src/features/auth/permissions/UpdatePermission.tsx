@@ -1,14 +1,14 @@
 import { EditOutlined } from "@ant-design/icons";
 import { Modal, Tooltip } from "antd";
 import { useState } from "react";
-import UpdateUserForm from "./UpdatePermissionForm";
-import { IStaff } from "../../../interfaces";
+import UpdatePermissionForm from "./UpdatePermissionForm";
+import { IPermission } from "../../../interfaces";
 
-interface UpdateStaffProps {
-  user: IStaff;
+interface UpdatePermissionProps {
+  permission: IPermission;
 }
 
-const UpdateStaff: React.FC<UpdateStaffProps> = ({ user }) => {
+const UpdatePermission: React.FC<UpdatePermissionProps> = ({ permission }) => {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 
   const handleOpenModal = () => {
@@ -30,15 +30,18 @@ const UpdateStaff: React.FC<UpdateStaffProps> = ({ user }) => {
       <Modal
         open={isOpenModal}
         width="50%"
-        title={<span className="text-lg">Cập nhật thông tin nhân viên</span>}
+        title={<span className="text-lg">Cập nhật quyền hạn</span>}
         destroyOnClose
         onCancel={handleCloseModal}
         footer={null}
       >
-        <UpdateUserForm userToUpdate={user} onCancel={handleCloseModal} />
+        <UpdatePermissionForm
+          permissionToUpdate={permission}
+          onCancel={handleCloseModal}
+        />
       </Modal>
     </>
   );
 };
 
-export default UpdateStaff;
+export default UpdatePermission;

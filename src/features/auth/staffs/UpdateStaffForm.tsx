@@ -12,7 +12,7 @@ import {
 import dayjs, { Dayjs } from "dayjs";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
-import { IStaff } from "../../../interfaces";
+import { IStaff, RoleName } from "../../../interfaces";
 import { staffService } from "../../../services";
 
 interface UpdateStaffFormProps {
@@ -57,18 +57,19 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
           return query.queryKey.includes("staffs");
         },
       });
-      toast.success(data.message || "Operation successful");
-
-      onCancel();
-      form.resetFields();
+      if (data && data.success) {
+        console.log("success", data.success);
+        onCancel();
+        form.resetFields();
+        toast.success(data?.message || "Operation successful");
+      } else if (data && !data.success) {
+        console.log("success", data.success);
+        toast.error(data?.message || "Operation failed");
+      }
     },
 
-    onError: (error: { response?: { data?: { message?: string } } }) => {
-      if (error.response?.data?.message) {
-        toast.error(error.response.data.message);
-      } else {
-        toast.error("An error occurred");
-      }
+    onError: (error) => {
+      console.log(error);
     },
   });
 
@@ -83,18 +84,19 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
           return query.queryKey.includes("staffs");
         },
       });
-      toast.success(data.message || "Operation successful");
-
-      onCancel();
-      form.resetFields();
+      if (data && data.success) {
+        console.log("success", data.success);
+        onCancel();
+        form.resetFields();
+        toast.success(data?.message || "Operation successful");
+      } else if (data && !data.success) {
+        console.log("success", data.success);
+        toast.error(data?.message || "Operation failed");
+      }
     },
 
-    onError: (error: { response?: { data?: { message?: string } } }) => {
-      if (error.response?.data?.message) {
-        toast.error(error.response.data.message);
-      } else {
-        toast.error("An error occurred");
-      }
+    onError: (error) => {
+      console.log(error);
     },
   });
 
@@ -107,15 +109,12 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
       const updatedUser = {
         ...userToUpdate,
         ...values,
-        firstName: values.firstName.toUpperCase(),
-        lastName: values.lastName.toUpperCase(),
       };
-      updateUser({ userId: userToUpdate.id, updatedUser });
+      updateUser({ userId: userToUpdate.staffId, updatedUser });
+      console.log("updatedUser", updatedUser);
     } else {
       const newUser = {
         ...values,
-        firstName: values.firstName.toUpperCase(),
-        lastName: values.lastName.toUpperCase(),
       };
       createUser(newUser);
     }
@@ -150,11 +149,7 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
             },
           ]}
         >
-          <Input
-            readOnly={viewOnly}
-            placeholder="Họ, ví dụ PHẠM"
-            style={{ textTransform: "uppercase" }}
-          />
+          <Input readOnly={viewOnly} placeholder="Họ, ví dụ PHẠM" />
         </Form.Item>
 
         <Form.Item
@@ -173,11 +168,7 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
             },
           ]}
         >
-          <Input
-            readOnly={viewOnly}
-            placeholder="Tên đệm & tên, ví dụ VAN A"
-            style={{ textTransform: "uppercase" }}
-          />
+          <Input readOnly={viewOnly} placeholder="Tên đệm & tên, ví dụ VAN A" />
         </Form.Item>
       </div>
 
@@ -234,7 +225,7 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
         >
           <Switch
             defaultValue={true}
-            disabled={viewOnly}
+            disabled={viewOnly || userToUpdate?.role.name === RoleName.MANAGER}
             checkedChildren="ACTIVE"
             unCheckedChildren="INACTIVE"
           />
@@ -287,9 +278,7 @@ const UpdateUserForm: React.FC<UpdateStaffFormProps> = ({
       {!viewOnly && (
         <Form.Item className="text-right" wrapperCol={{ span: 24 }}>
           <Space>
-            <Button onClick={onCancel} loading={isCreating || isUpdating}>
-              Hủy
-            </Button>
+            <Button onClick={onCancel}>Hủy</Button>
 
             <Button
               type="primary"

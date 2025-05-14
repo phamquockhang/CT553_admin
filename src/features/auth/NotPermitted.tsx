@@ -8,10 +8,10 @@ const NotPermitted: React.FC = () => {
     <Result
       status="403"
       title="Truy cập bị từ chối"
-      subTitle="Xin lỗi, bạn không có quyền truy cập thông tin này."
+      subTitle="Xin lỗi! Bạn không có quyền truy cập thông tin này!"
       extra={
         <Button type="primary" onClick={() => navigate("/")}>
-          Trở về trang chủ
+          Trở lại
         </Button>
       }
     />

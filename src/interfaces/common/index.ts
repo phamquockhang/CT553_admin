@@ -10,6 +10,7 @@ export interface ApiResponse<T> {
   error?: string;
   message?: string;
   payload?: T;
+  data?: T;
 }
 
 export interface PaginationParams {
@@ -39,12 +40,9 @@ export interface SortParams {
 //   order: string;
 // }
 
-export interface ICountry {
-  countryId: number;
-  countryName: string;
-  countryCode: number;
-  iso2Code: string;
-  iso3Code: string;
+export interface TimeRange {
+  startTime: string;
+  endTime: string;
 }
 
 export type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];

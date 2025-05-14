@@ -1,3 +1,65 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  html {
+    height: 100%;
+    line-height: 1.2;
+  }
+
+  body {
+    min-width: 440px;
+  }
+
+  .card {
+    @apply rounded-lg bg-white px-6 py-4;
+  }
+
+  .table-icon {
+    @apply h-6 w-6 cursor-pointer;
+  }
+
+  .table-row-light,
+  .table-row-light .ant-table-cell.ant-table-column-sort {
+    @apply bg-white;
+  }
+
+  .table-row-gray,
+  .table-row-gray .ant-table-cell.ant-table-column-sort {
+    @apply bg-gray-200/60;
+  }
+
+  .ant-timeline-item.timeline-item-content {
+    @apply pb-[4rem];
+  }
+
+  .right-input .ant-input-number-input {
+    text-align: right !important;
+    padding-right: 25px !important;
+  }
+
+  .centered-input .ant-input-number-input {
+    text-align: center !important;
+    padding: 0 !important;
+    /* margin: 0 !important; */
+  }
+
+  .centered-input .ant-input-number-group-addon {
+    padding: 0 !important;
+  }
+
+  .custom-card div.ant-card-body {
+    padding: 10px 15px 15px !important;
+  }
+}
+
+/* Ẩn scrollbar cho các trình duyệt phổ biến */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}

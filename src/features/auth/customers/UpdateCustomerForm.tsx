@@ -10,10 +10,13 @@ import {
   Switch,
 } from "antd";
 import dayjs, { Dayjs } from "dayjs";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { ICustomer } from "../../../interfaces";
-import { customerService } from "../../../services/auth/customer-service";
+import { IAddress } from "../../../interfaces/address";
+import { addressService, customerService } from "../../../services";
+import AddAddress from "./components/AddAddress";
+import AddressItem from "./components/AddressItem";
 
 interface UpdateCustomerFormProps {
   userToUpdate?: ICustomer;
@@ -39,6 +42,10 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
 }) => {
   const [form] = Form.useForm<ICustomer>();
   const queryClient = useQueryClient();
+  const [provinceId, setProvinceId] = useState<number>();
+  const [districtId, setDistrictId] = useState<number>();
+  const [wardCode, setWardCode] = useState<string>();
+  const [description, setDescription] = useState<string>();
 
   useEffect(() => {
     if (userToUpdate) {
@@ -57,18 +64,40 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
           return query.queryKey.includes("customers");
         },
       });
-      toast.success(data.message || "Operation successful");
-
-      onCancel();
-      form.resetFields();
+      if (data && data.success) {
+        toast.success(data?.message || "Operation successful");
+        onCancel();
+        form.resetFields();
+      } else if (data && !data.success)
+        toast.error(data?.message || "Operation failed");
     },
 
-    onError: (error: { response?: { data?: { message?: string } } }) => {
-      if (error.response?.data?.message) {
-        toast.error(error.response.data.message);
-      } else {
-        toast.error("An error occurred");
-      }
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
+  const { mutate: createAddress } = useMutation({
+    mutationFn: ({
+      customerId,
+      newAddress,
+    }: {
+      customerId: string;
+      newAddress: IAddress;
+    }) => {
+      return addressService.create(customerId, newAddress);
+    },
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        predicate: (query) => {
+          return query.queryKey.includes("addresses");
+        },
+      });
+    },
+
+    onError: (error) => {
+      console.log(error);
     },
   });
 
@@ -83,18 +112,16 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
           return query.queryKey.includes("customers");
         },
       });
-      toast.success(data.message || "Operation successful");
-
-      onCancel();
-      form.resetFields();
+      if (data && data.success) {
+        toast.success(data?.message || "Operation successful");
+        onCancel();
+        form.resetFields();
+      } else if (data && !data.success)
+        toast.error(data?.message || "Operation failed");
     },
 
-    onError: (error: { response?: { data?: { message?: string } } }) => {
-      if (error.response?.data?.message) {
-        toast.error(error.response.data.message);
-      } else {
-        toast.error("An error occurred");
-      }
+    onError: (error) => {
+      console.log(error);
     },
   });
 
@@ -107,23 +134,37 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
       const updatedUser = {
         ...userToUpdate,
         ...values,
-        firstName: values.firstName.toUpperCase(),
-        lastName: values.lastName.toUpperCase(),
       };
-      updateCustomer({ userId: userToUpdate.id, updatedUser });
+      updateCustomer({ userId: userToUpdate.customerId, updatedUser });
     } else {
       const newUser = {
         ...values,
-        firstName: values.firstName.toUpperCase(),
-        lastName: values.lastName.toUpperCase(),
       };
-      createCustomer(newUser);
+      createCustomer(newUser, {
+        onSuccess: (newCustomer) => {
+          // if (newCustomer && newCustomer.success) {
+          if (provinceId && districtId && wardCode && description) {
+            createAddress({
+              // customerId: customerIdByEmail?.payload || "",
+              customerId: newCustomer.payload?.customerId || "",
+              newAddress: {
+                provinceId,
+                districtId,
+                wardCode,
+                description,
+                isDefault: true,
+              },
+            });
+          }
+          // }
+        },
+      });
     }
   }
 
-  // if (isRolesLoading) {
-  //   return <Loading />;
-  // }
+  const sortedAddress = userToUpdate?.addresses?.sort((a, b) => {
+    return (a.createdAt ?? 0) > (b.createdAt ?? 0) ? -1 : 1;
+  });
 
   return (
     <Form
@@ -153,7 +194,6 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
           <Input
             readOnly={userToUpdate != undefined || viewOnly}
             placeholder="Họ, ví dụ PHẠM"
-            style={{ textTransform: "uppercase" }}
           />
         </Form.Item>
 
@@ -176,11 +216,9 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
           <Input
             readOnly={userToUpdate != undefined || viewOnly}
             placeholder="Tên đệm & tên, ví dụ VAN A"
-            style={{ textTransform: "uppercase" }}
           />
         </Form.Item>
       </div>
-
       <div className="flex gap-8">
         <Form.Item
           className="flex-1"
@@ -224,8 +262,23 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
           />
         </Form.Item>
       </div>
-
       <div className="flex gap-8">
+        {userToUpdate && (
+          <Form.Item className="flex-1" label="Điểm tích lũy:">
+            <Input
+              className="font-semibold text-[#003F8F]"
+              readOnly={true}
+              // bordered={false}
+              variant="borderless"
+              value={
+                userToUpdate.score
+                  ? userToUpdate.score.newValue.toLocaleString()
+                  : "0"
+              }
+            />
+          </Form.Item>
+        )}
+
         <Form.Item
           className="flex-1"
           label="Trạng thái"
@@ -240,7 +293,6 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
           />
         </Form.Item>
       </div>
-
       <div className="flex gap-8">
         <Form.Item
           className="flex-1"
@@ -284,12 +336,40 @@ const UpdateUserForm: React.FC<UpdateCustomerFormProps> = ({
         )}
       </div>
 
+      {userToUpdate ? (
+        <div className="flex gap-8">
+          <Form.Item className="flex-1" label="Địa chỉ">
+            {sortedAddress && sortedAddress.length > 0 ? (
+              <>
+                {sortedAddress.map((address) => (
+                  <AddressItem key={address.addressId} address={address} />
+                ))}
+              </>
+            ) : (
+              <>
+                <Input readOnly={true} value={"Chưa cập nhật địa chỉ"} />
+              </>
+            )}
+          </Form.Item>
+        </div>
+      ) : (
+        <AddAddress
+          form={form}
+          provinceId={provinceId}
+          setProvinceId={setProvinceId}
+          districtId={districtId}
+          setDistrictId={setDistrictId}
+          wardCode={wardCode}
+          setWardCode={setWardCode}
+          description={description}
+          setDescription={setDescription}
+          setFormattedAddress={() => {}}
+        />
+      )}
       {!viewOnly && (
         <Form.Item className="text-right" wrapperCol={{ span: 24 }}>
           <Space>
-            <Button onClick={onCancel} loading={isCreating || isUpdating}>
-              Hủy
-            </Button>
+            <Button onClick={onCancel}>Hủy</Button>
 
             <Button
               type="primary"

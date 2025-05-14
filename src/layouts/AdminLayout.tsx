@@ -1,16 +1,29 @@
-import { Button, Dropdown, Layout, Menu, theme } from "antd";
-import Loading from "../common/components/Loading";
-import { useEffect, useState } from "react";
-import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { MenuProps } from "antd/lib";
-import { useLoggedInUser } from "../features/auth/hooks/useLoggedInUser";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { authService } from "../services";
+import { Button, Dropdown, Layout, Menu, theme, Tooltip } from "antd";
+import { MenuProps } from "antd/lib";
+import { useEffect, useState } from "react";
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
-import { FaKey, FaUserCircle, FaUserCog, FaUsers } from "react-icons/fa";
-import { Module, PERMISSIONS } from "../interfaces";
-import { MdDashboard } from "react-icons/md";
+import { BiSolidCategory } from "react-icons/bi";
+import { BsFillBoxSeamFill } from "react-icons/bs";
+import {
+  FaKey,
+  FaSitemap,
+  FaUserCircle,
+  FaUserCog,
+  FaUsers,
+} from "react-icons/fa";
+import { FaBoxesStacked, FaMoneyBillTrendUp } from "react-icons/fa6";
+import { IoMdArrowDropleft, IoMdArrowDropright } from "react-icons/io";
 import { IoShieldCheckmark } from "react-icons/io5";
+import { LuTicketPercent } from "react-icons/lu";
+import { MdCategory, MdDashboard } from "react-icons/md";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import Loading from "../common/components/Loading";
+import { useLoggedInUser } from "../features/auth/hooks/useLoggedInUser";
+import OverviewNotification from "../features/notification/OverviewNotification";
+import { Module, PERMISSIONS } from "../interfaces";
+import { authService } from "../services";
+import FloatingChat from "../features/chat-box/FloatingChat";
 
 const { Header, Sider } = Layout;
 
@@ -46,12 +59,32 @@ const AdminLayout: React.FC = () => {
         </span>
       ),
     },
+    {
+      key: "profile",
+      label: (
+        <NavLink to="/profile" className="px-1">
+          Thông tin cá nhân
+        </NavLink>
+      ),
+    },
   ];
+
+  useEffect(() => {
+    const newKeys =
+      location.pathname === "/"
+        ? ["dashboard"]
+        : location.pathname.slice(1).split("/");
+
+    setSelectedKeys(newKeys);
+  }, [location.pathname]);
 
   useEffect(() => {
     if (user?.role.permissions) {
       const permissions = user.role.permissions;
 
+      const hasDashboard = Boolean(user.role.roleId === 1);
+
+      //////////////////////////////////////////
       const viewStaffs = permissions.find(
         (item) =>
           item.apiPath === PERMISSIONS[Module.STAFF].GET_PAGINATION.apiPath &&
@@ -74,20 +107,72 @@ const AdminLayout: React.FC = () => {
             PERMISSIONS[Module.PERMISSIONS].GET_PAGINATION.apiPath &&
           item.method === PERMISSIONS[Module.PERMISSIONS].GET_PAGINATION.method,
       );
+      //////////////
       const hasAuthChildren: boolean = Boolean(
         viewStaffs || viewRoles || viewPermissions || viewCustomers,
       );
 
+      //////////////////////////////////////////
+      const viewItems = permissions.find(
+        (item) =>
+          item.apiPath === PERMISSIONS[Module.ITEMS].GET_PAGINATION.apiPath &&
+          item.method === PERMISSIONS[Module.ITEMS].GET_PAGINATION.method,
+      );
+      const viewProducts = permissions.find(
+        (item) =>
+          item.apiPath ===
+            PERMISSIONS[Module.PRODUCTS].GET_PAGINATION.apiPath &&
+          item.method === PERMISSIONS[Module.PRODUCTS].GET_PAGINATION.method,
+      );
+      //////////////
+      const hasCategoryChildren: boolean = Boolean(viewItems || viewProducts);
+
+      //////////////////////////////////////////
+      const viewOrders = permissions.find(
+        (item) =>
+          item.apiPath ===
+            PERMISSIONS[Module.SELLING_ORDERS].GET_PAGINATION.apiPath &&
+          item.method ===
+            PERMISSIONS[Module.SELLING_ORDERS].GET_PAGINATION.method,
+      );
+      //////////////
+      const hasOrderChildren: boolean = Boolean(viewOrders);
+
+      //////////////////////////////////////////
+      const viewTransactions = permissions.find(
+        (item) =>
+          item.apiPath ===
+            PERMISSIONS[Module.TRANSACTIONS].GET_PAGINATION.apiPath &&
+          item.method ===
+            PERMISSIONS[Module.TRANSACTIONS].GET_PAGINATION.method,
+      );
+      //////////////
+      const hasTransactionChildren: boolean = Boolean(viewTransactions);
+
+      //////////////////////////////////////////
+      const viewVouchers = permissions.find(
+        (item) =>
+          item.apiPath ===
+            PERMISSIONS[Module.VOUCHERS].GET_PAGINATION.apiPath &&
+          item.method === PERMISSIONS[Module.VOUCHERS].GET_PAGINATION.method,
+      );
+      //////////////
+      const hasVoucherChildren: boolean = Boolean(viewVouchers);
+
       const menuItems = [
-        {
-          label: (
-            <NavLink className="" to="/">
-              Trang chủ
-            </NavLink>
-          ),
-          key: "dashboard",
-          icon: <MdDashboard />,
-        },
+        ...(hasDashboard
+          ? [
+              {
+                label: (
+                  <NavLink className="" to="/">
+                    Trang chủ
+                  </NavLink>
+                ),
+                key: "dashboard",
+                icon: <MdDashboard />,
+              },
+            ]
+          : []),
         ...(hasAuthChildren
           ? [
               {
@@ -133,6 +218,83 @@ const AdminLayout: React.FC = () => {
                     : []),
                 ],
               },
+            ]
+          : []),
+        ...(hasCategoryChildren
+          ? [
+              {
+                label: "Danh mục",
+                key: "categories",
+                icon: <BiSolidCategory />,
+                children: [
+                  ...(viewItems
+                    ? [
+                        {
+                          label: <NavLink to="/items">Mặt hàng</NavLink>,
+                          key: "items",
+                          icon: <FaSitemap />,
+                        },
+                      ]
+                    : []),
+                  ...(viewProducts
+                    ? [
+                        {
+                          label: <NavLink to="/products">Sản phẩm</NavLink>,
+                          key: "products",
+                          icon: <MdCategory />,
+                        },
+                      ]
+                    : []),
+                ],
+              },
+            ]
+          : []),
+        ...(hasOrderChildren
+          ? [
+              {
+                label: "Đơn hàng",
+                key: "orders",
+                icon: <FaBoxesStacked />,
+                children: [
+                  ...(viewOrders
+                    ? [
+                        {
+                          label: (
+                            <NavLink to="/selling-orders">Đơn bán</NavLink>
+                          ),
+                          key: "selling-orders",
+                          icon: <BsFillBoxSeamFill />,
+                        },
+                      ]
+                    : []),
+                ],
+              },
+            ]
+          : []),
+        ...(hasTransactionChildren
+          ? [
+              ...(viewTransactions
+                ? [
+                    {
+                      label: <NavLink to="/transactions">Giao dịch</NavLink>,
+                      key: "transactions",
+                      icon: <FaMoneyBillTrendUp />,
+                    },
+                  ]
+                : []),
+            ]
+          : []),
+        ...(hasVoucherChildren
+          ? [
+              ...(viewVouchers
+                ? [
+                    {
+                      label: <NavLink to="/vouchers">Mã giảm giá</NavLink>,
+                      key: "vouchers",
+                      icon: <LuTicketPercent />,
+                    },
+                  ]
+                : []),
             ]
           : []),
       ];
@@ -192,6 +354,8 @@ const AdminLayout: React.FC = () => {
 
   return (
     <Layout className="min-h-screen">
+      <FloatingChat />
+
       <Sider
         style={siderStyle}
         width={230}
@@ -201,7 +365,11 @@ const AdminLayout: React.FC = () => {
         theme="light"
       >
         <div className="demo-logo-vertical flex flex-col items-center pb-6">
-          <img src="logo_512.png" alt="Logo" className="w-36 p-3" />
+          <img
+            src="/src/assets/img/logo_512.png"
+            alt="Logo"
+            className="w-36 p-3"
+          />
           {!collapsed && <h1 className="font-bold">{user?.firstName}</h1>}
         </div>
         <Menu
@@ -215,23 +383,44 @@ const AdminLayout: React.FC = () => {
         />
       </Sider>
       <Layout
-        className="transition-all duration-200"
+        className="bg-slate-200/65 transition-all duration-200"
         style={{ marginInlineStart: collapsed ? 80 : 230 }}
       >
         <Header
           style={headerStyle}
-          className="shadow-md transition-all duration-200"
+          className="max-w-screen-2xl shadow-md transition-all duration-200"
         >
           <div className="flex items-center justify-between">
-            <Button
-              type="text"
-              icon={collapsed ? <AiOutlineMenuUnfold /> : <AiOutlineMenuFold />}
-              onClick={() => setCollapsed(!collapsed)}
-              style={{
-                fontSize: "20px",
-              }}
-            />
-            <div className="relative mr-5 flex items-center gap-2">
+            <div className="flex items-center gap-3">
+              <Tooltip title={collapsed ? "Mở menu" : "Đóng menu"}>
+                <Button
+                  type="text"
+                  icon={
+                    collapsed ? <AiOutlineMenuUnfold /> : <AiOutlineMenuFold />
+                  }
+                  onClick={() => setCollapsed(!collapsed)}
+                  style={{
+                    fontSize: "20px",
+                  }}
+                />
+              </Tooltip>
+              <Tooltip className="cursor-pointer" title="Quay lại">
+                <IoMdArrowDropleft
+                  className="text-2xl"
+                  onClick={() => window.history.back()}
+                />
+              </Tooltip>
+              <Tooltip title="Đi tới" className="cursor-pointer">
+                <IoMdArrowDropright
+                  className="text-2xl"
+                  onClick={() => window.history.forward()}
+                />
+              </Tooltip>
+            </div>
+
+            <div className="relative mr-5 flex items-center gap-3">
+              <OverviewNotification />
+
               <Dropdown
                 menu={{ items }}
                 placement="bottom"
@@ -258,7 +447,7 @@ const AdminLayout: React.FC = () => {
           </div>
         </Header>
 
-        <Layout.Content>
+        <Layout.Content className="max-w-screen-2xl">
           <div className="m-2 mt-[70px]">
             <Outlet />
           </div>

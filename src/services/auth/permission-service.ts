@@ -32,32 +32,29 @@ class PermissionService implements IPermissionService {
     filter?: PermissionFilterCriteria,
     sort?: SortParams,
   ): Promise<ApiResponse<Page<IPermission>>> {
-    return (
-      await apiClient.get("", {
-        params: {
-          ...pagination,
-          ...filter,
-          query,
-          sortBy: sort?.sortBy !== "" ? sort?.sortBy : undefined,
-          direction: sort?.direction !== "" ? sort?.direction : undefined,
-        },
-      })
-    ).data;
+    return await apiClient.get("", {
+      params: {
+        ...pagination,
+        ...filter,
+        query,
+        sortBy: sort?.sortBy !== "" ? sort?.sortBy : undefined,
+        direction: sort?.direction !== "" ? sort?.direction : undefined,
+      },
+    });
   }
 
   async getAllPermissions(): Promise<ApiResponse<IPermission[]>> {
-    return (await apiClient.get("/all")).data;
+    return await apiClient.get("/all");
   }
 
   async create(
     permission: Omit<IPermission, "permissionId">,
   ): Promise<ApiResponse<IPermission>> {
-    return (await apiClient.post("", permission)).data;
+    return await apiClient.post("", permission);
   }
 
   async update(permission: IPermission): Promise<ApiResponse<IPermission>> {
-    return (await apiClient.put(`/${permission.permissionId}`, permission))
-      .data;
+    return await apiClient.put(`/${permission.permissionId}`, permission);
   }
 }
 

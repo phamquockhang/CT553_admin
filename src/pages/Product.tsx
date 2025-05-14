@@ -3,18 +3,18 @@ import { Input } from "antd";
 import { SearchProps } from "antd/es/input";
 import { useSearchParams } from "react-router-dom";
 import Access from "../features/auth/Access";
-import AddStaff from "../features/auth/staffs/AddStaff";
-import StaffsTable from "../features/auth/staffs/StaffsTable";
+import AddProduct from "../features/category/product/AddProduct";
+import ProductsTable from "../features/category/product/ProductsTable";
 import {
   Module,
   PERMISSIONS,
+  ProductFilterCriteria,
   SortParams,
-  StaffFilterCriteria,
 } from "../interfaces";
-import { staffService } from "../services";
+import { productService } from "../services";
 import { useDynamicTitle } from "../utils";
 
-const Staffs: React.FC = () => {
+const Product: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const pagination = {
@@ -28,12 +28,13 @@ const Staffs: React.FC = () => {
     sortBy: searchParams.get("sortBy") || "",
     direction: searchParams.get("direction") || "",
   };
-  const filter: StaffFilterCriteria = {
+  const filter: ProductFilterCriteria = {
     isActivated: searchParams.get("isActivated") || undefined,
+    itemId: searchParams.get("itemId") || undefined,
   };
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["staffs", pagination, query, sort, filter].filter((key) => {
+  const { data, isLoading, isFetching } = useQuery({
+    queryKey: ["products", pagination, query, sort, filter].filter((key) => {
       if (typeof key === "string") {
         return key !== "";
       } else if (key instanceof Object) {
@@ -42,7 +43,7 @@ const Staffs: React.FC = () => {
         );
       }
     }),
-    queryFn: () => staffService.getStaffs(pagination, query, filter, sort),
+    queryFn: () => productService.getProducts(pagination, query, filter, sort),
   });
 
   const handleSearch: SearchProps["onSearch"] = (value) => {
@@ -54,18 +55,18 @@ const Staffs: React.FC = () => {
     setSearchParams(searchParams);
   };
 
-  useDynamicTitle("Quản lý nhân viên");
+  useDynamicTitle("Quản lý sản phẩm");
 
   return (
-    <Access permission={PERMISSIONS[Module.STAFF].GET_PAGINATION}>
+    <Access permission={PERMISSIONS[Module.PRODUCTS].GET_PAGINATION}>
       <div className="card">
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Quản lý nhân viên</h2>
+          <h2 className="text-xl font-semibold">Quản lý sản phẩm</h2>
 
           <div className="w-[60%]">
             <div className="flex gap-3">
               <Input.Search
-                placeholder="Nhập tên hoặc email của Nhân viên để tìm kiếm..."
+                placeholder="Nhập tên sản phẩm để tìm kiếm..."
                 defaultValue={query}
                 enterButton
                 allowClear
@@ -73,14 +74,18 @@ const Staffs: React.FC = () => {
               />
             </div>
           </div>
-          <Access permission={PERMISSIONS[Module.STAFF].CREATE} hideChildren>
-            <AddStaff />
+          <Access permission={PERMISSIONS[Module.PRODUCTS].CREATE} hideChildren>
+            <AddProduct />
           </Access>
         </div>
-        <StaffsTable staffPage={data?.payload} isLoading={isLoading} />
+        <ProductsTable
+          productPage={data?.payload}
+          isLoading={isLoading}
+          isFetching={isFetching}
+        />
       </div>
     </Access>
   );
 };
 
-export default Staffs;
+export default Product;

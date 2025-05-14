@@ -18,6 +18,7 @@ import {
   colorSortDownIcon,
   colorSortUpIcon,
   formatTimestamp,
+  getActiveColor,
   getDefaultFilterValue,
   getDefaultSortOrder,
   getSortDirection,
@@ -148,7 +149,7 @@ const CustomersTable: React.FC<CustomerTableProps> = ({
       width: "8%",
       align: "center",
       render: (isActivated: boolean) => (
-        <Tag color={isActivated ? "green" : "red"}>
+        <Tag color={getActiveColor(isActivated)}>
           {isActivated ? "ACTIVE" : "INACTIVE"}
         </Tag>
       ),
@@ -204,11 +205,11 @@ const CustomersTable: React.FC<CustomerTableProps> = ({
       render: (record: ICustomer) => (
         <Space>
           <ViewCustomer user={record} />
-          <Access permission={PERMISSIONS[Module.STAFF].UPDATE} hideChildren>
+          <Access permission={PERMISSIONS[Module.CUSTOMER].UPDATE} hideChildren>
             <UpdateCustomer user={record} />
           </Access>
-          <Access permission={PERMISSIONS[Module.STAFF].DELETE} hideChildren>
-            <DeleteCustomer userId={record.id} />
+          <Access permission={PERMISSIONS[Module.CUSTOMER].DELETE} hideChildren>
+            <DeleteCustomer userId={record.customerId} />
           </Access>
         </Space>
       ),
@@ -219,7 +220,7 @@ const CustomersTable: React.FC<CustomerTableProps> = ({
     <Table
       bordered={false}
       columns={columns}
-      rowKey={(record: ICustomer) => record.id}
+      rowKey={(record: ICustomer) => record.customerId}
       pagination={tableParams.pagination}
       dataSource={customerPage?.data}
       rowClassName={(_, index) =>

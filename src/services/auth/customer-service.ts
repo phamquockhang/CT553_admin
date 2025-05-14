@@ -17,6 +17,8 @@ interface ICustomerService {
     filter?: CustomerFilterCriteria,
     sort?: SortParams,
   ): Promise<ApiResponse<Page<ICustomer>>>;
+  getCustomerIdByEmail(email: string): Promise<ApiResponse<string>>;
+  getCustomerById(id: string): Promise<ApiResponse<ICustomer>>;
   create(
     newCustomer: Omit<ICustomer, "customerId">,
   ): Promise<ApiResponse<ICustomer>>;
@@ -30,7 +32,7 @@ interface ICustomerService {
 const apiClient: AxiosInstance = createApiClient("customers");
 class CustomerService implements ICustomerService {
   async getLoggedInCustomer(): Promise<ApiResponse<ICustomer>> {
-    return (await apiClient.get("/logged-in")).data;
+    return await apiClient.get("/logged-in");
   }
 
   async getCustomers(
@@ -39,34 +41,40 @@ class CustomerService implements ICustomerService {
     filter?: CustomerFilterCriteria,
     sort?: SortParams,
   ): Promise<ApiResponse<Page<ICustomer>>> {
-    return (
-      await apiClient.get("", {
-        params: {
-          ...pagination,
-          ...filter,
-          query,
-          sortBy: sort?.sortBy !== "" ? sort?.sortBy : undefined,
-          direction: sort?.direction !== "" ? sort?.direction : undefined,
-        },
-      })
-    ).data;
+    return await apiClient.get("", {
+      params: {
+        ...pagination,
+        ...filter,
+        query,
+        sortBy: sort?.sortBy !== "" ? sort?.sortBy : undefined,
+        direction: sort?.direction !== "" ? sort?.direction : undefined,
+      },
+    });
+  }
+
+  async getCustomerIdByEmail(email: string): Promise<ApiResponse<string>> {
+    return await apiClient.get(`/customer_id/${email}`);
+  }
+
+  async getCustomerById(id: string): Promise<ApiResponse<ICustomer>> {
+    return await apiClient.get(`/${id}`);
   }
 
   async create(
     newCustomer: Omit<ICustomer, "customerId">,
   ): Promise<ApiResponse<ICustomer>> {
-    return (await apiClient.post("", newCustomer)).data;
+    return await apiClient.post("", newCustomer);
   }
 
   async update(
     customerId: string,
     updatedCustomer: ICustomer,
   ): Promise<ApiResponse<ICustomer>> {
-    return (await apiClient.put(`/${customerId}`, updatedCustomer)).data;
+    return await apiClient.put(`/${customerId}`, updatedCustomer);
   }
 
   async delete(customerId: string): Promise<ApiResponse<void>> {
-    return (await apiClient.delete(`/${customerId}`)).data;
+    return await apiClient.delete(`/${customerId}`);
   }
 }
 

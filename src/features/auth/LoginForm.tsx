@@ -1,6 +1,6 @@
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { useMutation } from "@tanstack/react-query";
-import { Form, Input } from "antd";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Button, Form, Input } from "antd";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
@@ -18,26 +18,34 @@ const LoginForm: React.FC = () => {
     }
   }, [accessToken, navigate]);
 
-  const { mutate: login } = useMutation({
+  const { mutate: login, isPending } = useMutation({
     mutationFn: authService.login,
     onSuccess: (data: ApiResponse<IAuthResponse>) => {
       if (data.payload) {
         const { accessToken } = data.payload;
         window.localStorage.setItem("access_token", accessToken);
         navigate("/");
+        toast.success(data?.message || "Operation successful");
       }
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data.message);
+    },
+  });
+
+  const queryClient = useQueryClient();
+  const { mutate: logout } = useMutation({
+    mutationFn: () => authService.logout(),
+    onSuccess: () => {
+      window.localStorage.removeItem("access_token");
+      queryClient.removeQueries();
+      // navigate("/login");
     },
   });
 
   function onFinish(data: IAuthRequest): void {
-    login(data, {
-      onSuccess: () => {
-        toast.success("Đăng nhập thành công");
-      },
-      onError: (error: any) => {
-        toast.error(error.response?.data.message);
-      },
-    });
+    logout();
+    login(data);
   }
 
   return (
@@ -79,13 +87,19 @@ const LoginForm: React.FC = () => {
           <Input.Password prefix={<LockOutlined />} placeholder="Mật khẩu" />
         </Form.Item>
 
-        <Form.Item>
+        {/* <Form.Item>
           <button
             type="submit"
             className="focus:shadow-outline mt-2 w-full rounded bg-blue-700 py-2 font-bold text-white hover:bg-blue-900 focus:outline-none"
           >
             Đăng nhập
           </button>
+        </Form.Item> */}
+
+        <Form.Item>
+          <Button loading={isPending} type="primary" htmlType="submit" block>
+            Đăng nhập
+          </Button>
         </Form.Item>
 
         {/* <div className="flex flex-col gap-5 text-center text-xs">

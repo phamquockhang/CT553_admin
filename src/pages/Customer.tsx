@@ -10,7 +10,6 @@ import { customerService } from "../services/auth/customer-service";
 import { SearchProps } from "antd/es/input";
 import { useDynamicTitle } from "../utils";
 import Access from "../features/auth/Access";
-// import { Input } from "antd/lib";
 import AddCustomer from "../features/auth/customers/AddCustomer";
 import CustomersTable from "../features/auth/customers/CustomersTable";
 import { Input } from "antd";
@@ -59,7 +58,7 @@ const Customer: React.FC = () => {
   useDynamicTitle("Quản lý khách hàng");
 
   return (
-    <Access permission={PERMISSIONS[Module.STAFF].GET_PAGINATION}>
+    <Access permission={PERMISSIONS[Module.CUSTOMER].GET_PAGINATION}>
       <div className="card">
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-xl font-semibold">Quản lý Khách hàng</h2>
@@ -75,7 +74,7 @@ const Customer: React.FC = () => {
               />
             </div>
           </div>
-          <Access permission={PERMISSIONS[Module.STAFF].CREATE} hideChildren>
+          <Access permission={PERMISSIONS[Module.CUSTOMER].CREATE} hideChildren>
             <AddCustomer />
           </Access>
         </div>

@@ -3,7 +3,7 @@ import {
   CaretUpFilled,
   FilterFilled,
 } from "@ant-design/icons";
-import { Space, Table, TablePaginationConfig, TableProps } from "antd";
+import { Table, TablePaginationConfig, TableProps } from "antd";
 import { SorterResult } from "antd/es/table/interface";
 import { GetProp } from "antd/lib";
 import React, { useEffect, useState } from "react";
@@ -171,6 +171,7 @@ const PermissionsTable: React.FC<PermissionTableProps> = ({
       dataIndex: "module",
       key: "module",
       width: "10%",
+      align: "center",
       filters: Object.values(Module).map((module: string) => ({
         text: module,
         value: module,
@@ -197,41 +198,40 @@ const PermissionsTable: React.FC<PermissionTableProps> = ({
         </div>
       ),
     },
-    {
-      key: "updatedAt",
-      title: "Ngày cập nhật",
-      dataIndex: "updatedAt",
-      width: "12%",
-      align: "center",
-      render: (updatedAt: string) =>
-        updatedAt ? formatTimestamp(updatedAt) : "",
-      sorter: true,
-      defaultSortOrder: getDefaultSortOrder(searchParams, "updatedAt"),
-      sortIcon: ({ sortOrder }) => (
-        <div className="flex flex-col text-[10px]">
-          <CaretUpFilled style={{ color: colorSortUpIcon(sortOrder) }} />
-          <CaretDownFilled style={{ color: colorSortDownIcon(sortOrder) }} />
-        </div>
-      ),
-    },
-    {
-      title: "Hành động",
-      key: "action",
-      width: "10%",
-      align: "center",
+    // {
+    //   key: "updatedAt",
+    //   title: "Ngày cập nhật",
+    //   dataIndex: "updatedAt",
+    //   width: "12%",
+    //   align: "center",
+    //   render: (updatedAt: string) =>
+    //     updatedAt ? formatTimestamp(updatedAt) : "",
+    //   sorter: true,
+    //   defaultSortOrder: getDefaultSortOrder(searchParams, "updatedAt"),
+    //   sortIcon: ({ sortOrder }) => (
+    //     <div className="flex flex-col text-[10px]">
+    //       <CaretUpFilled style={{ color: colorSortUpIcon(sortOrder) }} />
+    //       <CaretDownFilled style={{ color: colorSortDownIcon(sortOrder) }} />
+    //     </div>
+    //   ),
+    // },
+    // {
+    //   title: "Hành động",
+    //   key: "action",
+    //   width: "10%",
+    //   align: "center",
 
-      render: (record: IPermission) => (
-        <Space>
-          {/* <ViewStaff user={record} />
-          <Access permission={PERMISSIONS[Module.STAFF].UPDATE} hideChildren>
-            <UpdateStaff user={record} />
-          </Access>
-          <Access permission={PERMISSIONS[Module.STAFF].DELETE} hideChildren>
-            <DeleteStaff userId={record.id} />
-          </Access> */}
-        </Space>
-      ),
-    },
+    //   render: (record: IPermission) => (
+    //     <Space>
+    //       <Access
+    //         permission={PERMISSIONS[Module.PERMISSIONS].UPDATE}
+    //         hideChildren
+    //       >
+    //         <UpdatePermission permission={record} />
+    //       </Access>
+    //     </Space>
+    //   ),
+    // },
   ];
 
   return (
